@@ -6,7 +6,7 @@
     :expand-on-hover="expandOnHover"
     :right="$vuetify.rtl"
     :src="barImage"
-    mobile-break-point="960"
+    mobile-breakpoint="960"
     app
     width="260"
     v-bind="$attrs"
@@ -74,8 +74,8 @@ export default {
   props: {
     expandOnHover: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
 
   data: () => ({
@@ -83,14 +83,14 @@ export default {
       {
         icon: "mdi-view-dashboard",
         title: "dashboard",
-        to: "/"
+        to: "/",
       },
       {
         title: "datatable",
         icon: "mdi-bell",
-        to: "/datatable"
-      }
-    ]
+        to: "/datatable",
+      },
+    ],
   }),
 
   computed: {
@@ -101,7 +101,7 @@ export default {
       },
       set(val) {
         this.$store.commit("SET_DRAWER", val);
-      }
+      },
     },
     computedItems() {
       return this.items.map(this.mapItem);
@@ -109,9 +109,9 @@ export default {
     profile() {
       return {
         avatar: true,
-        title: this.$t("avatar")
+        title: this.$t("avatar"),
       };
-    }
+    },
   },
 
   methods: {
@@ -119,10 +119,10 @@ export default {
       return {
         ...item,
         children: item.children ? item.children.map(this.mapItem) : undefined,
-        title: this.$t(item.title)
+        title: this.$t(item.title),
       };
-    }
-  }
+    },
+  },
 };
 </script>
 

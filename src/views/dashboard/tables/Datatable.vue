@@ -39,7 +39,116 @@
         </base-material-card>
       </v-col>
     </v-row>
-    <my-Modal :dialog="isShow" @close="isShow = false"></my-Modal>
+    <my-Modal :title="'Tạo người dùng'" :show="isShow" @close="isShow = false">
+      <v-col cols="12" sm="6" md="6">
+        <v-text-field label="Họ tên:*" required></v-text-field>
+      </v-col>
+      <v-col cols="12" sm="6" md="6">
+        <v-text-field
+          label="Số điện thoại"
+          hint="example of helper text only on focus"
+        ></v-text-field>
+      </v-col>
+      <!-- <v-col cols="12" sm="6" md="4">
+                <v-text-field
+                  label="Legal last name*"
+                  hint="example of persistent helper text"
+                  persistent-hint
+                  required
+                ></v-text-field>
+              </v-col> -->
+      <v-col cols="6">
+        <v-text-field label="Tên đăng nhập:*" required></v-text-field>
+      </v-col>
+      <v-col cols="6">
+        <v-text-field label="Mật khẩu*" type="password" required></v-text-field>
+      </v-col>
+      <v-col cols="12">
+        <v-text-field type="number" label="CMND:*" required></v-text-field>
+      </v-col>
+      <v-col cols="6">
+        <v-menu
+          v-model="menu"
+          :close-on-content-click="false"
+          :nudge-right="40"
+          transition="scale-transition"
+          offset-y
+          min-width="auto"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+              v-model="dateFormatted"
+              label="Ngày cấp:"
+              prepend-icon="mdi-calendar"
+              v-bind="attrs"
+              @blur="date = parseDate(dateFormatted)"
+              v-on="on"
+            ></v-text-field>
+          </template>
+          <v-date-picker v-model="date" @input="menu = false"></v-date-picker>
+        </v-menu>
+      </v-col>
+      <v-col cols="6">
+        <v-text-field label="Nơi cấp:" required></v-text-field>
+      </v-col>
+      <v-col cols="6">
+        <v-text-field label="Địa chỉ:" required></v-text-field>
+      </v-col>
+      <v-col cols="6">
+        <v-select
+          :items="['Admin', 'User', 'Test']"
+          label="Vai trò*"
+          required
+        ></v-select>
+      </v-col>
+      <v-col cols="12" sm="6">
+        <v-select
+          item-text="Name"
+          item-value="Id"
+          :items="Province"
+          label="Tỉnh/Thành phố*"
+          v-model="ProvinceId"
+          required
+        ></v-select>
+      </v-col>
+      <v-col cols="6">
+        <v-text-field
+          type="number"
+          label="Tài khoàn ngân hàng:"
+          required
+        ></v-text-field>
+      </v-col>
+      <v-col cols="6">
+        <v-text-field label="Tên ngân hàng:" required></v-text-field>
+      </v-col>
+      <!-- <v-col cols="12" sm="6">
+                <v-select
+                  :items="['0-17', '18-29', '30-54', '54+']"
+                  label="Age*"
+                  required
+                ></v-select>
+              </v-col> -->
+      <!-- <v-col cols="12" sm="6">
+                <v-autocomplete
+                  :items="[
+                    'Skiing',
+                    'Ice hockey',
+                    'Soccer',
+                    'Basketball',
+                    'Hockey',
+                    'Reading',
+                    'Writing',
+                    'Coding',
+                    'Basejump'
+                  ]"
+                  label="Interests"
+                  multiple
+                ></v-autocomplete>
+              </v-col> -->
+      <template v-slot:m-foot>
+        <v-btn color="blue darken-1" text @click="SaveModal()"> Save </v-btn>
+      </template>
+    </my-Modal>
   </v-container>
 </template>
 
@@ -49,40 +158,65 @@ import myModal from "../components/core/Modal";
 export default {
   components: { myModal },
   name: "DataTable",
-
+  async mounted() {
+    this.Province = await this.getProvince();
+  },
+  watch: {
+    date(val) {
+      this.dateFormatted = this.formatDate(this.date);
+    },
+    async ProvinceId(val) {
+      if (val) {
+        let resp = await this.$stores.api.get(
+          `http://localhost:60189/odata/District?$filter=ProvinceId eq ${val}`
+        );
+        if (resp && resp.status == 200) {
+          let data = await resp.json();
+          console.log(data);
+          return data.value;
+        }
+        return null;
+      }
+    },
+  },
   data() {
     return {
+      Province: null,
+      ProvinceId: null,
+      date: new Date().toISOString().substr(0, 10),
+      dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
+      menu: false,
       isShow: false,
       search: "",
       headers: [
         {
           sortable: false,
           text: "ID",
-          value: "id"
+          value: "id",
         },
         {
           sortable: false,
           text: "Name",
-          value: "name"
+          value: "name",
         },
         {
           sortable: false,
           text: "Salary",
           value: "salary",
-          align: "right"
+          align: "right",
         },
         {
           sortable: false,
           text: "Country",
           value: "country",
-          align: "right"
+          align: "right",
         },
         {
           sortable: false,
           text: "City",
           value: "city",
-          align: "right"
-        }
+          align: "right",
+        },
       ],
       items: [
         {
@@ -90,40 +224,67 @@ export default {
           name: "Dakota Rice",
           country: "Niger",
           city: "Oud-Tunrhout",
-          salary: "$35,738"
+          salary: "$35,738",
         },
         {
           id: 2,
           name: "Minerva Hooper",
           country: "Curaçao",
           city: "Sinaai-Waas",
-          salary: "$23,738"
+          salary: "$23,738",
         },
         {
           id: 3,
           name: "Sage Rodriguez",
           country: "Netherlands",
           city: "Overland Park",
-          salary: "$56,142"
+          salary: "$56,142",
         },
         {
           id: 4,
           name: "Philip Chanley",
           country: "Korea, South",
           city: "Gloucester",
-          salary: "$38,735"
+          salary: "$38,735",
         },
         {
           id: 5,
           name: "Doris Greene",
           country: "Malawi",
           city: "Feldkirchen in Kārnten",
-          salary: "$63,542"
-        }
-      ]
+          salary: "$63,542",
+        },
+      ],
     };
   },
 
-  methods: {}
+  methods: {
+    async getProvince() {
+      let resp = await this.$stores.api.get(
+        "http://localhost:60189/odata/Province"
+      );
+      if (resp && resp.status == 200) {
+        let data = await resp.json();
+        return data.value;
+      }
+      return null;
+    },
+    formatDate(date) {
+      if (!date) return null;
+
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
+    },
+    parseDate(date) {
+      if (!date) return null;
+
+      const [month, day, year] = date.split("/");
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    },
+    SaveModal() {
+      console.log(this.ProvinceId);
+      debugger;
+    },
+  },
 };
 </script>
