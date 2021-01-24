@@ -5,7 +5,7 @@
       <v-col cols="12" md="4">
         <v-btn
           color="success"
-          style="float:right"
+          style="float: right"
           rounded
           class="mr-0"
           @click="isShow = true"
@@ -18,7 +18,7 @@
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
               Employees Stats
-              <v-card-title style="width:200px; float: right">
+              <v-card-title style="width: 200px; float: right">
                 <v-text-field
                   v-model="search"
                   append-icon="mdi-magnify"
@@ -34,7 +34,34 @@
             </div>
           </template>
           <v-card-text>
-            <v-data-table :search="search" :headers="headers" :items="items" />
+            <v-data-table :search="search" :headers="headers" :items="Staff" />
+          </v-card-text>
+        </base-material-card>
+      </v-col>
+    </v-row>
+    <v-row> 
+      <v-col cols="12" md="12">
+        <base-material-card color="green" class="px-5 py-3">
+          <template v-slot:heading>
+            <div class="display-2 font-weight-light">
+              Nhân viên
+              <v-card-title style="width: 200px; float: right">
+                <v-text-field
+                  v-model="search"
+                  append-icon="mdi-magnify"
+                  label="Search"
+                  single-line
+                  hide-details
+                ></v-text-field>
+              </v-card-title>
+            </div>
+
+            <div class="subtitle-1 font-weight-light">
+              New employees on 15th September, 2016
+            </div>
+          </template>
+          <v-card-text>
+            <v-data-table :search="search" :headers="headers" :items="Staff" />
           </v-card-text>
         </base-material-card>
       </v-col>
@@ -89,25 +116,54 @@
         </v-menu>
       </v-col>
       <v-col cols="6">
-        <v-text-field label="Nơi cấp:" required></v-text-field>
-      </v-col>
-      <v-col cols="6">
-        <v-text-field label="Địa chỉ:" required></v-text-field>
-      </v-col>
-      <v-col cols="6">
         <v-select
-          :items="['Admin', 'User', 'Test']"
-          label="Vai trò*"
+          item-text="Name"
+          item-value="Name"
+          :items="Province"
+          label="Nơi cấp*"
           required
         ></v-select>
       </v-col>
-      <v-col cols="12" sm="6">
+      <v-col cols="3">
+        <v-text-field label="Địa chỉ:" required></v-text-field>
+      </v-col>
+      <v-col cols="3">
         <v-select
           item-text="Name"
           item-value="Id"
           :items="Province"
           label="Tỉnh/Thành phố*"
           v-model="ProvinceId"
+          required
+        ></v-select>
+      </v-col>
+      <v-col cols="3">
+        <v-select
+          item-text="Name"
+          item-value="Id"
+          :items="District"
+          v-bind:class="{ disabled: District.length ? false : true }"
+          label="Quận/Huyện/Thành phố/Thị xã*"
+          v-model="DistrictId"
+          required
+        ></v-select>
+      </v-col>
+      <v-col cols="3">
+        <v-select
+          item-text="Name"
+          item-value="Id"
+          :items="Ward"
+          v-bind:class="{ disabled: Ward.length ? false : true }"
+          label="Phường/Xã*"
+          required
+        ></v-select>
+      </v-col>
+      <v-col cols="6">
+        <v-select
+          item-text="Name"
+          item-value="Id"
+          :items="roles"
+          label="Vai trò*"
           required
         ></v-select>
       </v-col>
@@ -160,6 +216,8 @@ export default {
   name: "DataTable",
   async mounted() {
     this.Province = await this.getProvince();
+    this.roles = await this.getRoles();
+    // this.Staff = await this.getStaff();
   },
   watch: {
     date(val) {
@@ -168,106 +226,97 @@ export default {
     async ProvinceId(val) {
       if (val) {
         let resp = await this.$stores.api.get(
-          `http://localhost:60189/odata/District?$filter=ProvinceId eq ${val}`
+          `http://localhost:60189/odata/District?$filter=ProvinceId eq ${val}&$orderby=Name asc`
         );
         if (resp && resp.status == 200) {
           let data = await resp.json();
-          console.log(data);
-          return data.value;
+          this.District = data.value;
         }
-        return null;
+      }
+    },
+    async DistrictId(val) {
+      if (val) {
+        let resp = await this.$stores.api.get(
+          `http://localhost:60189/odata/Ward?$filter=DistrictId eq ${val}&$orderby=Name asc`
+        );
+        if (resp && resp.status == 200) {
+          let data = await resp.json();
+          this.Ward = data.value;
+        }
       }
     },
   },
   data() {
     return {
-      Province: null,
+      Province: [],
       ProvinceId: null,
+      District: [],
+      DistrictId: null,
+      Ward: [],
       date: new Date().toISOString().substr(0, 10),
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       menu: false,
       isShow: false,
+      roles: [],
       search: "",
       headers: [
         {
           sortable: false,
-          text: "ID",
-          value: "id",
-        },
-        {
-          sortable: false,
           text: "Name",
-          value: "name",
+          value: "Name",
         },
         {
           sortable: false,
-          text: "Salary",
-          value: "salary",
-          align: "right",
+          text: "Phone",
+          value: "PhoneNumber",
+          // align: "right",
         },
         {
           sortable: false,
-          text: "Country",
-          value: "country",
-          align: "right",
+          text: "TheAddress",
+          value: "TheAddress",
         },
         {
           sortable: false,
-          text: "City",
-          value: "city",
-          align: "right",
+          text: "CMND",
+          value: "IdNumber",
         },
+       
       ],
-      items: [
-        {
-          id: 1,
-          name: "Dakota Rice",
-          country: "Niger",
-          city: "Oud-Tunrhout",
-          salary: "$35,738",
-        },
-        {
-          id: 2,
-          name: "Minerva Hooper",
-          country: "Curaçao",
-          city: "Sinaai-Waas",
-          salary: "$23,738",
-        },
-        {
-          id: 3,
-          name: "Sage Rodriguez",
-          country: "Netherlands",
-          city: "Overland Park",
-          salary: "$56,142",
-        },
-        {
-          id: 4,
-          name: "Philip Chanley",
-          country: "Korea, South",
-          city: "Gloucester",
-          salary: "$38,735",
-        },
-        {
-          id: 5,
-          name: "Doris Greene",
-          country: "Malawi",
-          city: "Feldkirchen in Kārnten",
-          salary: "$63,542",
-        },
-      ],
+      Staff:[{id: 4, name: "Phan Tinh", idNumber: "01234567865", phoneNumber: "01665645580"}],
     };
   },
 
   methods: {
     async getProvince() {
       let resp = await this.$stores.api.get(
-        "http://localhost:60189/odata/Province"
+        "http://localhost:60189/odata/Province?$orderby=Name asc"
       );
       if (resp && resp.status == 200) {
         let data = await resp.json();
         return data.value;
       }
-      return null;
+      return [];
+    },
+    async getRoles() {
+      let resp = await this.$stores.api.get(
+        "http://localhost:60189/odata/Roles?$orderby=Name asc"
+      );
+      if (resp && resp.status == 200) {
+        let data = await resp.json();
+        return data.value;
+      }
+      return [];
+    },
+    async getStaff() {
+      let resp = await this.$stores.api.get(
+        "http://localhost:60189/odata/TheUsers/2"
+      );
+      if (resp && resp.status == 200) {
+        let data = await resp.json();
+        return data.value;
+      }
+      return [];
     },
     formatDate(date) {
       if (!date) return null;
@@ -288,3 +337,13 @@ export default {
   },
 };
 </script>
+<style scoped>
+.disabled {
+  pointer-events: none;
+  color: #bfcbd9;
+  cursor: not-allowed;
+  background-image: none;
+  background-color: #eef1f6;
+  border-color: #d1dbe5;
+}
+</style>
