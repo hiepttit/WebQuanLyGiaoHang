@@ -14,10 +14,62 @@
         </v-btn></v-col
       >
       <v-col cols="12" md="12">
+        <base-material-card
+          icon="mdi-clipboard-text"
+          title="Nhân viên"
+          class="px-5 py-3"
+        >
+          <v-simple-table>
+            <thead>
+              <tr>
+                <th class="primary--text">
+                  STT
+                </th>
+                <th class="primary--text">
+                  Tên
+                </th>
+                <th class="primary--text">
+                  CMND
+                </th>
+                <th class="primary--text">
+                  Địa chỉ
+                </th>
+                <th class="primary--text">
+                  Số điện thoại
+                </th>
+                <th class="primary--text">
+                  Tài khoản ngân hàng
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(user, i) in userInfo" :key="`tr-${i}`">
+                <td>{{ i }}</td>
+                <td>{{ user.Name }}</td>
+                <td>
+                  Số: {{ user.IdNumber }}
+                  <div>
+                    Ngày cấp: {{ monentDate(user.DateOfIssueIdNumber) }}
+                  </div>
+                  <div>Nơi cấp: {{ user.PlaceOfIssueIdNumber }}</div>
+                </td>
+                <td>{{ user.TheAddress }}</td>
+                <td>{{ user.PhoneNumber }}</td>
+                <td>
+                  {{ user.BankAccountNumber }}
+                  <div>Ngân hàng: {{ user.BankName }}</div>
+                </td>
+              </tr>
+            </tbody>
+          </v-simple-table>
+        </base-material-card>
+
+        <div class="py-3" />
+
         <base-material-card color="warning" class="px-5 py-3">
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
-              Employees Stats
+              Phường
               <v-card-title style="width:200px; float: right">
                 <v-text-field
                   v-model="search"
@@ -34,7 +86,14 @@
             </div>
           </template>
           <v-card-text>
-            <v-data-table :search="search" :headers="headers" :items="items" />
+            <v-data-table
+              :search="search"
+              :headers="headers"
+              :items="desserts"
+              :options.sync="options"
+              :server-items-length="totalDesserts"
+              :loading="loading"
+            />
           </v-card-text>
         </base-material-card>
       </v-col>
@@ -154,12 +213,15 @@
 
 <script>
 import myModal from "../components/core/Modal";
+import moment from "moment";
 
 export default {
   components: { myModal },
   name: "DataTable",
   async mounted() {
     this.Province = await this.getProvince();
+    this.userInfo = await this.getUser();
+    this.getDataFromApi();
   },
   watch: {
     date(val) {
@@ -178,90 +240,62 @@ export default {
         return null;
       }
     },
+    options: {
+      immediate: false,
+      handler() {
+        this.getDataFromApi();
+      },
+      deep: true,
+    },
+    search: {
+      handler(val) {
+        this.getDataFromApi();
+      },
+    },
   },
   data() {
     return {
-      Province: null,
+      Province: [],
       ProvinceId: null,
       date: new Date().toISOString().substr(0, 10),
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       menu: false,
       isShow: false,
-      search: "",
+      search: "Ho",
+      userInfo: [],
+      url: "http://localhost:60189/odata",
+      totalDesserts: 0,
+      desserts: [],
+      loading: true,
+      options: {},
       headers: [
         {
+          text: "Dessert (100g serving)",
+          align: "start",
           sortable: false,
-          text: "ID",
-          value: "id",
-        },
-        {
-          sortable: false,
-          text: "Name",
           value: "name",
         },
-        {
-          sortable: false,
-          text: "Salary",
-          value: "salary",
-          align: "right",
-        },
-        {
-          sortable: false,
-          text: "Country",
-          value: "country",
-          align: "right",
-        },
-        {
-          sortable: false,
-          text: "City",
-          value: "city",
-          align: "right",
-        },
-      ],
-      items: [
-        {
-          id: 1,
-          name: "Dakota Rice",
-          country: "Niger",
-          city: "Oud-Tunrhout",
-          salary: "$35,738",
-        },
-        {
-          id: 2,
-          name: "Minerva Hooper",
-          country: "Curaçao",
-          city: "Sinaai-Waas",
-          salary: "$23,738",
-        },
-        {
-          id: 3,
-          name: "Sage Rodriguez",
-          country: "Netherlands",
-          city: "Overland Park",
-          salary: "$56,142",
-        },
-        {
-          id: 4,
-          name: "Philip Chanley",
-          country: "Korea, South",
-          city: "Gloucester",
-          salary: "$38,735",
-        },
-        {
-          id: 5,
-          name: "Doris Greene",
-          country: "Malawi",
-          city: "Feldkirchen in Kārnten",
-          salary: "$63,542",
-        },
+        { text: "Calories", value: "calories" },
+        { text: "Fat (g)", value: "fat" },
+        { text: "Carbs (g)", value: "carbs" },
+        { text: "Protein (g)", value: "protein" },
+        { text: "Iron (%)", value: "iron" },
       ],
     };
   },
 
   methods: {
     async getProvince() {
+      let resp = await this.$stores.api.get(`${this.url}/Province`);
+      if (resp && resp.status == 200) {
+        let data = await resp.json();
+        return data.value;
+      }
+      return null;
+    },
+    async getUser() {
       let resp = await this.$stores.api.get(
-        "http://localhost:60189/odata/Province"
+        `${this.url}/TheUserView?$filter= IdRole eq 2`
       );
       if (resp && resp.status == 200) {
         let data = await resp.json();
@@ -275,6 +309,9 @@ export default {
       const [year, month, day] = date.split("-");
       return `${day}/${month}/${year}`;
     },
+    monentDate(date) {
+      return moment(date).format("DD/MM/YYYY");
+    },
     parseDate(date) {
       if (!date) return null;
 
@@ -284,6 +321,49 @@ export default {
     SaveModal() {
       console.log(this.ProvinceId);
       debugger;
+    },
+    getDataFromApi() {
+      this.loading = true;
+      this.fakeApiCall().then((data) => {
+        this.desserts = data.items;
+        this.totalDesserts = data.total;
+        this.loading = false;
+      });
+    },
+    async fakeApiCall() {
+      const { sortBy, sortDesc, page, itemsPerPage } = this.options;
+      const search = this.search;
+
+      let data = await this.getDesserts(page, itemsPerPage, search);
+      return {
+        items: data.items,
+        total: data.total,
+      };
+    },
+    async getDesserts(page, itemsPerPage, search) {
+      let top = itemsPerPage;
+      let skip = (page - 1) * itemsPerPage;
+      let filter = search && `&$filter=contains(Name, '${search}')`;
+      let url = `http://localhost:60189/odata/district?$count=true&$top=${top}&$skip=${skip}${filter}`;
+      let resp = await this.$stores.api.get(`${url}`);
+      if (resp && resp.status == 200) {
+        let data = await resp.json();
+        let total = data["@odata.count"];
+        return {
+          total,
+          items: data.value.map((_) => {
+            return {
+              name: _.Name,
+              calories: 159,
+              fat: 6.0,
+              carbs: 24,
+              protein: 4.0,
+              iron: "1%",
+            };
+          }),
+        };
+      }
+      return { total: 0, items: [] };
     },
   },
 };
