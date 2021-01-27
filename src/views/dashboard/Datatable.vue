@@ -13,14 +13,14 @@
           @click="isShow = true"
         >
           Thêm
-        </v-btn></v-col
-      >
+        </v-btn>
+      </v-col>
       <v-col cols="12" md="12">
         <base-material-card color="warning" class="px-5 py-3">
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
               Nhân viên
-              <v-card-title style="width:200px; float: right">
+              <v-card-title style="width: 200px; float: right">
                 <v-text-field
                   v-model="searchStaff"
                   append-icon="mdi-magnify"
@@ -75,7 +75,7 @@
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
               Shop
-              <v-card-title style="width:200px; float: right">
+              <v-card-title style="width: 200px; float: right">
                 <v-text-field
                   v-model="searchShop"
                   append-icon="mdi-magnify"
@@ -303,15 +303,14 @@
 </template>
 
 <script>
-import myModal from "../components/core/Modal";
+import myModal from "./components/core/Modal";
 import moment from "moment";
 
 export default {
   components: { myModal },
-  name: "DataTable",
+  name: "User",
   async mounted() {
     this.Province = await this.getProvince();
-    this.userInfo = await this.getUser();
     this.getDataFromApi();
     this.roles = await this.getRoles();
     this.getDataShopFromApi();
@@ -409,8 +408,6 @@ export default {
       address: "",
       menu: false,
       isShow: false,
-      userInfo: [],
-      url: "http://localhost:60189/odata",
       totalStaffs: 0,
       Staffs: [],
       totalShop: 0,

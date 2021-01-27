@@ -22,7 +22,13 @@ export default new Router({
         {
           name: 'DataTable',
           path: 'datatable',
-          component: () => import('@/views/dashboard/tables/Datatable'),
+          component: () => import('@/views/dashboard/Datatable'),
+        },
+        // Table
+        {
+          name: 'Tạo giao hàng',
+          path: 'delivered',
+          component: () => import('@/views/dashboard/Delivered'),
         },
       ],
     },
