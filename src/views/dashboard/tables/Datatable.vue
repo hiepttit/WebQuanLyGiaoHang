@@ -41,7 +41,7 @@
               :items="Staffs"
               :options.sync="optionsStaff"
               :server-items-length="totalStaffs"
-              :loading="loading"
+              :loading="loadingStaff"
               @page-count="pageCountStaff = $event"
             >
               <template v-slot:item.Stt="{ index }">
@@ -96,7 +96,7 @@
               :items="Shop"
               :options.sync="optionsShop"
               :server-items-length="totalShop"
-              :loading="loading"
+              :loading="loadingShop"
               @page-count="pageCountShop = $event"
             >
               <template v-slot:item.Stt="{ index }">
@@ -415,7 +415,8 @@ export default {
       Staffs: [],
       totalShop: 0,
       Shop: [],
-      loading: true,
+      loadingStaff: true,
+      loadingShop: true,
       optionsStaff: {},
       optionsShop: {},
       roles: [],
@@ -492,7 +493,7 @@ export default {
       const [month, day, year] = date.split("/");
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
-    SaveModal(objAddUser) {
+    async SaveModal(objAddUser) {
       objAddUser.TheAddress =
         this.address +
         ", " +
@@ -502,15 +503,24 @@ export default {
         ", " +
         this.ProvinceName;
       objAddUser.DateOfIssueIdNumber = this.DateOfIssueIdNumber;
+      let url = "http://localhost:60189/odata/TheUsers";
+      let resp = await this.$stores.api.post(`${url}`, objAddUser);
+      if (resp && resp.status == 200) {
+        alert("Updated successfully.");
+        this.isShow = false;
+        // this.data.reload(true);
+      } else {
+        alert("Updated failed.");
+      }
       console.log(objAddUser);
       debugger;
     },
     getDataFromApi() {
-      this.loading = true;
+      this.loadingStaff = true;
       this.fakeStaffsApiCall().then((data) => {
         this.Staffs = data.items;
         this.totalStaffs = data.total;
-        this.loading = false;
+        this.loadingStaff = false;
       });
     },
     async fakeStaffsApiCall() {
@@ -524,11 +534,11 @@ export default {
       };
     },
     getDataShopFromApi() {
-      this.loading = true;
+      this.loadingShop = true;
       this.fakeShopsApiCall().then((data) => {
         this.Shop = data.items;
         this.totalShop = data.total;
-        this.loading = false;
+        this.loadingShop = false;
       });
     },
     async fakeShopsApiCall() {
@@ -549,8 +559,8 @@ export default {
         skip = `&$skip=${(page - 1) * itemsPerPage}`;
       }
       let filter = searchStaff && ` contains(Name, '${searchStaff}')`;
-      // let url = `http://localhost:60189/odata/TheUserView?$count=true${top}${skip}&$filter=IdRole eq 2 ${filter}`;
-      let url = `http://localhost:60189/odata/District`;
+      let url = `http://localhost:60189/odata/TheUserView?$count=true${top}${skip}&$filter=IdRole eq 2 ${filter}`;
+      // let url = `http://localhost:60189/odata/District`;
       let resp = await this.$stores.api.get(`${url}`);
       if (resp && resp.status == 200) {
         let data = await resp.json();
