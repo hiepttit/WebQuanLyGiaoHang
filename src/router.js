@@ -26,9 +26,9 @@ export default new Router({
         },
         // Table
         {
-          name: 'Tạo giao hàng',
-          path: 'delivered',
-          component: () => import('@/views/dashboard/Delivered'),
+          name: 'orders',
+          path: 'orders',
+          component: () => import('@/views/dashboard/Orders'),
         },
       ],
     },

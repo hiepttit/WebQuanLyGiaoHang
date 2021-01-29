@@ -91,9 +91,9 @@ export default {
         to: "/datatable",
       },
       {
-        title: "Tạo giao hàng",
+        title: "Tạo Giao Hàng",
         icon: "mdi-bell",
-        to: "/delivered",
+        to: "/orders",
       },
     ],
   }),

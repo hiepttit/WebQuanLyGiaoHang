@@ -10,7 +10,7 @@
           style="float: right"
           rounded
           class="mr-0"
-          @click="isShow = true"
+          @click="(isShow = true), (objAddUser = {})"
         >
           Thêm
         </v-btn>
@@ -123,250 +123,30 @@
         </base-material-card>
       </v-col>
     </v-row>
-    <my-Modal :title="'Tạo người dùng'" :show="isShow" @close="isShow = false">
-      <v-col cols="12" sm="6" md="6">
-        <v-text-field
-          label="Họ tên:*"
-          v-model="objAddUser.Name"
-          required
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" sm="6" md="6">
-        <v-text-field
-          label="Số điện thoại"
-          v-model="objAddUser.PhoneNumber"
-          type="number"
-        ></v-text-field>
-      </v-col>
-      <!-- <v-col cols="12" sm="6" md="4">
-                <v-text-field
-                  label="Legal last name*"
-                  hint="example of persistent helper text"
-                  persistent-hint
-                  required
-                ></v-text-field>
-              </v-col> -->
-      <v-col cols="6">
-        <v-text-field
-          label="Tên đăng nhập:*"
-          v-model="objAddUser.UserName"
-          required
-        ></v-text-field>
-      </v-col>
-      <v-col cols="6">
-        <v-text-field
-          label="Mật khẩu*"
-          v-model="objAddUser.Pwd"
-          type="password"
-          required
-        ></v-text-field>
-      </v-col>
-      <v-col cols="4">
-        <v-text-field
-          type="number"
-          v-model="objAddUser.IdNumber"
-          label="CMND:*"
-          required
-        ></v-text-field>
-      </v-col>
-      <v-col cols="4">
-        <v-menu
-          v-model="menu"
-          :close-on-content-click="false"
-          :nudge-right="40"
-          transition="scale-transition"
-          offset-y
-          min-width="auto"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-text-field
-              v-model="dateFormatted"
-              label="Ngày cấp:"
-              prepend-icon="mdi-calendar"
-              v-bind="attrs"
-              @blur="date = parseDate(dateFormatted)"
-              v-on="on"
-            ></v-text-field>
-          </template>
-          <v-date-picker
-            v-model="DateOfIssueIdNumber"
-            @input="menu = false"
-          ></v-date-picker>
-        </v-menu>
-      </v-col>
-      <v-col cols="4">
-        <v-select
-          item-text="Name"
-          item-value="Name"
-          :items="Province"
-          label="Nơi cấp*"
-          :rules="[(v) => !!v || 'Item is required']"
-          v-model="objAddUser.PlaceOfIssueIdNumber"
-          required
-        ></v-select>
-      </v-col>
-      <v-col cols="3">
-        <v-text-field
-          v-model="address"
-          label="Địa chỉ:"
-          required
-        ></v-text-field>
-      </v-col>
-      <v-col cols="3">
-        <v-select
-          item-text="Name"
-          item-value="Id"
-          :items="Province"
-          label="Tỉnh/Thành phố*"
-          v-model="ProvinceId"
-          required
-        ></v-select>
-      </v-col>
-      <v-col cols="3">
-        <v-select
-          item-text="Name"
-          item-value="Id"
-          :items="District"
-          v-bind:class="{ disabled: District.length ? false : true }"
-          label="Quận/Huyện/Thành phố/Thị xã*"
-          v-model="DistrictId"
-          required
-        ></v-select>
-      </v-col>
-      <v-col cols="3">
-        <v-select
-          item-text="Name"
-          item-value="Id"
-          :items="Ward"
-          v-bind:class="{ disabled: Ward.length ? false : true }"
-          label="Phường/Xã*"
-          v-model="WardId"
-          required
-        ></v-select>
-      </v-col>
-      <v-col cols="6">
-        <v-select
-          item-text="Name"
-          item-value="Id"
-          :items="roles"
-          v-model="objAddUser.IdRole"
-          label="Vai trò*"
-          required
-        ></v-select>
-      </v-col>
-      <v-col cols="6">
-        <v-text-field
-          type="number"
-          label="Tài khoàn ngân hàng:"
-          required
-          v-model="objAddUser.BankAccountNumber"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="6">
-        <v-text-field
-          v-model="objAddUser.BankName"
-          label="Tên ngân hàng:"
-          required
-        ></v-text-field>
-      </v-col>
-      <!-- <v-col cols="12" sm="6">
-                <v-select
-                  :items="['0-17', '18-29', '30-54', '54+']"
-                  label="Age*"
-                  required
-                ></v-select>
-              </v-col> -->
-      <!-- <v-col cols="12" sm="6">
-                <v-autocomplete
-                  :items="[
-                    'Skiing',
-                    'Ice hockey',
-                    'Soccer',
-                    'Basketball',
-                    'Hockey',
-                    'Reading',
-                    'Writing',
-                    'Coding',
-                    'Basejump'
-                  ]"
-                  label="Interests"
-                  multiple
-                ></v-autocomplete>
-              </v-col> -->
-      <template v-slot:m-foot>
-        <v-btn color="blue darken-1" text @click="SaveModal(objAddUser)">
-          Save
-        </v-btn>
-      </template>
-    </my-Modal>
+    <input-detail
+      :user="objAddUser"
+      :isShow="isShow"
+      @update="
+        (e) => {
+          SaveModal(e);
+        }
+      "
+      @close="isShow = false"
+    />
   </v-container>
 </template>
 
 <script>
-import myModal from "./components/core/Modal";
+import InputDetail from "./Inputcomponents/InputUserDetail.vue";
 import moment from "moment";
-
 export default {
-  components: { myModal },
+  components: { InputDetail },
   name: "User",
   async mounted() {
-    this.Province = await this.getProvince();
     this.getDataFromApi();
-    this.roles = await this.getRoles();
     this.getDataShopFromApi();
-    // this.Staff = await this.getStaff();
   },
   watch: {
-    DateOfIssueIdNumber(val) {
-      this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
-    },
-    async ProvinceId(val) {
-      if (val) {
-        let resp = await this.$stores.api.get(
-          `http://localhost:60189/odata/District?$filter=ProvinceId eq ${val}&$orderby=Name asc`
-        );
-        if (resp && resp.status == 200) {
-          let data = await resp.json();
-          this.District = data.value;
-        }
-        let respName = await this.$stores.api.get(
-          `http://localhost:60189/odata/Province?$filter=Id eq ${val}`
-        );
-        if (respName && respName.status == 200) {
-          let data = await respName.json();
-          this.ProvinceName = data.value[0].Name;
-        }
-      }
-    },
-    async DistrictId(val) {
-      if (val) {
-        let resp = await this.$stores.api.get(
-          `http://localhost:60189/odata/Ward?$filter=DistrictId eq ${val}&$orderby=Name asc`
-        );
-        if (resp && resp.status == 200) {
-          let data = await resp.json();
-          this.Ward = data.value;
-        }
-        let respName = await this.$stores.api.get(
-          `http://localhost:60189/odata/District?$filter=Id eq ${val}`
-        );
-        if (respName && respName.status == 200) {
-          let data = await respName.json();
-          this.DistrictName = data.value[0].Name;
-        }
-      }
-    },
-    async WardId(val) {
-      if (val) {
-        let respName = await this.$stores.api.get(
-          `http://localhost:60189/odata/Ward?$filter=Id eq ${val}`
-        );
-        if (respName && respName.status == 200) {
-          let data = await respName.json();
-          this.WardName = data.value[0].Type + " " + data.value[0].Name;
-        }
-      }
-    },
     optionsStaff: {
       immediate: false,
       handler() {
@@ -394,19 +174,6 @@ export default {
   },
   data() {
     return {
-      Province: [],
-      ProvinceId: null,
-      ProvinceName: "",
-      District: [],
-      DistrictId: null,
-      DistrictName: "",
-      Ward: [],
-      WardId: null,
-      WardName: "",
-      DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
-      dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
-      address: "",
-      menu: false,
       isShow: false,
       totalStaffs: 0,
       Staffs: [],
@@ -416,12 +183,12 @@ export default {
       loadingShop: true,
       optionsStaff: {},
       optionsShop: {},
-      roles: [],
       searchStaff: "",
       searchShop: "",
       pageCountStaff: 0,
       pageCountShop: 0,
       objAddUser: {},
+      url: "http://localhost:60189/odata",
       headers: [
         {
           text: "Stt",
@@ -445,62 +212,13 @@ export default {
   },
 
   methods: {
-    async getProvince() {
-      let resp = await this.$stores.api.get(
-        `${this.url}/Province?$orderBy=Name asc`
-      );
-      if (resp && resp.status == 200) {
-        let data = await resp.json();
-        return data.value;
-      }
-      return null;
-    },
-    async getUser() {
-      let resp = await this.$stores.api.get(
-        `${this.url}/TheUserView?$filter= IdRole eq 2`
-      );
-      if (resp && resp.status == 200) {
-        let data = await resp.json();
-        return data.value;
-      }
-      return [];
-    },
-    async getRoles() {
-      let resp = await this.$stores.api.get(
-        "http://localhost:60189/odata/Roles?$orderby=Name asc"
-      );
-      if (resp && resp.status == 200) {
-        let data = await resp.json();
-        return data.value;
-      }
-      return [];
-    },
-    formatDate(date) {
-      if (!date) return null;
-
-      const [year, month, day] = date.split("-");
-      return `${day}/${month}/${year}`;
-    },
     monentDate(date) {
       return moment(date).format("DD/MM/YYYY");
     },
-    parseDate(date) {
-      if (!date) return null;
-
-      const [month, day, year] = date.split("/");
-      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-    },
-    async SaveModal(objAddUser) {
-      objAddUser.TheAddress =
-        this.address +
-        ", " +
-        this.WardName +
-        ", " +
-        this.DistrictName +
-        ", " +
-        this.ProvinceName;
-      objAddUser.DateOfIssueIdNumber = this.DateOfIssueIdNumber;
-      let url = "http://localhost:60189/odata/TheUsers";
+    async SaveModal(e) {
+      this.objAddUser = e;
+      let objAddUser = this.objAddUser;
+      let url = `http://localhost:60189/api/Authenticate/register-admin`;
       let resp = await this.$stores.api.post(`${url}`, objAddUser);
       if (resp && resp.status == 200) {
         alert("Updated successfully.");
@@ -509,8 +227,6 @@ export default {
       } else {
         alert("Updated failed.");
       }
-      console.log(objAddUser);
-      debugger;
     },
     getDataFromApi() {
       this.loadingStaff = true;
@@ -556,8 +272,8 @@ export default {
         skip = `&$skip=${(page - 1) * itemsPerPage}`;
       }
       let filter = searchStaff && ` contains(Name, '${searchStaff}')`;
-      let url = `http://localhost:60189/odata/TheUserView?$count=true${top}${skip}&$filter=IdRole eq 2 ${filter}`;
-      // let url = `http://localhost:60189/odata/District`;
+      let url = `${this.url}/TheUserView?$count=true${top}${skip}&$filter=IdRole eq 2 ${filter}`;
+      // let url = `http://localhost:60189/odata/District?$count=true${top}${skip}`;
       let resp = await this.$stores.api.get(`${url}`);
       if (resp && resp.status == 200) {
         let data = await resp.json();
@@ -577,7 +293,7 @@ export default {
         skip = `&$skip=${(page - 1) * itemsPerPage}`;
       }
       let filter = searchShop && `and contains(Name, '${searchShop}')`;
-      let url = `http://localhost:60189/odata/TheUserView?$count=true${top}${skip}&$filter=IdRole eq 3 ${filter}`;
+      let url = `${this.url}/TheUserView?$count=true${top}${skip}&$filter=IdRole eq 3 ${filter}`;
       let resp = await this.$stores.api.get(`${url}`);
       if (resp && resp.status == 200) {
         let data = await resp.json();
@@ -592,13 +308,4 @@ export default {
   },
 };
 </script>
-<style scoped>
-.disabled {
-  pointer-events: none;
-  color: #bfcbd9;
-  cursor: not-allowed;
-  background-image: none;
-  background-color: #eef1f6;
-  border-color: #d1dbe5;
-}
-</style>
+<style scoped></style>

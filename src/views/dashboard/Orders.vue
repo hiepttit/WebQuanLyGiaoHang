@@ -4,8 +4,9 @@
       <v-col cols="4">
         <v-select
           item-text="Name"
-          item-value="Name"
+          item-value="Id"
           :items="Shop"
+          v-model="objAddOrder.IdShop"
           label="Tên Shop*"
           :rules="[(v) => !!v || 'Item is required']"
           required
@@ -56,7 +57,6 @@
               Shop
               <v-card-title style="width: 200px; float: right">
                 <v-text-field
-                  v-model="searchShop"
                   append-icon="mdi-magnify"
                   label="Search"
                   single-line
@@ -70,128 +70,24 @@
             </div>
           </template>
           <v-card-text>
-            <v-data-table
-              :headers="headers"
-              :items="Shop"
-              :options.sync="optionsShop"
-              :server-items-length="totalShop"
-              :loading="loadingShop"
-              @page-count="pageCountShop = $event"
-            >
-              <template v-slot:item.Stt="{ index }">
-                {{ index + 1 }}
-              </template>
-              <template v-slot:item.CMND="{ item }">
-                Số: {{ item.IdNumber }}
-                <div>Ngày cấp: {{ monentDate(item.DateOfIssueIdNumber) }}</div>
-                <div>Nơi cấp: {{ item.PlaceOfIssueIdNumber }}</div>
-              </template>
-              <template v-slot:item.Bank="{ item }">
-                Số: {{ item.BankAccountNumber }}
-                <div>Ngân hàng: {{ item.BankName }}</div>
-              </template>
-            </v-data-table>
-            <div class="text-center pt-2">
-              <v-pagination
-                v-model="optionsShop.page"
-                :length="pageCountShop"
-                :total-visible="7"
-              ></v-pagination>
-            </div>
+            <div class="text-center pt-2"></div>
           </v-card-text>
         </base-material-card>
       </v-col>
     </v-row>
-    <my-Modal :title="'Tạo giao hàng'" :show="isShow" @close="isShow = false">
-      <v-col cols="12" sm="6" md="6">
-        <v-text-field
-          label="Họ tên khách hàng:*"
-          v-model="objAddUser.Name"
-          required
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" sm="6" md="6">
-        <v-text-field
-          label="Số điện thoại"
-          v-model="objAddUser.PhoneNumber"
-          type="number"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="3">
-        <v-text-field
-          v-model="address"
-          label="Địa chỉ:"
-          required
-        ></v-text-field>
-      </v-col>
-      <v-col cols="3">
-        <v-select
-          item-text="Name"
-          item-value="Id"
-          :items="Province"
-          label="Tỉnh/Thành phố*"
-          v-model="ProvinceId"
-          required
-        ></v-select>
-      </v-col>
-      <v-col cols="3">
-        <v-select
-          item-text="Name"
-          item-value="Id"
-          :items="District"
-          v-bind:class="{ disabled: District.length ? false : true }"
-          label="Quận/Huyện/Thành phố/Thị xã*"
-          v-model="DistrictId"
-          required
-        ></v-select>
-      </v-col>
-      <v-col cols="3">
-        <v-select
-          item-text="Name"
-          item-value="Id"
-          :items="Ward"
-          v-bind:class="{ disabled: Ward.length ? false : true }"
-          label="Phường/Xã*"
-          v-model="WardId"
-          required
-        ></v-select>
-      </v-col>
-      <v-col cols="6">
-        <v-text-field
-          type="number"
-          label="COD:"
-          required
-          v-model="objAddUser.BankAccountNumber"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="6">
-        <v-text-field
-          type="number"
-          label="Ship:"
-          required
-          v-model="objAddUser.BankAccountNumber"
-        ></v-text-field>
-      </v-col>
-      <template v-slot:m-foot>
-        <v-btn color="blue darken-1" text @click="SaveModal(objAddUser)">
-          Save
-        </v-btn>
-      </template>
-    </my-Modal>
   </v-container>
 </template>
 
 <script>
-import myModal from "./components/core/Modal";
+import InputDetail from "./Inputcomponents/InputOrderDetail.vue";
 import moment from "moment";
 
 export default {
-  components: { myModal },
+  components: { InputDetail },
   name: "Delivered",
   async mounted() {
     this.Province = await this.getProvince();
-    this.getDataShopFromApi();
-    // this.Staff = await this.getStaff();
+    this.Shop = await this.getShop();
   },
   watch: {
     DateOfIssueIdNumber(val) {
@@ -200,14 +96,14 @@ export default {
     async ProvinceId(val) {
       if (val) {
         let resp = await this.$stores.api.get(
-          `http://localhost:60189/odata/District?$filter=ProvinceId eq ${val}&$orderby=Name asc`
+          `${this.url}/District?$filter=ProvinceId eq ${val}&$orderby=Name asc`
         );
         if (resp && resp.status == 200) {
           let data = await resp.json();
           this.District = data.value;
         }
         let respName = await this.$stores.api.get(
-          `http://localhost:60189/odata/Province?$filter=Id eq ${val}`
+          `${this.url}/Province?$filter=Id eq ${val}`
         );
         if (respName && respName.status == 200) {
           let data = await respName.json();
@@ -218,14 +114,14 @@ export default {
     async DistrictId(val) {
       if (val) {
         let resp = await this.$stores.api.get(
-          `http://localhost:60189/odata/Ward?$filter=DistrictId eq ${val}&$orderby=Name asc`
+          `${this.url}/odata/Ward?$filter=DistrictId eq ${val}&$orderby=Name asc`
         );
         if (resp && resp.status == 200) {
           let data = await resp.json();
           this.Ward = data.value;
         }
         let respName = await this.$stores.api.get(
-          `http://localhost:60189/odata/District?$filter=Id eq ${val}`
+          `${this.url}/odata/District?$filter=Id eq ${val}`
         );
         if (respName && respName.status == 200) {
           let data = await respName.json();
@@ -236,25 +132,13 @@ export default {
     async WardId(val) {
       if (val) {
         let respName = await this.$stores.api.get(
-          `http://localhost:60189/odata/Ward?$filter=Id eq ${val}`
+          `${this.url}/odata/Ward?$filter=Id eq ${val}`
         );
         if (respName && respName.status == 200) {
           let data = await respName.json();
           this.WardName = data.value[0].Type + " " + data.value[0].Name;
         }
       }
-    },
-    optionsShop: {
-      immediate: false,
-      handler() {
-        this.getDataShopFromApi();
-      },
-      deep: true,
-    },
-    searchShop: {
-      handler(val) {
-        this.getDataShopFromApi();
-      },
     },
   },
   data() {
@@ -273,13 +157,10 @@ export default {
       address: "",
       menu: false,
       isShow: false,
-      Staffs: [],
       totalShop: 0,
       Shop: [],
-      loadingShop: true,
-      optionsShop: {},
-      pageCountShop: 0,
-      objAddUser: {},
+      objAddOrder: {},
+      url: "http://localhost:60189/odata/",
       headers: [
         {
           text: "Stt",
@@ -303,6 +184,16 @@ export default {
   },
 
   methods: {
+    async getShop() {
+      let resp = await this.$stores.api.get(
+        `${this.url}/TheUserView?$filter=IdRole eq 3&$orderby=Name asc`
+      );
+      if (resp && resp.status == 200) {
+        let data = await resp.json();
+        return data.value;
+      }
+      return [];
+    },
     async getProvince() {
       let resp = await this.$stores.api.get(
         `${this.url}/Province?$orderBy=Name asc`
@@ -328,8 +219,8 @@ export default {
       const [month, day, year] = date.split("/");
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
-    async SaveModal(objAddUser) {
-      objAddUser.TheAddress =
+    async SaveModal(objAddOrder) {
+      objAddOrder.TheAddress =
         this.address +
         ", " +
         this.WardName +
@@ -337,9 +228,9 @@ export default {
         this.DistrictName +
         ", " +
         this.ProvinceName;
-      objAddUser.DateOfIssueIdNumber = this.DateOfIssueIdNumber;
-      let url = "http://localhost:60189/odata/TheUsers";
-      let resp = await this.$stores.api.post(`${url}`, objAddUser);
+      objAddOrder.DateOfIssueIdNumber = this.DateOfIssueIdNumber;
+      let url = `${this.url}/TheUsers`;
+      let resp = await this.$stores.api.post(`${url}`, objAddOrder);
       if (resp && resp.status == 200) {
         alert("Updated successfully.");
         this.isShow = false;
@@ -347,47 +238,8 @@ export default {
       } else {
         alert("Updated failed.");
       }
-      console.log(objAddUser);
+      console.log(objAddOrder);
       debugger;
-    },
-    getDataShopFromApi() {
-      this.loadingShop = true;
-      this.fakeShopsApiCall().then((data) => {
-        this.Shop = data.items;
-        this.totalShop = data.total;
-        this.loadingShop = false;
-      });
-    },
-    async fakeShopsApiCall() {
-      const { sortBy, page, itemsPerPage } = this.optionsShop;
-      const searchShop = this.searchShop;
-
-      let data = await this.getShop(page, itemsPerPage, searchShop);
-      return {
-        items: data.items,
-        total: data.total,
-      };
-    },
-    async getShop(page, itemsPerPage, searchShop) {
-      let top = "";
-      let skip = "";
-      if (itemsPerPage > 0) {
-        top = `&$top=${itemsPerPage}`;
-        skip = `&$skip=${(page - 1) * itemsPerPage}`;
-      }
-      let filter = searchShop && `and contains(Name, '${searchShop}')`;
-      let url = `http://localhost:60189/odata/TheUserView?$count=true${top}${skip}&$filter=IdRole eq 3 ${filter}`;
-      // let url = `http://localhost:60189/odata/District`;
-      let resp = await this.$stores.api.get(`${url}`);
-      if (resp && resp.status == 200) {
-        let data = await resp.json();
-        let total = data["@odata.count"];
-        return {
-          total,
-          items: data.value,
-        };
-      }
-      return { total: 0, items: [] };
     },
   },
 };
