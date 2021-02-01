@@ -3,7 +3,7 @@
     <v-col cols="12" sm="6" md="6">
       <v-text-field
         label="Họ tên khách hàng:*"
-        v-model="objAddOrder.Name"
+        v-model="objAddOrder.CustomerName"
         required
       ></v-text-field>
     </v-col>
@@ -54,7 +54,7 @@
         type="number"
         label="COD:"
         required
-        v-model="objAddOrder.BankAccountNumber"
+        v-model="objAddOrder.Cod"
       ></v-text-field>
     </v-col>
     <v-col cols="6">
@@ -62,7 +62,7 @@
         type="number"
         label="Ship:"
         required
-        v-model="objAddOrder.BankAccountNumber"
+        v-model="objAddOrder.ShipFee"
       ></v-text-field>
     </v-col>
     <template v-slot:m-foot>
@@ -82,7 +82,7 @@ export default {
   data() {
     return {
       menu: false,
-      objAddUser: {},
+      objAddOrder: {},
       Province: [],
       ProvinceId: null,
       ProvinceName: "",
@@ -97,7 +97,6 @@ export default {
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       address: "",
       url: "http://localhost:60189/odata",
-      //SaveModal(objAddUser)
     };
   },
   async mounted() {
@@ -108,7 +107,7 @@ export default {
     user: {
       deep: true,
       handler(val) {
-        this.objAddUser = val;
+        this.objAddOrder = val;
       },
     },
     DateOfIssueIdNumber(val) {
@@ -197,7 +196,7 @@ export default {
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
     Save() {
-      this.objAddUser.TheAddress =
+      this.objAddOrder.TheAddresss =
         this.address +
         ", " +
         this.WardName +
@@ -205,8 +204,7 @@ export default {
         this.DistrictName +
         ", " +
         this.ProvinceName;
-      this.objAddUser.DateOfIssueIdNumber = this.DateOfIssueIdNumber;
-      this.$emit("update", this.objAddUser);
+      this.$emit("update", this.objAddOrder);
     },
   },
 };

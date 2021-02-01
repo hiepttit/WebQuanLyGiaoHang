@@ -44,7 +44,7 @@
           style="float: right"
           rounded
           class="mr-0"
-          @click="isShow = true"
+          @click="(isShow = true), (objAddOrder = {})"
         >
           Thêm
         </v-btn>
@@ -70,11 +70,48 @@
             </div>
           </template>
           <v-card-text>
-            <div class="text-center pt-2"></div>
+            <v-data-table
+              :headers="headers"
+              :items="Orders"
+              :options.sync="options"
+              :server-items-length="total"
+              :loading="loading"
+              @page-count="pageCount = $event"
+            >
+              <template v-slot:item.Stt="{ index }">
+                {{ index + 1 }}
+              </template>
+              <template v-slot:item.CMND="{ item }">
+                Số: {{ item.IdNumber }}
+                <div>Ngày cấp: {{ monentDate(item.DateOfIssueIdNumber) }}</div>
+                <div>Nơi cấp: {{ item.PlaceOfIssueIdNumber }}</div>
+              </template>
+              <template v-slot:item.Bank="{ item }">
+                Số: {{ item.BankAccountNumber }}
+                <div>Ngân hàng: {{ item.BankName }}</div>
+              </template>
+            </v-data-table>
+            <div class="text-center pt-2">
+              <v-pagination
+                v-model="options.page"
+                :length="pageCount"
+                :total-visible="7"
+              ></v-pagination>
+            </div>
           </v-card-text>
         </base-material-card>
       </v-col>
     </v-row>
+    <input-detail
+      :user="objAddOrder"
+      :isShow="isShow"
+      @update="
+        (e) => {
+          SaveModal(e);
+        }
+      "
+      @close="isShow = false"
+    />
   </v-container>
 </template>
 
@@ -84,10 +121,11 @@ import moment from "moment";
 
 export default {
   components: { InputDetail },
-  name: "Delivered",
+  name: "Orders",
   async mounted() {
     this.Province = await this.getProvince();
     this.Shop = await this.getShop();
+    this.getDataFromApi();
   },
   watch: {
     DateOfIssueIdNumber(val) {
@@ -152,15 +190,20 @@ export default {
       Ward: [],
       WardId: null,
       WardName: "",
+      pageCount: 0,
+      options: {},
+      total: 0,
       DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       address: "",
       menu: false,
       isShow: false,
+      loading: true,
       totalShop: 0,
       Shop: [],
+      Orders: [],
       objAddOrder: {},
-      url: "http://localhost:60189/odata/",
+      url: "http://localhost:60189/odata",
       headers: [
         {
           text: "Stt",
@@ -219,27 +262,55 @@ export default {
       const [month, day, year] = date.split("/");
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
-    async SaveModal(objAddOrder) {
-      objAddOrder.TheAddress =
-        this.address +
-        ", " +
-        this.WardName +
-        ", " +
-        this.DistrictName +
-        ", " +
-        this.ProvinceName;
-      objAddOrder.DateOfIssueIdNumber = this.DateOfIssueIdNumber;
-      let url = `${this.url}/TheUsers`;
+    async SaveModal(e) {
+      this.objAddOrder = e;
+      let objAddOrder = this.objAddOrder;
+      let url = `${this.url}/Orders`;
       let resp = await this.$stores.api.post(`${url}`, objAddOrder);
-      if (resp && resp.status == 200) {
+      if ((resp && resp.status == 200) || resp.status == 201) {
         alert("Updated successfully.");
         this.isShow = false;
-        // this.data.reload(true);
+        this.getDataFromApi();
       } else {
         alert("Updated failed.");
       }
-      console.log(objAddOrder);
-      debugger;
+    },
+    getDataFromApi() {
+      this.loading = true;
+      this.fakeApiCall().then((data) => {
+        this.Orders = data.items;
+        this.total = data.total;
+        this.loading = false;
+      });
+    },
+    async fakeApiCall() {
+      const { sortBy, page, itemsPerPage } = this.options;
+
+      let data = await this.getOrders(page, itemsPerPage);
+      return {
+        items: data.items,
+        total: data.total,
+      };
+    },
+    async getOrders(page, itemsPerPage) {
+      let top = "";
+      let skip = "";
+      if (itemsPerPage > 0) {
+        top = `&$top=${itemsPerPage}`;
+        skip = `&$skip=${(page - 1) * itemsPerPage}`;
+      }
+      // let filter = search && ` contains(Name, '${search}')`;
+      let url = `${this.url}/Orders?$count=true${top}${skip}`;
+      let resp = await this.$stores.api.get(`${url}`);
+      if (resp && resp.status == 200) {
+        let data = await resp.json();
+        let total = data["@odata.count"];
+        return {
+          total,
+          items: data.value,
+        };
+      }
+      return { total: 0, items: [] };
     },
   },
 };

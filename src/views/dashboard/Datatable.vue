@@ -1,9 +1,9 @@
 <template>
   <v-container id="dashboard" fluid tag="section">
     <v-row>
-      <v-col cols="6" md="6"
-        ><h1>Tổng nhân viên: {{ totalStaffs }}</h1></v-col
-      >
+      <v-col cols="6" md="6">
+        <h1 class="ml-10">Tổng nhân viên: {{ totalStaffs }}</h1>
+      </v-col>
       <v-col cols="6" md="4">
         <v-btn
           color="success"
@@ -13,6 +13,15 @@
           @click="(isShow = true), (objAddUser = {})"
         >
           Thêm
+        </v-btn>
+        <v-btn
+          color="success"
+          style="float: right"
+          rounded
+          class="mr-3"
+          @click="print()"
+        >
+          In
         </v-btn>
       </v-col>
       <v-col cols="12" md="12">
@@ -44,7 +53,8 @@
               :loading="loadingStaff"
               @page-count="pageCountStaff = $event"
             >
-              <template v-slot:item.Stt="{ index }">
+              <template v-slot:item.Stt="{ index, item }">
+                <span v-if="item.UserName == objAddUser.UserName">New</span>
                 {{ index + 1 }}
               </template>
               <template v-slot:item.CMND="{ item }">
@@ -67,9 +77,9 @@
           </v-card-text>
         </base-material-card>
       </v-col>
-      <v-col cols="6" md="6"
-        ><h1>Tổng Shop: {{ totalShop }}</h1></v-col
-      >
+      <v-col cols="6" md="6">
+        <h1 class="ml-10">Tổng Shop: {{ totalShop }}</h1>
+      </v-col>
       <v-col cols="12" md="12">
         <base-material-card color="green" class="px-5 py-3">
           <template v-slot:heading>
@@ -223,6 +233,8 @@ export default {
       if (resp && resp.status == 200) {
         alert("Updated successfully.");
         this.isShow = false;
+        this.getDataFromApi();
+        this.getDataShopFromApi();
         // this.data.reload(true);
       } else {
         alert("Updated failed.");
@@ -305,7 +317,23 @@ export default {
       }
       return { total: 0, items: [] };
     },
+    print() {
+      window.print();
+    },
   },
 };
 </script>
-<style scoped></style>
+<style lang="scss">
+@media print {
+  header {
+    left: 0;
+  }
+  #core-navigation-drawer {
+    display: none;
+    transform: translateX(-100%);
+  }
+  .v-main {
+    padding: 75px 0px 0px !important;
+  }
+}
+</style>
