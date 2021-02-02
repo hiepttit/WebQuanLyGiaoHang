@@ -84,8 +84,18 @@
               <template v-slot:item.Sum="{ item }">
                 <div>{{ item.ShipFee + item.Cod }}</div>
               </template>
-              <template v-slot:item.Action>
-                <div><v-icon>close</v-icon></div>
+              <template v-slot:item.Action="{ item }">
+                <div>
+                  <v-btn
+                    color="success"
+                    style="float: right"
+                    rounded
+                    class="mr-0"
+                    @click="(Show = true), (IdOrder = item.Id)"
+                  >
+                    In
+                  </v-btn>
+                </div>
               </template>
             </v-data-table>
             <div class="text-center pt-2">
@@ -109,15 +119,25 @@
       "
       @close="isShow = false"
     />
+    <my-Modal :show="Show" :title="'Tạo người dùng'" @close="Show = false">
+      <VueBarcode v-bind:value="IdOrder" />
+      <template v-slot:m-foot>
+        <v-btn color="blue darken-1" text>
+          Save
+        </v-btn>
+      </template>
+    </my-Modal>
   </v-container>
 </template>
 
 <script>
 import InputDetail from "./Inputcomponents/InputOrderDetail.vue";
 import moment from "moment";
+import VueBarcode from "vue-barcode";
+import myModal from "./components/Modal.vue";
 
 export default {
-  components: { InputDetail },
+  components: { InputDetail, VueBarcode, myModal },
   name: "Orders",
   async mounted() {
     this.Province = await this.getProvince();
@@ -190,11 +210,13 @@ export default {
       pageCount: 0,
       options: {},
       total: 0,
+      IdOrder: "",
       DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       address: "",
       menu: false,
       isShow: false,
+      Show: false,
       loading: true,
       totalShop: 0,
       Shop: [],
