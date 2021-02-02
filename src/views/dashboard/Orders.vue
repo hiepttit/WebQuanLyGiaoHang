@@ -81,14 +81,11 @@
               <template v-slot:item.Stt="{ index }">
                 {{ index + 1 }}
               </template>
-              <template v-slot:item.CMND="{ item }">
-                Số: {{ item.IdNumber }}
-                <div>Ngày cấp: {{ monentDate(item.DateOfIssueIdNumber) }}</div>
-                <div>Nơi cấp: {{ item.PlaceOfIssueIdNumber }}</div>
+              <template v-slot:item.Sum="{ item }">
+                <div>{{ item.ShipFee + item.Cod }}</div>
               </template>
-              <template v-slot:item.Bank="{ item }">
-                Số: {{ item.BankAccountNumber }}
-                <div>Ngân hàng: {{ item.BankName }}</div>
+              <template v-slot:item.Action>
+                <div><v-icon>close</v-icon></div>
               </template>
             </v-data-table>
             <div class="text-center pt-2">
@@ -212,16 +209,19 @@ export default {
           value: "Stt",
         },
         {
-          text: "Họ Tên",
+          text: "Mã",
           align: "start",
           sortable: false,
-          value: "Name",
+          value: "Id",
         },
-        { text: "Tài khoản", align: "start", value: "UserName" },
-        { text: "CMND", value: "CMND", align: "center" },
-        { text: "Địa Chỉ", value: "TheAddress" },
+        { text: "Tên khách hàng", align: "start", value: "CustomerName" },
+        { text: "Địa chỉ", value: "TheAddresss", align: "left" },
         { text: "Số điện thoại", value: "PhoneNumber" },
-        { text: "Tài khoản ngân hàng", value: "Bank" },
+        { text: "COD", value: "Cod" },
+        { text: "Ship", value: "ShipFee" },
+        { text: "Ship", value: "ShipFee" },
+        { text: "Tổng thu", value: "Sum" },
+        { text: "Tác vụ", value: "Action" },
       ],
     };
   },
@@ -323,5 +323,13 @@ export default {
   background-image: none;
   background-color: #eef1f6;
   border-color: #d1dbe5;
+}
+@media print {
+  body .wrapper *:not(.printed-content) {
+    display: none;
+  }
+  body .wrapper .printed-content * {
+    display: block;
+  }
 }
 </style>
