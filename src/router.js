@@ -24,11 +24,17 @@ export default new Router({
           path: 'datatable',
           component: () => import('@/views/dashboard/Datatable'),
         },
-        // Table
+        // Order
         {
-          name: 'orders',
+          name: 'Tạo giao hàng',
           path: 'orders',
-          component: () => import('@/views/dashboard/Orders'),
+          component: () => import('@/views/dashboard/MyOrders/Orders'),
+        },
+        // Manager Orders
+        {
+          name: 'Quản lý giao hàng',
+          path: 'Manager_orders',
+          component: () => import('@/views/dashboard/MyOrders/Manager'),
         },
       ],
     },

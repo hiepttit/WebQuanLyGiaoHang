@@ -25,7 +25,11 @@
         </v-btn>
       </v-col>
       <v-col cols="12" md="12">
-        <base-material-card color="warning" class="px-5 py-3">
+        <base-material-card
+          id="printed-content"
+          color="warning"
+          class="px-5 py-3"
+        >
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
               Nhân viên
@@ -136,6 +140,7 @@
     <input-detail
       :user="objAddUser"
       :isShow="isShow"
+      class="printed-content"
       @update="
         (e) => {
           SaveModal(e);
@@ -325,6 +330,16 @@ export default {
 </script>
 <style lang="scss">
 @media print {
+  body {
+    visibility: hidden;
+  }
+  #printed-content {
+    visibility: visible;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
   header {
     left: 0;
   }

@@ -119,11 +119,17 @@
       "
       @close="isShow = false"
     />
-    <my-Modal :show="Show" :title="'Tạo người dùng'" @close="Show = false">
-      <VueBarcode v-bind:value="IdOrder" />
+    <my-Modal :show="Show" :title="'In mã'" @close="Show = false">
+      <v-col cols="12">
+        <VueBarcode
+          v-bind:options="{ lineColor: '#0275d8', text: 'Scan' }"
+          id="printImg"
+          v-bind:value="IdOrder"
+        />
+      </v-col>
       <template v-slot:m-foot>
-        <v-btn color="blue darken-1" text>
-          Save
+        <v-btn color="blue darken-1" text @click="PrintCode()">
+          In
         </v-btn>
       </template>
     </my-Modal>
@@ -131,10 +137,10 @@
 </template>
 
 <script>
-import InputDetail from "./Inputcomponents/InputOrderDetail.vue";
+import InputDetail from "../Inputcomponents/InputOrderDetail.vue";
 import moment from "moment";
 import VueBarcode from "vue-barcode";
-import myModal from "./components/Modal.vue";
+import myModal from "../components/Modal.vue";
 
 export default {
   components: { InputDetail, VueBarcode, myModal },
@@ -334,10 +340,13 @@ export default {
       }
       return { total: 0, items: [] };
     },
+    PrintCode() {
+      window.print();
+    },
   },
 };
 </script>
-<style scoped>
+<style lang="scss">
 .disabled {
   pointer-events: none;
   color: #bfcbd9;
@@ -347,11 +356,27 @@ export default {
   border-color: #d1dbe5;
 }
 @media print {
-  body .wrapper *:not(.printed-content) {
-    display: none;
+  body {
+    visibility: hidden;
   }
-  body .wrapper .printed-content * {
-    display: block;
+  #printImg {
+    visibility: visible;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  svg {
+    width: 90%;
+  }
+  header {
+    left: 0;
+  }
+  #core-navigation-drawer {
+    display: none;
+    transform: translateX(-100%);
+  }
+  .v-main {
+    padding: 75px 0px 0px !important;
   }
 }
 </style>

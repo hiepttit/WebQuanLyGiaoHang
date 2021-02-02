@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center">
-    <v-dialog v-model="show" persistent max-width="900px">
+    <v-dialog v-model="show" persistent max-width="1000px">
       <v-card>
         <slot :name="`m-head`">
           <v-card-title>

@@ -95,6 +95,11 @@ export default {
         icon: "mdi-bell",
         to: "/orders",
       },
+      {
+        title: "Quản lý giao hàng",
+        icon: "truck-check-outline",
+        to: "/Manager_orders",
+      },
     ],
   }),
 
