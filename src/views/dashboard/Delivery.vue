@@ -6,7 +6,7 @@
           item-text="Name"
           item-value="Id"
           :items="Users"
-          v-model="objAddOrder.IdUser"
+          v-model="IdStaff"
           label="Tên nhân viên*"
           :rules="[(v) => !!v || 'Item is required']"
           required
@@ -44,7 +44,7 @@
           style="float: right"
           rounded
           class="mr-0"
-          @click="(isShow = true), (objAddOrder = {})"
+          @click="Show = true"
         >
           Thêm
         </v-btn>
@@ -54,7 +54,7 @@
         <base-material-card color="green" class="px-5 py-3">
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
-              Shop
+              Đơn hàng
               <v-card-title style="width: 200px; float: right">
                 <v-text-field
                   append-icon="mdi-magnify"
@@ -66,7 +66,7 @@
             </div>
 
             <div class="subtitle-1 font-weight-light">
-              Danh sách tất cả Shop
+              Danh sách tất cả đơn hàng
             </div>
           </template>
           <v-card-text>
@@ -84,15 +84,6 @@
               <template v-slot:item.Sum="{ item }">
                 <div>{{ item.ShipFee + item.Cod }}</div>
               </template>
-              <template v-slot:item.Action="{ item }">
-                <template v-if="item.IsSuccess == null">
-                  <v-btn color="warning" @click="onState(item)">
-                    Đang giao
-                    <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
-                    </i>
-                  </v-btn>
-                </template>
-              </template>
             </v-data-table>
             <div class="text-center pt-2">
               <v-pagination
@@ -105,83 +96,24 @@
         </base-material-card>
       </v-col>
     </v-row>
-    <input-detail
-      :user="objAddOrder"
-      :isShow="isShow"
-      @update="
-        (e) => {
-          SaveModal(e);
-        }
-      "
-      @close="isShow = false"
-    />
-    <my-Modal
-      :show="Show"
-      :title="'CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG'"
-      @close="Show = false"
-    >
+    <my-Modal :show="Show" :title="'THÊM ĐƠN GIAO HÀNG'" @close="Show = false">
       <v-col cols="12">
         <v-select
-          item-text="Name"
-          item-value="Id"
-          :items="States"
-          v-model="defaultStateSelected"
-          label="Chọn trạng thái"
+          item-text="id"
+          item-value="id"
+          :items="Code"
+          label="Chọn mã:"
           dense
           outlined
+          v-model="objAddDelivery.IdTheOrder"
         ></v-select>
       </v-col>
-      <template v-if="defaultStateSelected == 3">
-        <v-col cols="6">
-          <v-menu
-            v-model="menuModal"
-            :close-on-content-click="false"
-            :nudge-right="40"
-            transition="scale-transition"
-            offset-y
-            min-width="auto"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                v-model="dateFormattedModal"
-                label="Hoãn tới ngày:"
-                prepend-icon="mdi-calendar"
-                v-bind="attrs"
-                @blur="date = parseDate(dateFormattedModal)"
-                v-on="on"
-              ></v-text-field>
-            </template>
-            <v-date-picker
-              v-model="DateOfIssueIdNumberModal"
-              @input="menuModal = false"
-            ></v-date-picker>
-          </v-menu>
-        </v-col>
-        <v-col cols="6">
-          <label> Shop: {{ nameShop }} </label>
-        </v-col>
-      </template>
-      <template v-if="defaultStateSelected == 4">
-        <v-col cols="6">
-          <v-text-field
-            v-model="address"
-            label="Thực thu:"
-            type="number"
-            required
-          ></v-text-field>
-        </v-col>
-        <v-col cols="6">
-          <div>
-            <label> Shop: {{ nameShop }} </label>
-          </div>
-          <div>
-            <label> Tổng đơn: {{ Receive }} </label>
-          </div>
-        </v-col>
-      </template>
       <template v-slot:m-foot>
-        <v-btn color="blue darken-1" text @click="PrintCode()">
+        <v-btn depressed color="primary" @click="SaveModal()">
           Ok
+        </v-btn>
+        <v-btn depressed color="error">
+          Quét
         </v-btn>
       </template>
     </my-Modal>
@@ -189,12 +121,11 @@
 </template>
 
 <script>
-import InputDetail from "../Inputcomponents/InputOrderDetail.vue";
 import moment from "moment";
-import myModal from "../components/Modal.vue";
+import myModal from "./components/Modal.vue";
 
 export default {
-  components: { InputDetail, myModal },
+  components: { myModal },
   name: "Orders",
   data() {
     return {
@@ -210,24 +141,18 @@ export default {
       pageCount: 0,
       options: {},
       total: 0,
-      IdOrder: "",
+      IdStaff: "",
       DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
-      DateOfIssueIdNumberModal: new Date().toISOString().substr(0, 10),
-      dateFormattedModal: this.formatDate(
-        new Date().toISOString().substr(0, 10)
-      ),
       address: "",
       menu: false,
-      menuModal: false,
-      isShow: false,
       Show: false,
       loading: true,
       Users: [],
       Orders: [],
       nameShop: "",
       Receive: 0,
-      objAddOrder: {},
+      objAddDelivery: {},
       url: "http://localhost:60189/odata",
       headers: [
         { text: "Stt", align: "center", sortable: false, value: "Stt" },
@@ -239,22 +164,14 @@ export default {
         { text: "Ship", value: "ShipFee" },
         { text: "Ship", value: "ShipFee" },
         { text: "Tổng thu", value: "Sum" },
-        { text: "Trạng thái", value: "Action" },
       ],
-      defaultStateSelected: 0,
-      States: [
-        { Id: "0", Name: "Đang giao" },
-        { Id: "1", Name: "Thành công" },
-        { Id: "2", Name: "Trả hàng" },
-        { Id: "3", Name: "Tồn kho" },
-        { Id: "4", Name: "Hoàn thành 1 phần" },
-      ],
-      state: {},
+      Code: {},
     };
   },
   async mounted() {
     this.Province = await this.getProvince();
     this.Users = await this.getUser();
+    this.Code = await this.getIdFromOrder();
     this.getDataFromApi();
   },
   watch: {
@@ -311,6 +228,9 @@ export default {
         }
       }
     },
+    IdStaff(val) {
+      this.getDataFromApi();
+    },
   },
 
   methods: {
@@ -349,14 +269,15 @@ export default {
       const [month, day, year] = date.split("/");
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
-    async SaveModal(e) {
-      this.objAddOrder = e;
-      let objAddOrder = this.objAddOrder;
-      let url = `${this.url}/Orders`;
-      let resp = await this.$stores.api.post(`${url}`, objAddOrder);
-      if ((resp && resp.status == 200) || resp.status == 201) {
+    async SaveModal() {
+      this.Code = await this.getIdFromOrder();
+      this.objAddDelivery.IdStaff = this.IdStaff;
+      let objAddDelivery = this.objAddDelivery;
+      let url = `${this.url}/DeliveryOrders`;
+      let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
+      if (resp && resp.status == 200) {
         alert("Updated successfully.");
-        this.isShow = false;
+        this.Show = false;
         this.getDataFromApi();
       } else {
         alert("Updated failed.");
@@ -373,51 +294,44 @@ export default {
     async fakeApiCall() {
       const { sortBy, page, itemsPerPage } = this.options;
 
-      let data = await this.getOrders(page, itemsPerPage);
+      let data = await this.getDelivery(page, itemsPerPage);
       return {
         items: data.items,
         total: data.total,
       };
     },
-    async getOrders(page, itemsPerPage) {
+    async getDelivery(page, itemsPerPage) {
       let top = "";
       let skip = "";
-      if (itemsPerPage > 0) {
-        top = `&$top=${itemsPerPage}`;
-        skip = `&$skip=${(page - 1) * itemsPerPage}`;
-      }
-      // let filter = search && ` contains(Name, '${search}')`;
-      let url = `${this.url}/Orders?$count=true${top}${skip}`;
-      let resp = await this.$stores.api.get(`${url}`);
-      if (resp && resp.status == 200) {
-        let data = await resp.json();
-        let total = data["@odata.count"];
-        return {
-          total,
-          items: data.value,
-        };
+      if (this.IdStaff) {
+        if (itemsPerPage > 0) {
+          top = `&$top=${itemsPerPage}`;
+          skip = `&$skip=${(page - 1) * itemsPerPage}`;
+        }
+        let url = `${this.url}/Orders?$expand=DeliveryOrders($filter=IdStaff eq '${this.IdStaff}')&$count=true${top}${skip}`;
+        let resp = await this.$stores.api.get(`${url}`);
+        if (resp && resp.status == 200) {
+          let data = await resp.json();
+          console.log(data.value);
+          let total = data["@odata.count"];
+          return {
+            total,
+            items: data.value.filter((_) => _.DeliveryOrders.length > 0),
+          };
+        }
+        return { total: 0, items: [] };
       }
       return { total: 0, items: [] };
     },
-    PrintCode() {
-      window.print();
-    },
-    async getShopById(Id) {
+    async getIdFromOrder() {
       let resp = await this.$stores.api.get(
-        `${this.url}/TheUserView/${Id}?$orderBy=Name asc`
+        `http://localhost:60189/Order/GetId`
       );
       if (resp && resp.status == 200) {
         let data = await resp.json();
-        return data.value;
+        return data;
       }
       return null;
-    },
-    async onState(item) {
-      this.state = item;
-      let data = await this.getShopById(item.IdShop);
-      this.nameShop = data[0].Name;
-      this.Receive = item.Cod + item.ShipFee;
-      this.Show = true;
     },
   },
 };

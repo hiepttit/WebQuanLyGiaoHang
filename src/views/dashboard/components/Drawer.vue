@@ -86,18 +86,23 @@ export default {
         to: "/",
       },
       {
-        title: "datatable",
-        icon: "mdi-bell",
+        title: "Quản lý người dùng",
+        icon: "mdi-account-tie",
         to: "/datatable",
       },
       {
-        title: "Tạo Giao Hàng",
-        icon: "mdi-bell",
+        title: "Tạo Đơn Hàng",
+        icon: "mdi-pencil-outline",
         to: "/orders",
       },
       {
+        title: "Tạo Giao Hàng",
+        icon: "mdi-pencil-outline",
+        to: "/Create_delivery",
+      },
+      {
         title: "Quản lý giao hàng",
-        icon: "truck-check-outline",
+        icon: "mdi-mouse",
         to: "/Manager_orders",
       },
     ],

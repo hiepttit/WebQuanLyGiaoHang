@@ -6,7 +6,7 @@
           item-text="Name"
           item-value="Id"
           :items="Shop"
-          v-model="objAddOrder.IdShop"
+          v-model="IdShop"
           label="Tên Shop*"
           :rules="[(v) => !!v || 'Item is required']"
           required
@@ -25,7 +25,7 @@
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
               v-model="dateFormatted"
-              label="Ngày cấp:"
+              label="Ngày:"
               prepend-icon="mdi-calendar"
               v-bind="attrs"
               @blur="date = parseDate(dateFormatted)"
@@ -50,7 +50,7 @@
         </v-btn>
       </v-col>
       <v-col cols="12" md="12">
-        <h1>Số lượng: {{ totalShop }}</h1>
+        <h1>Số lượng: {{ total }}</h1>
         <base-material-card color="green" class="px-5 py-3">
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
@@ -201,10 +201,14 @@ export default {
         }
       }
     },
+    IdShop(val) {
+      this.getDataFromApi();
+    },
   },
   data() {
     return {
       Province: [],
+      IdShop: "",
       ProvinceId: null,
       ProvinceName: "",
       District: [],
@@ -224,7 +228,6 @@ export default {
       isShow: false,
       Show: false,
       loading: true,
-      totalShop: 0,
       Shop: [],
       Orders: [],
       objAddOrder: {},
@@ -292,10 +295,11 @@ export default {
     },
     async SaveModal(e) {
       this.objAddOrder = e;
+      this.objAddOrder.IdShop = this.IdShop;
       let objAddOrder = this.objAddOrder;
       let url = `${this.url}/Orders`;
       let resp = await this.$stores.api.post(`${url}`, objAddOrder);
-      if ((resp && resp.status == 200) || resp.status == 201) {
+      if (resp && resp.status == 200) {
         alert("Updated successfully.");
         this.isShow = false;
         this.getDataFromApi();
@@ -323,20 +327,22 @@ export default {
     async getOrders(page, itemsPerPage) {
       let top = "";
       let skip = "";
-      if (itemsPerPage > 0) {
-        top = `&$top=${itemsPerPage}`;
-        skip = `&$skip=${(page - 1) * itemsPerPage}`;
-      }
-      // let filter = search && ` contains(Name, '${search}')`;
-      let url = `${this.url}/Orders?$count=true${top}${skip}`;
-      let resp = await this.$stores.api.get(`${url}`);
-      if (resp && resp.status == 200) {
-        let data = await resp.json();
-        let total = data["@odata.count"];
-        return {
-          total,
-          items: data.value,
-        };
+      if (this.IdShop) {
+        if (itemsPerPage > 0) {
+          top = `&$top=${itemsPerPage}`;
+          skip = `&$skip=${(page - 1) * itemsPerPage}`;
+        }
+        // let filter = search && ` contains(Name, '${search}')`;
+        let url = `${this.url}/Orders?$filter=IdShop eq '${this.IdShop}'&$count=true${top}${skip}`;
+        let resp = await this.$stores.api.get(`${url}`);
+        if (resp && resp.status == 200) {
+          let data = await resp.json();
+          let total = data["@odata.count"];
+          return {
+            total,
+            items: data.value,
+          };
+        }
       }
       return { total: 0, items: [] };
     },

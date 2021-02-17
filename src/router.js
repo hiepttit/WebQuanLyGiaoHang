@@ -20,15 +20,21 @@ export default new Router({
         // Pages
         // Table
         {
-          name: 'DataTable',
+          name: 'Quản lý người dùng',
           path: 'datatable',
-          component: () => import('@/views/dashboard/Datatable'),
+          component: () => import('@/views/dashboard/User'),
         },
         // Order
         {
-          name: 'Tạo giao hàng',
+          name: 'Tạo đơn hàng',
           path: 'orders',
           component: () => import('@/views/dashboard/MyOrders/Orders'),
+        },
+        // Delevery
+        {
+          name: 'Tạo giao hàng',
+          path: 'Create_delivery',
+          component: () => import('@/views/dashboard/Delivery'),
         },
         // Manager Orders
         {
