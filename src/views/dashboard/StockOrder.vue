@@ -5,9 +5,9 @@
         <v-select
           item-text="Name"
           item-value="Id"
-          :items="Users"
-          v-model="IdStaff"
-          label="Tên nhân viên*"
+          :items="Shop"
+          v-model="IdShop"
+          label="Tên Shop*"
           :rules="[(v) => !!v || 'Item is required']"
           required
           style="float: right"
@@ -44,7 +44,7 @@
           style="float: right"
           rounded
           class="mr-0"
-          @click="Show = true"
+          @click="(isShow = true), (objAddOrder = {})"
         >
           Thêm
         </v-btn>
@@ -54,7 +54,7 @@
         <base-material-card color="green" class="px-5 py-3">
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
-              Đơn hàng
+              Shop
               <v-card-title style="width: 200px; float: right">
                 <v-text-field
                   append-icon="mdi-magnify"
@@ -66,7 +66,7 @@
             </div>
 
             <div class="subtitle-1 font-weight-light">
-              Danh sách tất cả đơn hàng
+              Danh sách tất cả Shop
             </div>
           </template>
           <v-card-text>
@@ -84,6 +84,19 @@
               <template v-slot:item.Sum="{ item }">
                 <div>{{ item.ShipFee + item.Cod }}</div>
               </template>
+              <template v-slot:item.Action="{ item }">
+                <div>
+                  <v-btn
+                    color="success"
+                    style="float: right"
+                    rounded
+                    class="mr-0"
+                    @click="(Show = true), (IdOrder = item.Id)"
+                  >
+                    In
+                  </v-btn>
+                </div>
+              </template>
             </v-data-table>
             <div class="text-center pt-2">
               <v-pagination
@@ -96,24 +109,27 @@
         </base-material-card>
       </v-col>
     </v-row>
-    <my-Modal :show="Show" :title="'THÊM ĐƠN GIAO HÀNG'" @close="Show = false">
+    <input-detail
+      :user="objAddOrder"
+      :isShow="isShow"
+      @update="
+        (e) => {
+          SaveModal(e);
+        }
+      "
+      @close="isShow = false"
+    />
+    <my-Modal :show="Show" :title="'In mã'" @close="Show = false">
       <v-col cols="12">
-        <v-select
-          item-text="id"
-          item-value="id"
-          :items="idOrder"
-          label="Chọn mã:"
-          dense
-          outlined
-          v-model="objAddDelivery.IdTheOrder"
-        ></v-select>
+        <VueBarcode
+          v-bind:options="{ lineColor: '#0275d8', text: 'Scan' }"
+          id="printImg"
+          v-bind:value="IdOrder"
+        />
       </v-col>
       <template v-slot:m-foot>
-        <v-btn depressed color="primary" @click="SaveModal()">
-          Ok
-        </v-btn>
-        <v-btn depressed color="error">
-          Quét
+        <v-btn color="blue darken-1" text @click="PrintCode()">
+          In
         </v-btn>
       </template>
     </my-Modal>
@@ -121,70 +137,22 @@
 </template>
 
 <script>
+import InputDetail from "./Inputcomponents/InputOrderDetail.vue";
 import moment from "moment";
+import VueBarcode from "vue-barcode";
 import myModal from "./components/Modal.vue";
 
 export default {
-  components: { myModal },
+  components: { InputDetail, VueBarcode, myModal },
   name: "Orders",
-  data() {
-    return {
-      Province: [],
-      ProvinceId: null,
-      ProvinceName: "",
-      District: [],
-      DistrictId: null,
-      DistrictName: "",
-      Ward: [],
-      WardId: null,
-      WardName: "",
-      pageCount: 0,
-      options: {},
-      total: 0,
-      IdStaff: "",
-      DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
-      dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
-      address: "",
-      menu: false,
-      Show: false,
-      loading: true,
-      Users: [],
-      Orders: [],
-      nameShop: "",
-      Receive: 0,
-      objAddDelivery: {},
-      url: "http://localhost:60189/odata",
-      headers: [
-        { text: "Stt", align: "center", sortable: false, value: "Stt" },
-        { text: "Mã", align: "start", sortable: false, value: "Id" },
-        { text: "Tên khách hàng", align: "start", value: "CustomerName" },
-        { text: "Địa chỉ", value: "TheAddresss", align: "left" },
-        { text: "Số điện thoại", value: "PhoneNumber" },
-        { text: "COD", value: "Cod" },
-        { text: "Ship", value: "ShipFee" },
-        { text: "Ship", value: "ShipFee" },
-        { text: "Tổng thu", value: "Sum" },
-      ],
-      Code: [],
-    };
-  },
   async mounted() {
     this.Province = await this.getProvince();
-    this.Users = await this.getUser();
-    this.Code = await this.getIdFromOrder();
+    this.Shop = await this.getShop();
     this.getDataFromApi();
-  },
-  computed: {
-    idOrder() {
-      return this.Code;
-    },
   },
   watch: {
     DateOfIssueIdNumber(val) {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
-    },
-    DateOfIssueIdNumberModal(val) {
-      this.dateFormattedModal = this.formatDate(this.DateOfIssueIdNumberModal);
     },
     async ProvinceId(val) {
       if (val) {
@@ -233,15 +201,66 @@ export default {
         }
       }
     },
-    IdStaff(val) {
+    IdShop(val) {
       this.getDataFromApi();
     },
   },
+  data() {
+    return {
+      Province: [],
+      IdShop: "",
+      ProvinceId: null,
+      ProvinceName: "",
+      District: [],
+      DistrictId: null,
+      DistrictName: "",
+      Ward: [],
+      WardId: null,
+      WardName: "",
+      pageCount: 0,
+      options: {},
+      total: 0,
+      IdOrder: "",
+      DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
+      dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
+      address: "",
+      menu: false,
+      isShow: false,
+      Show: false,
+      loading: true,
+      Shop: [],
+      Orders: [],
+      objAddOrder: {},
+      url: "http://localhost:60189/odata",
+      headers: [
+        {
+          text: "Stt",
+          align: "center",
+          sortable: false,
+          value: "Stt",
+        },
+        {
+          text: "Mã",
+          align: "start",
+          sortable: false,
+          value: "Id",
+        },
+        { text: "Tên khách hàng", align: "start", value: "CustomerName" },
+        { text: "Địa chỉ", value: "TheAddresss", align: "left" },
+        { text: "Số điện thoại", value: "PhoneNumber" },
+        { text: "COD", value: "Cod" },
+        { text: "Ship", value: "ShipFee" },
+        { text: "Ship", value: "ShipFee" },
+        { text: "Tổng thu", value: "Sum" },
+        { text: "Tác vụ", value: "Action" },
+      ],
+    };
+  },
 
   methods: {
-    async getUser() {
+    async getShop() {
       let resp = await this.$stores.api.get(
-        `${this.url}/TheUserView?$filter=IdRole eq 2&$orderby=Name asc`
+        `${this.url}/TheUserView?$filter=IdRole eq 3&$orderby=Name asc`
       );
       if (resp && resp.status == 200) {
         let data = await resp.json();
@@ -274,16 +293,16 @@ export default {
       const [month, day, year] = date.split("/");
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
-    async SaveModal() {
-      this.objAddDelivery.IdStaff = this.IdStaff;
-      let objAddDelivery = this.objAddDelivery;
-      let url = `${this.url}/DeliveryOrders`;
-      let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
+    async SaveModal(e) {
+      this.objAddOrder = e;
+      this.objAddOrder.IdShop = this.IdShop;
+      let objAddOrder = this.objAddOrder;
+      let url = `${this.url}/Orders`;
+      let resp = await this.$stores.api.post(`${url}`, objAddOrder);
       if (resp && resp.status == 200) {
         alert("Updated successfully.");
-        this.Show = false;
+        this.isShow = false;
         this.getDataFromApi();
-        this.Code = await this.getIdFromOrder();
       } else {
         alert("Updated failed.");
       }
@@ -299,21 +318,22 @@ export default {
     async fakeApiCall() {
       const { sortBy, page, itemsPerPage } = this.options;
 
-      let data = await this.getDelivery(page, itemsPerPage);
+      let data = await this.getStockOrders(page, itemsPerPage);
       return {
         items: data.items,
         total: data.total,
       };
     },
-    async getDelivery(page, itemsPerPage) {
+    async getStockOrders(page, itemsPerPage) {
       let top = "";
       let skip = "";
-      if (this.IdStaff) {
+      if (this.IdShop) {
         if (itemsPerPage > 0) {
           top = `&$top=${itemsPerPage}`;
           skip = `&$skip=${(page - 1) * itemsPerPage}`;
         }
-        let url = `${this.url}/Orders?$expand=DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdStaff}')&$count=true${top}${skip}`;
+        // let filter = search && ` contains(Name, '${search}')`;
+        let url = `${this.url}/Orders?$expand=StockOrders&$filter=StockOrders/any(x:x/Delaydate ne null) and IdShop eq '${this.IdShop}'&$count=true${top}${skip}`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();
@@ -323,19 +343,11 @@ export default {
             items: data.value,
           };
         }
-        return { total: 0, items: [] };
       }
       return { total: 0, items: [] };
     },
-    async getIdFromOrder() {
-      let resp = await this.$stores.api.get(
-        `http://localhost:60189/Order/GetId`
-      );
-      if (resp && resp.status == 200) {
-        let data = await resp.json();
-        return data;
-      }
-      return null;
+    PrintCode() {
+      window.print();
     },
   },
 };

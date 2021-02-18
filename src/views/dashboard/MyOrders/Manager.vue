@@ -6,7 +6,7 @@
           item-text="Name"
           item-value="Id"
           :items="Users"
-          v-model="objAddOrder.IdUser"
+          v-model="IdUser"
           label="Tên nhân viên*"
           :rules="[(v) => !!v || 'Item is required']"
           required
@@ -37,17 +37,6 @@
             @input="menu = false"
           ></v-date-picker>
         </v-menu>
-      </v-col>
-      <v-col cols="4">
-        <v-btn
-          color="success"
-          style="float: right"
-          rounded
-          class="mr-0"
-          @click="(isShow = true), (objAddOrder = {})"
-        >
-          Thêm
-        </v-btn>
       </v-col>
       <v-col cols="12" md="12">
         <h1>Số lượng: {{ total }}</h1>
@@ -85,9 +74,37 @@
                 <div>{{ item.ShipFee + item.Cod }}</div>
               </template>
               <template v-slot:item.Action="{ item }">
-                <template v-if="item.IsSuccess == null">
-                  <v-btn color="warning" @click="onState(item)">
+                <template v-if="item.IsSuccess == null || item.IsSuccess == 0">
+                  <v-btn color="#5cbbf6" @click="onState(item)">
                     Đang giao
+                    <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
+                    </i>
+                  </v-btn>
+                </template>
+                <template v-if="item.IsSuccess == 1">
+                  <v-btn color="success" @click="onState(item)">
+                    Thành công
+                    <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
+                    </i>
+                  </v-btn>
+                </template>
+                <template v-if="item.IsSuccess == 2">
+                  <v-btn color="error" @click="onState(item)">
+                    Trả hàng
+                    <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
+                    </i>
+                  </v-btn>
+                </template>
+                <template v-if="item.IsSuccess == 3">
+                  <v-btn color="warning" @click="onState(item)">
+                    Tồn kho
+                    <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
+                    </i>
+                  </v-btn>
+                </template>
+                <template v-if="item.IsSuccess == 4">
+                  <v-btn color="primary" @click="onState(item)">
+                    Hoàn thành 1 phần
                     <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
                     </i>
                   </v-btn>
@@ -105,16 +122,6 @@
         </base-material-card>
       </v-col>
     </v-row>
-    <input-detail
-      :user="objAddOrder"
-      :isShow="isShow"
-      @update="
-        (e) => {
-          SaveModal(e);
-        }
-      "
-      @close="isShow = false"
-    />
     <my-Modal
       :show="Show"
       :title="'CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG'"
@@ -180,7 +187,7 @@
         </v-col>
       </template>
       <template v-slot:m-foot>
-        <v-btn color="blue darken-1" text @click="PrintCode()">
+        <v-btn color="blue darken-1" text @click="UpdateState()">
           Ok
         </v-btn>
       </template>
@@ -189,12 +196,11 @@
 </template>
 
 <script>
-import InputDetail from "../Inputcomponents/InputOrderDetail.vue";
 import moment from "moment";
 import myModal from "../components/Modal.vue";
 
 export default {
-  components: { InputDetail, myModal },
+  components: { myModal },
   name: "Orders",
   data() {
     return {
@@ -207,10 +213,12 @@ export default {
       Ward: [],
       WardId: null,
       WardName: "",
+      IdUser: "",
       pageCount: 0,
       options: {},
       total: 0,
       IdOrder: "",
+      DelayDate: "",
       DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       DateOfIssueIdNumberModal: new Date().toISOString().substr(0, 10),
@@ -249,7 +257,7 @@ export default {
         { Id: "3", Name: "Tồn kho" },
         { Id: "4", Name: "Hoàn thành 1 phần" },
       ],
-      state: {},
+      IdKey: "",
     };
   },
   async mounted() {
@@ -311,6 +319,9 @@ export default {
         }
       }
     },
+    IdUser(val) {
+      this.getDataFromApi();
+    },
   },
 
   methods: {
@@ -349,19 +360,6 @@ export default {
       const [month, day, year] = date.split("/");
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
-    async SaveModal(e) {
-      this.objAddOrder = e;
-      let objAddOrder = this.objAddOrder;
-      let url = `${this.url}/Orders`;
-      let resp = await this.$stores.api.post(`${url}`, objAddOrder);
-      if ((resp && resp.status == 200) || resp.status == 201) {
-        alert("Updated successfully.");
-        this.isShow = false;
-        this.getDataFromApi();
-      } else {
-        alert("Updated failed.");
-      }
-    },
     getDataFromApi() {
       this.loading = true;
       this.fakeApiCall().then((data) => {
@@ -387,20 +385,53 @@ export default {
         skip = `&$skip=${(page - 1) * itemsPerPage}`;
       }
       // let filter = search && ` contains(Name, '${search}')`;
-      let url = `${this.url}/Orders?$count=true${top}${skip}`;
+      let url = `${this.url}/Orders?$expand=DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdUser}')&$count=true${top}${skip}`;
       let resp = await this.$stores.api.get(`${url}`);
       if (resp && resp.status == 200) {
         let data = await resp.json();
         let total = data["@odata.count"];
         return {
           total,
-          items: data.value,
+          items: data.value.filter((_) => _.DeliveryOrders.length > 0),
         };
       }
       return { total: 0, items: [] };
     },
-    PrintCode() {
-      window.print();
+    async UpdateState() {
+      let state = {};
+      state.IsSuccess = this.defaultStateSelected;
+      let key = this.IdKey;
+      let url = `${this.url}/Orders/${key}`;
+      if (this.defaultStateSelected == 3) {
+        let check = await this.UpdateStateDelay();
+        if (!check) {
+          return;
+        }
+      }
+      let resp = await this.$stores.api.patch(`${url}`, state);
+      if (resp && resp.status == 200) {
+        alert("Updated successfully.");
+        this.Show = false;
+        this.getDataFromApi();
+      } else {
+        alert("Updated failed.");
+      }
+    },
+    async UpdateStateDelay() {
+      try {
+        let stock = {};
+        stock.IdTheOrder = this.IdKey;
+        stock.Delaydate = this.DateOfIssueIdNumberModal;
+        let url = `${this.url}/StockOrder`;
+        let resp = await this.$stores.api.post(`${url}`, stock);
+        if (resp && resp.status == 200) {
+          return true;
+        }
+      } catch (e) {
+        let x = await e.json();
+        alert(x.detail);
+        return false;
+      }
     },
     async getShopById(Id) {
       let resp = await this.$stores.api.get(
@@ -413,11 +444,28 @@ export default {
       return null;
     },
     async onState(item) {
-      this.state = item;
+      this.defaultStateSelected = 0;
+      this.IdKey = item.Id;
+      let delayDate = await this.getDelayDate(item.Id);
+      if (delayDate.length) {
+        this.dateFormattedModal = this.monentDate(
+          new Date(delayDate[0].Delaydate).toLocaleDateString()
+        );
+      }
       let data = await this.getShopById(item.IdShop);
       this.nameShop = data[0].Name;
       this.Receive = item.Cod + item.ShipFee;
       this.Show = true;
+    },
+    async getDelayDate(idOrder) {
+      let resp = await this.$stores.api.get(
+        `${this.url}/StockOrder?$select=Delaydate&$filter=IdTheOrder eq '${idOrder}'`
+      );
+      if (resp && resp.status == 200) {
+        let data = await resp.json();
+        return data.value;
+      }
+      return null;
     },
   },
 };

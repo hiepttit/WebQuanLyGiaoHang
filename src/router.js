@@ -42,6 +42,12 @@ export default new Router({
           path: 'Manager_orders',
           component: () => import('@/views/dashboard/MyOrders/Manager'),
         },
+         // Manager Stock Orders
+        {
+          name: 'Quản lý tồn kho',
+          path: 'Manager_stock_orders',
+          component: () => import('@/views/dashboard/StockOrder'),
+        },
       ],
     },
   ],

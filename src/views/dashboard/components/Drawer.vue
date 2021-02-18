@@ -105,6 +105,11 @@ export default {
         icon: "mdi-mouse",
         to: "/Manager_orders",
       },
+      {
+        title: "Quản lý tồn kho",
+        icon: "mdi-mouse",
+        to: "/Manager_stock_orders",
+      },
     ],
   }),
 
