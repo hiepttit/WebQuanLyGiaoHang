@@ -43,7 +43,7 @@
         <base-material-card color="green" class="px-5 py-3">
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
-              Đơn hàng
+              Đơn hàng thành công
               <v-card-title style="width: 200px; float: right">
                 <v-text-field
                   append-icon="mdi-magnify"
@@ -55,7 +55,7 @@
             </div>
 
             <div class="subtitle-1 font-weight-light">
-              Danh sách tất cả đơn hàng
+              Danh sách tất cả đơn hàng thành công
             </div>
           </template>
           <v-card-text>
@@ -63,83 +63,256 @@
               <thead>
                 <tr>
                   <th class="primary--text">
-                    ID
+                    Stt
                   </th>
                   <th class="primary--text">
-                    Name
+                    Mã
                   </th>
                   <th class="primary--text">
-                    Country
+                    Tên khách hàng
                   </th>
                   <th class="primary--text">
-                    City
+                    Địa chỉ
                   </th>
-                  <th class="text-right primary--text">
-                    Salary
+                  <th class="primary--text">
+                    Số điện thoại
+                  </th>
+                  <th class="primary--text">
+                    COD
+                  </th>
+                  <th class="primary--text">
+                    Ship
+                  </th>
+                  <th class="primary--text">
+                    Tổng thu
                   </th>
                 </tr>
               </thead>
 
               <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>Dakota Rice</td>
-                  <td>Niger</td>
-                  <td>Oud-Turnhout</td>
-                  <td class="text-right">
-                    $36,738
-                  </td>
-                </tr>
+                <template v-for="(item, i) in OrdersSuccess">
+                  <tr :key="`r${i}`">
+                    <td>{{ i }}</td>
+                    <td>{{ item.Id }}</td>
+                    <td>{{ item.CustomerName }}</td>
+                    <td>{{ item.TheAddresss }}</td>
+                    <td>{{ item.PhoneNumber }}</td>
+                    <td>{{ item.Cod }}</td>
+                    <td>{{ item.ShipFee }}</td>
+                    <td>{{ item.RealReceive }}</td>
+                  </tr>
+                </template>
+              </tbody>
+            </v-simple-table>
+          </v-card-text>
+        </base-material-card>
+      </v-col>
+      <v-col cols="12" md="12">
+        <h1>Số lượng: {{ total }}</h1>
+        <base-material-card color="error" class="px-5 py-3">
+          <template v-slot:heading>
+            <div class="display-2 font-weight-light">
+              Đơn hàng trả
+              <v-card-title style="width: 200px; float: right">
+                <v-text-field
+                  append-icon="mdi-magnify"
+                  label="Search"
+                  single-line
+                  hide-details
+                ></v-text-field>
+              </v-card-title>
+            </div>
 
+            <div class="subtitle-1 font-weight-light">
+              Danh sách tất cả đơn hàng trả
+            </div>
+          </template>
+          <v-card-text>
+            <v-simple-table>
+              <thead>
                 <tr>
-                  <td>2</td>
-                  <td>Minverva Hooper</td>
-                  <td>Curaçao</td>
-                  <td>Sinaas-Waas</td>
-                  <td class="text-right">
-                    $23,789
-                  </td>
+                  <th class="primary--text">
+                    Stt
+                  </th>
+                  <th class="primary--text">
+                    Mã
+                  </th>
+                  <th class="primary--text">
+                    Tên khách hàng
+                  </th>
+                  <th class="primary--text">
+                    Địa chỉ
+                  </th>
+                  <th class="primary--text">
+                    Số điện thoại
+                  </th>
+                  <th class="primary--text">
+                    COD
+                  </th>
+                  <th class="primary--text">
+                    Ship
+                  </th>
+                  <th class="primary--text">
+                    Tổng thu
+                  </th>
                 </tr>
+              </thead>
 
-                <tr>
-                  <td>3</td>
-                  <td>Sage Rodriguez</td>
-                  <td>Netherlands</td>
-                  <td>Baileux</td>
-                  <td class="text-right">
-                    $56,142
-                  </td>
-                </tr>
+              <tbody>
+                <template v-for="(item, i) in OrdersFail">
+                  <tr :key="`r${i}`">
+                    <td>{{ i }}</td>
+                    <td>{{ item.Id }}</td>
+                    <td>{{ item.CustomerName }}</td>
+                    <td>{{ item.TheAddresss }}</td>
+                    <td>{{ item.PhoneNumber }}</td>
+                    <td>{{ item.Cod }}</td>
+                    <td>{{ item.ShipFee }}</td>
+                    <td>{{ item.RealReceive }}</td>
+                  </tr>
+                </template>
+              </tbody>
+            </v-simple-table>
+          </v-card-text>
+        </base-material-card>
+      </v-col>
+      <v-col cols="12" md="12">
+        <h1>Số lượng: {{ total }}</h1>
+        <base-material-card color="warning" class="px-5 py-3">
+          <template v-slot:heading>
+            <div class="display-2 font-weight-light">
+              Đơn hàng hoãn
+              <v-card-title style="width: 200px; float: right">
+                <v-text-field
+                  append-icon="mdi-magnify"
+                  label="Search"
+                  single-line
+                  hide-details
+                ></v-text-field>
+              </v-card-title>
+            </div>
 
+            <div class="subtitle-1 font-weight-light">
+              Danh sách tất cả đơn hàng hoãn
+            </div>
+          </template>
+          <v-card-text>
+            <v-simple-table>
+              <thead>
                 <tr>
-                  <td>4</td>
-                  <td>Philip Chaney</td>
-                  <td>Korea, South</td>
-                  <td>Overland Park</td>
-                  <td class="text-right">
-                    $38,735
-                  </td>
+                  <th class="primary--text">
+                    Stt
+                  </th>
+                  <th class="primary--text">
+                    Mã
+                  </th>
+                  <th class="primary--text">
+                    Tên khách hàng
+                  </th>
+                  <th class="primary--text">
+                    Địa chỉ
+                  </th>
+                  <th class="primary--text">
+                    Số điện thoại
+                  </th>
+                  <th class="primary--text">
+                    COD
+                  </th>
+                  <th class="primary--text">
+                    Ship
+                  </th>
+                  <th class="primary--text">
+                    Hoãn tới
+                  </th>
                 </tr>
+              </thead>
 
-                <tr>
-                  <td>5</td>
-                  <td>Doris Greene</td>
-                  <td>Malawi</td>
-                  <td>Feldkirchen in Kärnten</td>
-                  <td class="text-right">
-                    $63,542
-                  </td>
-                </tr>
+              <tbody>
+                <template v-for="(item, i) in OrdersDelay">
+                  <tr :key="`r${i}`">
+                    <td>{{ i }}</td>
+                    <td>{{ item.Id }}</td>
+                    <td>{{ item.CustomerName }}</td>
+                    <td>{{ item.TheAddresss }}</td>
+                    <td>{{ item.PhoneNumber }}</td>
+                    <td>{{ item.Cod }}</td>
+                    <td>{{ item.ShipFee }}</td>
+                    <td>{{ item.DelayDate }}</td>
+                  </tr>
+                </template>
+              </tbody>
+            </v-simple-table>
+          </v-card-text>
+        </base-material-card>
+      </v-col>
+      <v-col cols="12" md="12">
+        <h1>Số lượng: {{ total }}</h1>
+        <base-material-card color="#5cbbf6" class="px-5 py-3">
+          <template v-slot:heading>
+            <div class="display-2 font-weight-light">
+              Đơn hàng thành công một phần
+              <v-card-title style="width: 200px; float: right">
+                <v-text-field
+                  append-icon="mdi-magnify"
+                  label="Search"
+                  single-line
+                  hide-details
+                ></v-text-field>
+              </v-card-title>
+            </div>
 
+            <div class="subtitle-1 font-weight-light">
+              Danh sách tất cả đơn hàng thành công 1 phần
+            </div>
+          </template>
+          <v-card-text>
+            <v-simple-table>
+              <thead>
                 <tr>
-                  <td>6</td>
-                  <td>Mason Porter</td>
-                  <td>Chile</td>
-                  <td>Gloucester</td>
-                  <td class="text-right">
-                    $78,615
-                  </td>
+                  <th class="primary--text">
+                    Stt
+                  </th>
+                  <th class="primary--text">
+                    Mã
+                  </th>
+                  <th class="primary--text">
+                    Tên khách hàng
+                  </th>
+                  <th class="primary--text">
+                    Địa chỉ
+                  </th>
+                  <th class="primary--text">
+                    Số điện thoại
+                  </th>
+                  <th class="primary--text">
+                    COD
+                  </th>
+                  <th class="primary--text">
+                    Ship
+                  </th>
+                  <th class="primary--text">
+                    Tổng thu
+                  </th>
+                  <th class="primary--text">
+                    Thực thu
+                  </th>
                 </tr>
+              </thead>
+
+              <tbody>
+                <template v-for="(item, i) in OrdersHalf">
+                  <tr :key="`r${i}`">
+                    <td>{{ i }}</td>
+                    <td>{{ item.Id }}</td>
+                    <td>{{ item.CustomerName }}</td>
+                    <td>{{ item.TheAddresss }}</td>
+                    <td>{{ item.PhoneNumber }}</td>
+                    <td>{{ item.Cod }}</td>
+                    <td>{{ item.ShipFee }}</td>
+                    <td>{{ item.Cod + item.ShipFee }}</td>
+                    <td>{{ item.RealReceive }}</td>
+                  </tr>
+                </template>
               </tbody>
             </v-simple-table>
           </v-card-text>
@@ -164,6 +337,10 @@ export default {
       menu: false,
       Users: [],
       Orders: [],
+      OrdersSuccess: [],
+      OrdersDelay: [],
+      OrdersFail: [],
+      OrdersHalf: [],
       Receive: 0,
       url: "http://localhost:60189/odata",
     };
@@ -225,6 +402,10 @@ export default {
       this.loading = true;
       this.getDelivery().then((data) => {
         this.Orders = data.items;
+        this.OrdersSuccess = data.items.filter((_) => _.TheStatus == 1);
+        this.OrdersFail = data.items.filter((_) => _.TheStatus == 2);
+        this.OrdersDelay = data.items.filter((_) => _.TheStatus == 3);
+        this.OrdersHalf = data.items.filter((_) => _.TheStatus == 4);
         this.total = data.total;
         this.loading = false;
       });
