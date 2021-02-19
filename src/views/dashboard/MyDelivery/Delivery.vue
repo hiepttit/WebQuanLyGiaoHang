@@ -1,7 +1,7 @@
 <template>
   <v-container id="dashboard" fluid tag="section">
     <v-row>
-      <v-col cols="4">
+      <v-col cols="4" md="4">
         <v-select
           item-text="Name"
           item-value="Id"
@@ -38,7 +38,7 @@
           ></v-date-picker>
         </v-menu>
       </v-col>
-      <v-col cols="4">
+      <v-col cols="4" md="4">
         <v-btn
           color="success"
           style="float: right"
@@ -161,7 +161,6 @@ export default {
         { text: "Địa chỉ", value: "TheAddresss", align: "left" },
         { text: "Số điện thoại", value: "PhoneNumber" },
         { text: "COD", value: "Cod" },
-        { text: "Ship", value: "ShipFee" },
         { text: "Ship", value: "ShipFee" },
         { text: "Tổng thu", value: "Sum" },
       ],

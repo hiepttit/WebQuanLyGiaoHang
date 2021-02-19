@@ -250,7 +250,6 @@ export default {
         { text: "Số điện thoại", value: "PhoneNumber" },
         { text: "COD", value: "Cod" },
         { text: "Ship", value: "ShipFee" },
-        { text: "Ship", value: "ShipFee" },
         { text: "Tổng thu", value: "Sum" },
         { text: "Tác vụ", value: "Action" },
       ],

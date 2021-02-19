@@ -40,18 +40,21 @@
       </v-col>
       <v-col style="float: right;" cols="9" md="9">
         <div style="background-color:#1867c0" class="statistical">
-          <h1>Đơn hàn đã thanh toán: {{ countSucess }}</h1>
-          <h1>Tổng phí Cod: {{ totalCodSucess }}</h1>
+          <h1>Đơn hàng đã thanh toán: {{ countSucess }}</h1>
+          <!-- <h1>Tổng phí Cod: {{ totalCodSucess }}</h1>
           <h1>Tổng phí Ship: {{ totalShipSucess }}</h1>
-          <h1>Tổng phí: {{ totalCodSucess + totalShipSucess }}</h1>
+          <h1>Tổng phí ban đầu: {{ totalCodSucess + totalShipSucess }}</h1> -->
+          <h1>Tổng phí đã trả: {{ totalRealSucess }}</h1>
         </div>
       </v-col>
       <v-col cols="3" md="3">
         <div style="background-color:#fb8c00;float:left" class="statistical">
-          <h1>Đơn hàn chưa thanh toán: {{ countUnSucess }}</h1>
-          <h1>Tổng phí Cod: {{ totalCodUnSucess }}</h1>
+          <h1>Đơn hàng chưa thanh toán: {{ countUnSucess }}</h1>
+          <h1>Đơn hàng đã xong: {{ countRealUnSucess }}</h1>
+          <!-- <h1>Tổng phí Cod: {{ totalCodUnSucess }}</h1>
           <h1>Tổng phí Ship: {{ totalShipUnSucess }}</h1>
-          <h1>Tổng phí: {{ totalCodUnSucess + totalShipUnSucess }}</h1>
+          <h1>Tổng phí ban đầu: {{ totalCodUnSucess + totalShipUnSucess }}</h1> -->
+          <h1>Tổng phí phải trả: {{ totalRealUnSucess }}</h1>
         </div>
       </v-col>
       <v-col cols="12" md="12">
@@ -87,18 +90,19 @@
                 {{ index + 1 }}
               </template>
               <template v-slot:item.Sum="{ item }">
-                <div>{{ item.ShipFee + item.Cod }}</div>
+                <div v-if="item.RealReceive == null">
+                  {{ item.ShipFee + item.Cod }}
+                </div>
+                <div v-else>{{ item.RealReceive }}</div>
               </template>
               <template v-slot:item.Action="{ item }">
                 <template v-if="item.IsSuccess == null || item.IsSuccess == 0">
-                  <v-btn color="warning" @click="onState(item)">
+                  <v-btn color="warning" @click="SaveModal(item, 1)">
                     Chưa thanh toán
-                    <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
-                    </i>
                   </v-btn>
                 </template>
                 <template v-if="item.IsSuccess == 1">
-                  <v-btn color="#1867c0" @click="onState(item)">
+                  <v-btn color="#1867c0" @click="SaveModal(item, 0)">
                     Đã thanh toán
                   </v-btn>
                 </template>
@@ -115,33 +119,13 @@
         </base-material-card>
       </v-col>
     </v-row>
-    <my-Modal :show="Show" :title="'Cấp nhật trạng thái'" @close="Show = false">
-      <v-col cols="12">
-        <v-select
-          item-text="Name"
-          item-value="Id"
-          :items="States"
-          v-model="StateSelected"
-          label="Chọn trạng thái"
-          dense
-          outlined
-        ></v-select>
-      </v-col>
-      <template v-slot:m-foot>
-        <v-btn color="blue darken-1" text @click="SaveModal()">
-          Ok
-        </v-btn>
-      </template>
-    </my-Modal>
   </v-container>
 </template>
 
 <script>
 import moment from "moment";
-import myModal from "../components/Modal.vue";
 
 export default {
-  components: { myModal },
   name: "Orders",
   async mounted() {
     this.Province = await this.getProvince();
@@ -152,53 +136,6 @@ export default {
     DateOfIssueIdNumber(val) {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
     },
-    async ProvinceId(val) {
-      if (val) {
-        let resp = await this.$stores.api.get(
-          `${this.url}/District?$filter=ProvinceId eq ${val}&$orderby=Name asc`
-        );
-        if (resp && resp.status == 200) {
-          let data = await resp.json();
-          this.District = data.value;
-        }
-        let respName = await this.$stores.api.get(
-          `${this.url}/Province?$filter=Id eq ${val}`
-        );
-        if (respName && respName.status == 200) {
-          let data = await respName.json();
-          this.ProvinceName = data.value[0].Name;
-        }
-      }
-    },
-    async DistrictId(val) {
-      if (val) {
-        let resp = await this.$stores.api.get(
-          `${this.url}/odata/Ward?$filter=DistrictId eq ${val}&$orderby=Name asc`
-        );
-        if (resp && resp.status == 200) {
-          let data = await resp.json();
-          this.Ward = data.value;
-        }
-        let respName = await this.$stores.api.get(
-          `${this.url}/odata/District?$filter=Id eq ${val}`
-        );
-        if (respName && respName.status == 200) {
-          let data = await respName.json();
-          this.DistrictName = data.value[0].Name;
-        }
-      }
-    },
-    async WardId(val) {
-      if (val) {
-        let respName = await this.$stores.api.get(
-          `${this.url}/odata/Ward?$filter=Id eq ${val}`
-        );
-        if (respName && respName.status == 200) {
-          let data = await respName.json();
-          this.WardName = data.value[0].Type + " " + data.value[0].Name;
-        }
-      }
-    },
     IdShop(val) {
       this.getDataFromApi();
     },
@@ -207,28 +144,18 @@ export default {
     return {
       Province: [],
       IdShop: "",
-      ProvinceId: null,
-      ProvinceName: "",
-      District: [],
-      DistrictId: null,
-      DistrictName: "",
-      Ward: [],
-      WardId: null,
-      WardName: "",
       pageCount: 0,
       options: {},
       total: 0,
       IdOrder: "",
       DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
-      address: "",
       menu: false,
       isShow: false,
       Show: false,
       loading: true,
       Shop: [],
       Orders: [],
-      objAddOrder: {},
       IdKey: "",
       url: "http://localhost:60189/odata",
       headers: [
@@ -252,16 +179,19 @@ export default {
         { text: "Tổng thu", value: "Sum" },
         { text: "Trạng thái", value: "Action" },
       ],
-      StateSelected: 0,
-      States: [
-        { Id: "0", Name: "Chưa thanh toán" },
-        { Id: "1", Name: "Đã thanh toán" },
-      ],
+      // StateSelected: 0,
+      // States: [
+      //   { Id: "0", Name: "Chưa thanh toán" },
+      //   { Id: "1", Name: "Đã thanh toán" },
+      // ],
       totalCodSucess: 0,
       totalShipSucess: 0,
       totalCodUnSucess: 0,
       totalShipUnSucess: 0,
+      totalRealSucess: 0,
+      totalRealUnSucess: 0,
       countSucess: 0,
+      countRealUnSucess: 0,
       countUnSucess: 0,
     };
   },
@@ -302,18 +232,23 @@ export default {
       const [month, day, year] = date.split("/");
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
-    async SaveModal(e) {
+    async SaveModal(item, sucess) {
       let state = {};
-      state.IsSuccess = this.StateSelected;
-      let key = this.IdKey;
+      state.IsSuccess = sucess;
+      let key = item.Id;
       let url = `${this.url}/Orders/${key}`;
-      let resp = await this.$stores.api.patch(`${url}`, state);
-      if (resp && resp.status == 200) {
-        alert("Updated successfully.");
-        this.Show = false;
-        this.getDataFromApi();
+      let order = this.Orders.filter((_) => _.Id == key.toString());
+      if (order[0].TheStatus) {
+        let resp = await this.$stores.api.patch(`${url}`, state);
+        if (resp && resp.status == 200) {
+          alert("Updated successfully.");
+          this.Show = false;
+          this.getDataFromApi();
+        } else {
+          alert("Updated failed.");
+        }
       } else {
-        alert("Updated failed.");
+        alert("Đơn hàng đang giao");
       }
     },
     getDataFromApi() {
@@ -321,26 +256,36 @@ export default {
       this.fakeApiCall().then((data) => {
         this.Orders = data.items;
         this.total = data.total;
-        this.totalCodSucess = this.sum(
-          data.items.filter((_) => _.IsSuccess == 1),
-          "Cod"
-        );
+        // this.totalCodSucess = this.sum(
+        //   data.items.filter((_) => _.IsSuccess == 1),
+        //   "Cod"
+        // );
         this.countSucess = data.items.filter((_) => _.IsSuccess == 1).length;
         this.countUnSucess = data.items.filter((_) => _.IsSuccess == 0).length;
-        this.totalShipSucess = this.sum(
+        this.countRealUnSucess = data.items.filter(
+          (_) => _.IsSuccess == 0 && _.RealReceive != null
+        ).length;
+        // this.totalShipSucess = this.sum(
+        //   data.items.filter((_) => _.IsSuccess == 1),
+        //   "ShipFee"
+        // );
+        // this.totalCodUnSucess = this.sum(
+        //   data.items.filter((_) => _.IsSuccess == 0),
+        //   "Cod"
+        // );
+        // this.totalShipUnSucess = this.sum(
+        //   data.items.filter((_) => _.IsSuccess == 0),
+        //   "ShipFee"
+        // );
+        this.totalRealSucess = this.sum(
           data.items.filter((_) => _.IsSuccess == 1),
-          "ShipFee"
+          "RealReceive"
         );
-        this.totalCodUnSucess = this.sum(
+        this.totalRealUnSucess = this.sum(
           data.items.filter((_) => _.IsSuccess == 0),
-          "Cod"
-        );
-        this.totalShipUnSucess = this.sum(
-          data.items.filter((_) => _.IsSuccess == 0),
-          "ShipFee"
+          "RealReceive"
         );
         this.loading = false;
-        console.log(this.countUnSucess);
       });
     },
     async fakeApiCall() {
@@ -374,12 +319,12 @@ export default {
       }
       return { total: 0, items: [] };
     },
-    async onState(item) {
-      this.IdKey = item.Id;
-      if (item.IsSuccess == 0) {
-        this.Show = true;
-      }
-    },
+    // async onState(item) {
+    //   this.IdKey = item.Id;
+    //   if (item.IsSuccess == 0) {
+    //     this.Show = true;
+    //   }
+    // },
     sum(array, key) {
       return array.reduce(function(r, a) {
         return r + a[key];

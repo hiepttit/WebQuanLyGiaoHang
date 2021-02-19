@@ -71,7 +71,10 @@
                 {{ index + 1 }}
               </template>
               <template v-slot:item.Sum="{ item }">
-                <div>{{ item.ShipFee + item.Cod }}</div>
+                <div v-if="item.RealReceive == null">
+                  {{ item.ShipFee + item.Cod }}
+                </div>
+                <div v-else>{{ item.RealReceive }}</div>
               </template>
               <template v-slot:item.Action="{ item }">
                 <template v-if="item.TheStatus == null || item.TheStatus == 0">
@@ -99,7 +102,7 @@
                   </v-btn>
                 </template>
                 <template v-if="item.TheStatus == 4">
-                  <v-btn color="primary" @click="onState(item)">
+                  <v-btn color="#5cbbf6" @click="onState(item)">
                     Hoàn thành 1 phần
                     <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
                     </i>
@@ -167,7 +170,7 @@
       <template v-if="defaultStateSelected == 4">
         <v-col cols="6">
           <v-text-field
-            v-model="address"
+            v-model="realReceive"
             label="Thực thu:"
             type="number"
             required
@@ -201,14 +204,6 @@ export default {
   data() {
     return {
       Province: [],
-      ProvinceId: null,
-      ProvinceName: "",
-      District: [],
-      DistrictId: null,
-      DistrictName: "",
-      Ward: [],
-      WardId: null,
-      WardName: "",
       IdUser: "",
       pageCount: 0,
       options: {},
@@ -221,10 +216,8 @@ export default {
       dateFormattedModal: this.formatDate(
         new Date().toISOString().substr(0, 10)
       ),
-      address: "",
       menu: false,
       menuModal: false,
-      isShow: false,
       Show: false,
       loading: true,
       Users: [],
@@ -246,7 +239,7 @@ export default {
       ],
       defaultStateSelected: 0,
       States: [
-        { Id: "0", Name: "Đang giao" },
+        // { Id: "0", Name: "Đang giao" },
         { Id: "1", Name: "Thành công" },
         { Id: "2", Name: "Trả hàng" },
         { Id: "3", Name: "Tồn kho" },
@@ -254,6 +247,7 @@ export default {
       ],
       IdKey: "",
       data: [],
+      realReceive: null,
     };
   },
   async mounted() {
@@ -267,53 +261,6 @@ export default {
     },
     DateOfIssueIdNumberModal(val) {
       this.dateFormattedModal = this.formatDate(this.DateOfIssueIdNumberModal);
-    },
-    async ProvinceId(val) {
-      if (val) {
-        let resp = await this.$stores.api.get(
-          `${this.url}/District?$filter=ProvinceId eq ${val}&$orderby=Name asc`
-        );
-        if (resp && resp.status == 200) {
-          let data = await resp.json();
-          this.District = data.value;
-        }
-        let respName = await this.$stores.api.get(
-          `${this.url}/Province?$filter=Id eq ${val}`
-        );
-        if (respName && respName.status == 200) {
-          let data = await respName.json();
-          this.ProvinceName = data.value[0].Name;
-        }
-      }
-    },
-    async DistrictId(val) {
-      if (val) {
-        let resp = await this.$stores.api.get(
-          `${this.url}/odata/Ward?$filter=DistrictId eq ${val}&$orderby=Name asc`
-        );
-        if (resp && resp.status == 200) {
-          let data = await resp.json();
-          this.Ward = data.value;
-        }
-        let respName = await this.$stores.api.get(
-          `${this.url}/odata/District?$filter=Id eq ${val}`
-        );
-        if (respName && respName.status == 200) {
-          let data = await respName.json();
-          this.DistrictName = data.value[0].Name;
-        }
-      }
-    },
-    async WardId(val) {
-      if (val) {
-        let respName = await this.$stores.api.get(
-          `${this.url}/odata/Ward?$filter=Id eq ${val}`
-        );
-        if (respName && respName.status == 200) {
-          let data = await respName.json();
-          this.WardName = data.value[0].Type + " " + data.value[0].Name;
-        }
-      }
     },
     IdUser(val) {
       this.getDataFromApi();
@@ -397,9 +344,21 @@ export default {
       let state = {};
       state.TheStatus = this.defaultStateSelected;
       let key = this.IdKey;
+      let order = this.Orders.filter((_) => _.Id == this.IdKey.toString());
+      let price = order[0].Cod + order[0].ShipFee;
       let url = `${this.url}/Orders/${key}`;
+      if (this.defaultStateSelected == 1 || this.defaultStateSelected == 2) {
+        state.RealReceive = price;
+      }
       if (this.defaultStateSelected == 3) {
         let check = await this.UpdateStateDelay();
+        if (!check) {
+          return;
+        }
+        state.IsInStock = 1;
+      }
+      if (this.defaultStateSelected == 4) {
+        let check = await this.UpdateStateHalf();
         if (!check) {
           return;
         }
@@ -422,6 +381,28 @@ export default {
         let resp = await this.$stores.api.post(`${url}`, stock);
         if (resp && resp.status == 200) {
           return true;
+        }
+      } catch (e) {
+        let x = await e.json();
+        alert(x.detail);
+        return false;
+      }
+    },
+    async UpdateStateHalf() {
+      try {
+        let half = {};
+        half.RealReceive = this.realReceive;
+        let url = `${this.url}/Orders/${this.IdKey}`;
+
+        let order = this.Orders.filter((_) => _.Id == this.IdKey.toString());
+        let price = order[0].Cod + order[0].ShipFee;
+        if (half.RealReceive > 0 && half.RealReceive < price) {
+          let resp = await this.$stores.api.patch(`${url}`, half);
+          if (resp && resp.status == 200) {
+            return true;
+          }
+        } else {
+          alert("Mức thu không chính xác");
         }
       } catch (e) {
         let x = await e.json();

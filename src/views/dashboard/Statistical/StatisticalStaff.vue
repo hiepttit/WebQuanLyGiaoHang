@@ -1,0 +1,284 @@
+<template>
+  <v-container id="dashboard" fluid tag="section">
+    <v-row>
+      <v-col cols="4" md="4">
+        <v-select
+          item-text="Name"
+          item-value="Id"
+          :items="Users"
+          v-model="IdStaff"
+          label="Tên nhân viên*"
+          :rules="[(v) => !!v || 'Item is required']"
+          required
+          style="float: right"
+        ></v-select>
+      </v-col>
+      <v-col cols="2">
+        <v-menu
+          v-model="menu"
+          :close-on-content-click="false"
+          :nudge-right="40"
+          transition="scale-transition"
+          offset-y
+          min-width="auto"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+              v-model="dateFormatted"
+              label="Ngày:"
+              prepend-icon="mdi-calendar"
+              v-bind="attrs"
+              @blur="date = parseDate(dateFormatted)"
+              v-on="on"
+            ></v-text-field>
+          </template>
+          <v-date-picker
+            v-model="DateOfIssueIdNumber"
+            @input="menu = false"
+          ></v-date-picker>
+        </v-menu>
+      </v-col>
+      <v-col cols="12" md="12">
+        <h1>Số lượng: {{ total }}</h1>
+        <base-material-card color="green" class="px-5 py-3">
+          <template v-slot:heading>
+            <div class="display-2 font-weight-light">
+              Đơn hàng
+              <v-card-title style="width: 200px; float: right">
+                <v-text-field
+                  append-icon="mdi-magnify"
+                  label="Search"
+                  single-line
+                  hide-details
+                ></v-text-field>
+              </v-card-title>
+            </div>
+
+            <div class="subtitle-1 font-weight-light">
+              Danh sách tất cả đơn hàng
+            </div>
+          </template>
+          <v-card-text>
+            <v-simple-table>
+              <thead>
+                <tr>
+                  <th class="primary--text">
+                    ID
+                  </th>
+                  <th class="primary--text">
+                    Name
+                  </th>
+                  <th class="primary--text">
+                    Country
+                  </th>
+                  <th class="primary--text">
+                    City
+                  </th>
+                  <th class="text-right primary--text">
+                    Salary
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Dakota Rice</td>
+                  <td>Niger</td>
+                  <td>Oud-Turnhout</td>
+                  <td class="text-right">
+                    $36,738
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>2</td>
+                  <td>Minverva Hooper</td>
+                  <td>Curaçao</td>
+                  <td>Sinaas-Waas</td>
+                  <td class="text-right">
+                    $23,789
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>3</td>
+                  <td>Sage Rodriguez</td>
+                  <td>Netherlands</td>
+                  <td>Baileux</td>
+                  <td class="text-right">
+                    $56,142
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>4</td>
+                  <td>Philip Chaney</td>
+                  <td>Korea, South</td>
+                  <td>Overland Park</td>
+                  <td class="text-right">
+                    $38,735
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>5</td>
+                  <td>Doris Greene</td>
+                  <td>Malawi</td>
+                  <td>Feldkirchen in Kärnten</td>
+                  <td class="text-right">
+                    $63,542
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>6</td>
+                  <td>Mason Porter</td>
+                  <td>Chile</td>
+                  <td>Gloucester</td>
+                  <td class="text-right">
+                    $78,615
+                  </td>
+                </tr>
+              </tbody>
+            </v-simple-table>
+          </v-card-text>
+        </base-material-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<script>
+import moment from "moment";
+
+export default {
+  name: "Orders",
+  data() {
+    return {
+      Province: [],
+      total: 0,
+      IdStaff: "",
+      DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
+      dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
+      menu: false,
+      Users: [],
+      Orders: [],
+      Receive: 0,
+      url: "http://localhost:60189/odata",
+    };
+  },
+  async mounted() {
+    this.Province = await this.getProvince();
+    this.Users = await this.getUser();
+    this.getDataFromApi();
+  },
+  watch: {
+    DateOfIssueIdNumber(val) {
+      this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
+    },
+    DateOfIssueIdNumberModal(val) {
+      this.dateFormattedModal = this.formatDate(this.DateOfIssueIdNumberModal);
+    },
+    IdStaff(val) {
+      this.getDataFromApi();
+    },
+  },
+
+  methods: {
+    async getUser() {
+      let resp = await this.$stores.api.get(
+        `${this.url}/TheUserView?$filter=IdRole eq 2&$orderby=Name asc`
+      );
+      if (resp && resp.status == 200) {
+        let data = await resp.json();
+        return data.value;
+      }
+      return [];
+    },
+    async getProvince() {
+      let resp = await this.$stores.api.get(
+        `${this.url}/Province?$orderBy=Name asc`
+      );
+      if (resp && resp.status == 200) {
+        let data = await resp.json();
+        return data.value;
+      }
+      return null;
+    },
+    formatDate(date) {
+      if (!date) return null;
+
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
+    },
+    monentDate(date) {
+      return moment(date).format("DD/MM/YYYY");
+    },
+    parseDate(date) {
+      if (!date) return null;
+
+      const [month, day, year] = date.split("/");
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    },
+    getDataFromApi() {
+      this.loading = true;
+      this.getDelivery().then((data) => {
+        this.Orders = data.items;
+        this.total = data.total;
+        this.loading = false;
+      });
+    },
+    async getDelivery() {
+      if (this.IdStaff) {
+        let url = `${this.url}/Orders?$expand=DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdStaff}')&$count=true`;
+        let resp = await this.$stores.api.get(`${url}`);
+        if (resp && resp.status == 200) {
+          let data = await resp.json();
+          let total = data["@odata.count"];
+          return {
+            total,
+            items: data.value,
+          };
+        }
+        return { total: 0, items: [] };
+      }
+      return { total: 0, items: [] };
+    },
+  },
+};
+</script>
+<style lang="scss">
+.disabled {
+  pointer-events: none;
+  color: #bfcbd9;
+  cursor: not-allowed;
+  background-image: none;
+  background-color: #eef1f6;
+  border-color: #d1dbe5;
+}
+@media print {
+  body {
+    visibility: hidden;
+  }
+  #printImg {
+    visibility: visible;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  svg {
+    width: 90%;
+  }
+  header {
+    left: 0;
+  }
+  #core-navigation-drawer {
+    display: none;
+    transform: translateX(-100%);
+  }
+  .v-main {
+    padding: 75px 0px 0px !important;
+  }
+}
+</style>

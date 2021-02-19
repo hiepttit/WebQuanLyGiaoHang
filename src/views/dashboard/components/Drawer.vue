@@ -115,6 +115,11 @@ export default {
         icon: "mdi-mouse",
         to: "/Manager_orders",
       },
+      {
+        title: "Thống kê đơn hàng nhân viên",
+        icon: "mdi-mouse",
+        to: "/Statistical_Staff",
+      },
     ],
   }),
 

@@ -54,6 +54,12 @@ export default new Router({
           path: 'Manager_orders',
           component: () => import('@/views/dashboard/MyOrder/ManagerOrder'),
         },
+        // Statistical Staff
+        {
+          name: 'Thống kê đơn hàng nhân viên',
+          path: 'Statistical_Staff',
+          component: () => import('@/views/dashboard/Statistical/StatisticalStaff'),
+        },
       ],
     },
   ],
