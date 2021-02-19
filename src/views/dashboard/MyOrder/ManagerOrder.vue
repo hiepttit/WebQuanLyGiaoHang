@@ -38,6 +38,22 @@
           ></v-date-picker>
         </v-menu>
       </v-col>
+      <v-col style="float: right;" cols="9" md="9">
+        <div style="background-color:#1867c0" class="statistical">
+          <h1>Đơn hàn đã thanh toán: {{ countSucess }}</h1>
+          <h1>Tổng phí Cod: {{ totalCodSucess }}</h1>
+          <h1>Tổng phí Ship: {{ totalShipSucess }}</h1>
+          <h1>Tổng phí: {{ totalCodSucess + totalShipSucess }}</h1>
+        </div>
+      </v-col>
+      <v-col cols="3" md="3">
+        <div style="background-color:#fb8c00;float:left" class="statistical">
+          <h1>Đơn hàn chưa thanh toán: {{ countUnSucess }}</h1>
+          <h1>Tổng phí Cod: {{ totalCodUnSucess }}</h1>
+          <h1>Tổng phí Ship: {{ totalShipUnSucess }}</h1>
+          <h1>Tổng phí: {{ totalCodUnSucess + totalShipUnSucess }}</h1>
+        </div>
+      </v-col>
       <v-col cols="12" md="12">
         <h1>Số lượng: {{ total }}</h1>
         <base-material-card color="green" class="px-5 py-3">
@@ -82,7 +98,7 @@
                   </v-btn>
                 </template>
                 <template v-if="item.IsSuccess == 1">
-                  <v-btn color="success" @click="onState(item)">
+                  <v-btn color="#1867c0" @click="onState(item)">
                     Đã thanh toán
                   </v-btn>
                 </template>
@@ -380,6 +396,21 @@ export default {
   background-image: none;
   background-color: #eef1f6;
   border-color: #d1dbe5;
+}
+.statistical {
+  float: right;
+  align-items: center;
+  color: inherit;
+  justify-content: inherit;
+  line-height: normal;
+  position: relative;
+  transition: inherit;
+  transition-property: opacity;
+  color: #fff;
+  margin-bottom: 2px;
+  font-size: 1rem;
+  border-radius: 4px;
+  padding: 5px 20px;
 }
 @media print {
   body {
