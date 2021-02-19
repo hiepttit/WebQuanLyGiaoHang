@@ -74,35 +74,31 @@
                 <div>{{ item.ShipFee + item.Cod }}</div>
               </template>
               <template v-slot:item.Action="{ item }">
-                <template v-if="item.IsSuccess == null || item.IsSuccess == 0">
+                <template v-if="item.TheStatus == null || item.TheStatus == 0">
                   <v-btn color="#5cbbf6" @click="onState(item)">
                     Đang giao
                     <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
                     </i>
                   </v-btn>
                 </template>
-                <template v-if="item.IsSuccess == 1">
+                <template v-if="item.TheStatus == 1">
                   <v-btn color="success" @click="onState(item)">
                     Thành công
-                    <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
-                    </i>
                   </v-btn>
                 </template>
-                <template v-if="item.IsSuccess == 2">
+                <template v-if="item.TheStatus == 2">
                   <v-btn color="error" @click="onState(item)">
                     Trả hàng
-                    <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
-                    </i>
                   </v-btn>
                 </template>
-                <template v-if="item.IsSuccess == 3">
+                <template v-if="item.TheStatus == 3">
                   <v-btn color="warning" @click="onState(item)">
                     Tồn kho
                     <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
                     </i>
                   </v-btn>
                 </template>
-                <template v-if="item.IsSuccess == 4">
+                <template v-if="item.TheStatus == 4">
                   <v-btn color="primary" @click="onState(item)">
                     Hoàn thành 1 phần
                     <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
@@ -245,7 +241,6 @@ export default {
         { text: "Số điện thoại", value: "PhoneNumber" },
         { text: "COD", value: "Cod" },
         { text: "Ship", value: "ShipFee" },
-        { text: "Ship", value: "ShipFee" },
         { text: "Tổng thu", value: "Sum" },
         { text: "Trạng thái", value: "Action" },
       ],
@@ -258,6 +253,7 @@ export default {
         { Id: "4", Name: "Hoàn thành 1 phần" },
       ],
       IdKey: "",
+      data: [],
     };
   },
   async mounted() {
@@ -399,7 +395,7 @@ export default {
     },
     async UpdateState() {
       let state = {};
-      state.IsSuccess = this.defaultStateSelected;
+      state.TheStatus = this.defaultStateSelected;
       let key = this.IdKey;
       let url = `${this.url}/Orders/${key}`;
       if (this.defaultStateSelected == 3) {
@@ -455,7 +451,12 @@ export default {
       let data = await this.getShopById(item.IdShop);
       this.nameShop = data[0].Name;
       this.Receive = item.Cod + item.ShipFee;
-      this.Show = true;
+      if (item.TheStatus == 0 || item.TheStatus == 3) {
+        this.Show = true;
+      }
+      if (item.TheStatus == 3) {
+        this.defaultStateSelected = 3;
+      }
     },
     async getDelayDate(idOrder) {
       let resp = await this.$stores.api.get(

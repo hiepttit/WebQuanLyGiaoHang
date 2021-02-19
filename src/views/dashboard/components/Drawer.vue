@@ -103,12 +103,17 @@ export default {
       {
         title: "Quản lý giao hàng",
         icon: "mdi-mouse",
-        to: "/Manager_orders",
+        to: "/Manager_delivery",
       },
       {
         title: "Quản lý tồn kho",
         icon: "mdi-mouse",
         to: "/Manager_stock_orders",
+      },
+      {
+        title: "Quản lý đơn hàng",
+        icon: "mdi-mouse",
+        to: "/Manager_orders",
       },
     ],
   }),

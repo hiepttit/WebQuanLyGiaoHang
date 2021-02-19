@@ -28,25 +28,31 @@ export default new Router({
         {
           name: 'Tạo đơn hàng',
           path: 'orders',
-          component: () => import('@/views/dashboard/MyOrders/Orders'),
+          component: () => import('@/views/dashboard/MyOrder/Orders'),
         },
         // Delevery
         {
           name: 'Tạo giao hàng',
           path: 'Create_delivery',
-          component: () => import('@/views/dashboard/Delivery'),
+          component: () => import('@/views/dashboard/MyDelivery/Delivery'),
         },
-        // Manager Orders
+        // Manager Delevery
         {
           name: 'Quản lý giao hàng',
-          path: 'Manager_orders',
-          component: () => import('@/views/dashboard/MyOrders/Manager'),
+          path: 'Manager_delivery',
+          component: () => import('@/views/dashboard/MyDelivery/Manager'),
         },
          // Manager Stock Orders
         {
           name: 'Quản lý tồn kho',
           path: 'Manager_stock_orders',
           component: () => import('@/views/dashboard/StockOrder'),
+        },
+        // Manager Orders
+        {
+          name: 'Quản lý đơn hàng',
+          path: 'Manager_orders',
+          component: () => import('@/views/dashboard/MyOrder/ManagerOrder'),
         },
       ],
     },

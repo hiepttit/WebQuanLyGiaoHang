@@ -5,9 +5,9 @@
         <v-select
           item-text="Name"
           item-value="Id"
-          :items="Users"
-          v-model="IdStaff"
-          label="Tên nhân viên*"
+          :items="Shop"
+          v-model="IdShop"
+          label="Tên Shop*"
           :rules="[(v) => !!v || 'Item is required']"
           required
           style="float: right"
@@ -38,23 +38,12 @@
           ></v-date-picker>
         </v-menu>
       </v-col>
-      <v-col cols="4">
-        <v-btn
-          color="success"
-          style="float: right"
-          rounded
-          class="mr-0"
-          @click="Show = true"
-        >
-          Thêm
-        </v-btn>
-      </v-col>
       <v-col cols="12" md="12">
         <h1>Số lượng: {{ total }}</h1>
         <base-material-card color="green" class="px-5 py-3">
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
-              Đơn hàng
+              Shop
               <v-card-title style="width: 200px; float: right">
                 <v-text-field
                   append-icon="mdi-magnify"
@@ -66,7 +55,7 @@
             </div>
 
             <div class="subtitle-1 font-weight-light">
-              Danh sách tất cả đơn hàng
+              Danh sách tất cả Shop
             </div>
           </template>
           <v-card-text>
@@ -84,6 +73,20 @@
               <template v-slot:item.Sum="{ item }">
                 <div>{{ item.ShipFee + item.Cod }}</div>
               </template>
+              <template v-slot:item.Action="{ item }">
+                <template v-if="item.IsSuccess == null || item.IsSuccess == 0">
+                  <v-btn color="warning" @click="onState(item)">
+                    Chưa thanh toán
+                    <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
+                    </i>
+                  </v-btn>
+                </template>
+                <template v-if="item.IsSuccess == 1">
+                  <v-btn color="success" @click="onState(item)">
+                    Đã thanh toán
+                  </v-btn>
+                </template>
+              </template>
             </v-data-table>
             <div class="text-center pt-2">
               <v-pagination
@@ -96,24 +99,21 @@
         </base-material-card>
       </v-col>
     </v-row>
-    <my-Modal :show="Show" :title="'THÊM ĐƠN GIAO HÀNG'" @close="Show = false">
+    <my-Modal :show="Show" :title="'Cấp nhật trạng thái'" @close="Show = false">
       <v-col cols="12">
         <v-select
-          item-text="id"
-          item-value="id"
-          :items="idOrder"
-          label="Chọn mã:"
+          item-text="Name"
+          item-value="Id"
+          :items="States"
+          v-model="StateSelected"
+          label="Chọn trạng thái"
           dense
           outlined
-          v-model="objAddDelivery.IdTheOrder"
         ></v-select>
       </v-col>
       <template v-slot:m-foot>
-        <v-btn depressed color="primary" @click="SaveModal()">
+        <v-btn color="blue darken-1" text @click="SaveModal()">
           Ok
-        </v-btn>
-        <v-btn depressed color="error">
-          Quét
         </v-btn>
       </template>
     </my-Modal>
@@ -122,69 +122,19 @@
 
 <script>
 import moment from "moment";
-import myModal from "./components/Modal.vue";
+import myModal from "../components/Modal.vue";
 
 export default {
   components: { myModal },
   name: "Orders",
-  data() {
-    return {
-      Province: [],
-      ProvinceId: null,
-      ProvinceName: "",
-      District: [],
-      DistrictId: null,
-      DistrictName: "",
-      Ward: [],
-      WardId: null,
-      WardName: "",
-      pageCount: 0,
-      options: {},
-      total: 0,
-      IdStaff: "",
-      DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
-      dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
-      address: "",
-      menu: false,
-      Show: false,
-      loading: true,
-      Users: [],
-      Orders: [],
-      nameShop: "",
-      Receive: 0,
-      objAddDelivery: {},
-      url: "http://localhost:60189/odata",
-      headers: [
-        { text: "Stt", align: "center", sortable: false, value: "Stt" },
-        { text: "Mã", align: "start", sortable: false, value: "Id" },
-        { text: "Tên khách hàng", align: "start", value: "CustomerName" },
-        { text: "Địa chỉ", value: "TheAddresss", align: "left" },
-        { text: "Số điện thoại", value: "PhoneNumber" },
-        { text: "COD", value: "Cod" },
-        { text: "Ship", value: "ShipFee" },
-        { text: "Ship", value: "ShipFee" },
-        { text: "Tổng thu", value: "Sum" },
-      ],
-      Code: [],
-    };
-  },
   async mounted() {
     this.Province = await this.getProvince();
-    this.Users = await this.getUser();
-    this.Code = await this.getIdFromOrder();
+    this.Shop = await this.getShop();
     this.getDataFromApi();
-  },
-  computed: {
-    idOrder() {
-      return this.Code;
-    },
   },
   watch: {
     DateOfIssueIdNumber(val) {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
-    },
-    DateOfIssueIdNumberModal(val) {
-      this.dateFormattedModal = this.formatDate(this.DateOfIssueIdNumberModal);
     },
     async ProvinceId(val) {
       if (val) {
@@ -233,15 +183,77 @@ export default {
         }
       }
     },
-    IdStaff(val) {
+    IdShop(val) {
       this.getDataFromApi();
     },
   },
+  data() {
+    return {
+      Province: [],
+      IdShop: "",
+      ProvinceId: null,
+      ProvinceName: "",
+      District: [],
+      DistrictId: null,
+      DistrictName: "",
+      Ward: [],
+      WardId: null,
+      WardName: "",
+      pageCount: 0,
+      options: {},
+      total: 0,
+      IdOrder: "",
+      DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
+      dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
+      address: "",
+      menu: false,
+      isShow: false,
+      Show: false,
+      loading: true,
+      Shop: [],
+      Orders: [],
+      objAddOrder: {},
+      IdKey: "",
+      url: "http://localhost:60189/odata",
+      headers: [
+        {
+          text: "Stt",
+          align: "center",
+          sortable: false,
+          value: "Stt",
+        },
+        {
+          text: "Mã",
+          align: "start",
+          sortable: false,
+          value: "Id",
+        },
+        { text: "Tên khách hàng", align: "start", value: "CustomerName" },
+        { text: "Địa chỉ", value: "TheAddresss", align: "left" },
+        { text: "Số điện thoại", value: "PhoneNumber" },
+        { text: "COD", value: "Cod" },
+        { text: "Ship", value: "ShipFee" },
+        { text: "Tổng thu", value: "Sum" },
+        { text: "Trạng thái", value: "Action" },
+      ],
+      StateSelected: 0,
+      States: [
+        { Id: "0", Name: "Chưa thanh toán" },
+        { Id: "1", Name: "Đã thanh toán" },
+      ],
+      totalCodSucess: 0,
+      totalShipSucess: 0,
+      totalCodUnSucess: 0,
+      totalShipUnSucess: 0,
+      countSucess: 0,
+      countUnSucess: 0,
+    };
+  },
 
   methods: {
-    async getUser() {
+    async getShop() {
       let resp = await this.$stores.api.get(
-        `${this.url}/TheUserView?$filter=IdRole eq 2&$orderby=Name asc`
+        `${this.url}/TheUserView?$filter=IdRole eq 3&$orderby=Name asc`
       );
       if (resp && resp.status == 200) {
         let data = await resp.json();
@@ -274,16 +286,16 @@ export default {
       const [month, day, year] = date.split("/");
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
-    async SaveModal() {
-      this.objAddDelivery.IdStaff = this.IdStaff;
-      let objAddDelivery = this.objAddDelivery;
-      let url = `${this.url}/DeliveryOrders`;
-      let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
+    async SaveModal(e) {
+      let state = {};
+      state.IsSuccess = this.StateSelected;
+      let key = this.IdKey;
+      let url = `${this.url}/Orders/${key}`;
+      let resp = await this.$stores.api.patch(`${url}`, state);
       if (resp && resp.status == 200) {
         alert("Updated successfully.");
         this.Show = false;
         this.getDataFromApi();
-        this.Code = await this.getIdFromOrder();
       } else {
         alert("Updated failed.");
       }
@@ -293,27 +305,47 @@ export default {
       this.fakeApiCall().then((data) => {
         this.Orders = data.items;
         this.total = data.total;
+        this.totalCodSucess = this.sum(
+          data.items.filter((_) => _.IsSuccess == 1),
+          "Cod"
+        );
+        this.countSucess = data.items.filter((_) => _.IsSuccess == 1).length;
+        this.countUnSucess = data.items.filter((_) => _.IsSuccess == 0).length;
+        this.totalShipSucess = this.sum(
+          data.items.filter((_) => _.IsSuccess == 1),
+          "ShipFee"
+        );
+        this.totalCodUnSucess = this.sum(
+          data.items.filter((_) => _.IsSuccess == 0),
+          "Cod"
+        );
+        this.totalShipUnSucess = this.sum(
+          data.items.filter((_) => _.IsSuccess == 0),
+          "ShipFee"
+        );
         this.loading = false;
+        console.log(this.countUnSucess);
       });
     },
     async fakeApiCall() {
       const { sortBy, page, itemsPerPage } = this.options;
 
-      let data = await this.getDelivery(page, itemsPerPage);
+      let data = await this.getOrders(page, itemsPerPage);
       return {
         items: data.items,
         total: data.total,
       };
     },
-    async getDelivery(page, itemsPerPage) {
+    async getOrders(page, itemsPerPage) {
       let top = "";
       let skip = "";
-      if (this.IdStaff) {
+      if (this.IdShop) {
         if (itemsPerPage > 0) {
           top = `&$top=${itemsPerPage}`;
           skip = `&$skip=${(page - 1) * itemsPerPage}`;
         }
-        let url = `${this.url}/Orders?$expand=DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdStaff}')&$count=true${top}${skip}`;
+        // let filter = search && ` contains(Name, '${search}')`;
+        let url = `${this.url}/Orders?$filter=IdShop eq '${this.IdShop}'&$count=true${top}${skip}`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();
@@ -323,19 +355,19 @@ export default {
             items: data.value,
           };
         }
-        return { total: 0, items: [] };
       }
       return { total: 0, items: [] };
     },
-    async getIdFromOrder() {
-      let resp = await this.$stores.api.get(
-        `http://localhost:60189/Order/GetId`
-      );
-      if (resp && resp.status == 200) {
-        let data = await resp.json();
-        return data;
+    async onState(item) {
+      this.IdKey = item.Id;
+      if (item.IsSuccess == 0) {
+        this.Show = true;
       }
-      return null;
+    },
+    sum(array, key) {
+      return array.reduce(function(r, a) {
+        return r + a[key];
+      }, 0);
     },
   },
 };
