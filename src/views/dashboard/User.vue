@@ -10,7 +10,7 @@
           style="float: right"
           rounded
           class="mr-0"
-          @click="(isShow = true), (objAddUser = {})"
+          @click="(isShow = true), (objAddUser = {}), (IdProvince = [])"
         >
           Thêm
         </v-btn>
@@ -140,6 +140,7 @@
     <input-detail
       :user="objAddUser"
       :isShow="isShow"
+      :IdProvince="IdProvince"
       class="printed-content"
       @update="
         (e) => {
@@ -202,6 +203,7 @@ export default {
       searchShop: "",
       pageCountStaff: 0,
       pageCountShop: 0,
+      IdProvince: null,
       objAddUser: {},
       url: "http://localhost:60189/odata",
       headers: [

@@ -116,9 +116,14 @@ export default {
         to: "/Manager_orders",
       },
       {
-        title: "Thống kê đơn hàng nhân viên",
+        title: "Thống kê nhân viên",
         icon: "mdi-mouse",
         to: "/Statistical_Staff",
+      },
+      {
+        title: "Thống kê Shop",
+        icon: "mdi-mouse",
+        to: "/Statistical_Shop",
       },
     ],
   }),

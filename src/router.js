@@ -40,7 +40,7 @@ export default new Router({
         {
           name: 'Quản lý giao hàng',
           path: 'Manager_delivery',
-          component: () => import('@/views/dashboard/MyDelivery/Manager'),
+          component: () => import('@/views/dashboard/MyDelivery/ManagerDelivery'),
         },
          // Manager Stock Orders
         {
@@ -56,9 +56,15 @@ export default new Router({
         },
         // Statistical Staff
         {
-          name: 'Thống kê đơn hàng nhân viên',
+          name: 'Thống kê nhân viên',
           path: 'Statistical_Staff',
           component: () => import('@/views/dashboard/Statistical/StatisticalStaff'),
+        },
+        // Statistical Shop
+        {
+          name: 'Thống kê Shop',
+          path: 'Statistical_Shop',
+          component: () => import('@/views/dashboard/Statistical/StatisticalShop'),
         },
       ],
     },

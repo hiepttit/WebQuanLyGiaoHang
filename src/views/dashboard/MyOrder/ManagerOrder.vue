@@ -128,13 +128,13 @@ import moment from "moment";
 export default {
   name: "Orders",
   async mounted() {
-    this.Province = await this.getProvince();
     this.Shop = await this.getShop();
     this.getDataFromApi();
   },
   watch: {
     DateOfIssueIdNumber(val) {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
+      this.getDataFromApi();
     },
     IdShop(val) {
       this.getDataFromApi();
@@ -142,7 +142,6 @@ export default {
   },
   data() {
     return {
-      Province: [],
       IdShop: "",
       pageCount: 0,
       options: {},
@@ -206,16 +205,6 @@ export default {
         return data.value;
       }
       return [];
-    },
-    async getProvince() {
-      let resp = await this.$stores.api.get(
-        `${this.url}/Province?$orderBy=Name asc`
-      );
-      if (resp && resp.status == 200) {
-        let data = await resp.json();
-        return data.value;
-      }
-      return null;
     },
     formatDate(date) {
       if (!date) return null;
@@ -306,7 +295,7 @@ export default {
           skip = `&$skip=${(page - 1) * itemsPerPage}`;
         }
         // let filter = search && ` contains(Name, '${search}')`;
-        let url = `${this.url}/Orders?$filter=IdShop eq '${this.IdShop}'&$count=true${top}${skip}`;
+        let url = `${this.url}/Orders?$filter=IdShop eq '${this.IdShop}'and CreatedAt eq ${this.DateOfIssueIdNumber}&$count=true${top}${skip}`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();

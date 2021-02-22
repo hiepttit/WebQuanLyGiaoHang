@@ -178,7 +178,7 @@ import myModal from "../components/Modal.vue";
 
 export default {
   components: { myModal },
-  props: ["user", "isShow"],
+  props: ["user", "IdProvince", "isShow"],
   data() {
     return {
       menu: false,
@@ -201,7 +201,6 @@ export default {
     };
   },
   async mounted() {
-    this.Province = await this.getProvince();
     this.roles = await this.getRoles();
   },
   watch: {
@@ -210,6 +209,16 @@ export default {
       handler(val) {
         this.objAddUser = val;
       },
+    },
+    async IdProvince(val) {
+      this.Province = await this.getProvince();
+      this.ProvinceId = val;
+      this.DistrictId = val;
+      this.WardId = val;
+      this.District = [];
+      this.Ward = [];
+      this.address = "";
+      this.WardId = val;
     },
     DateOfIssueIdNumber(val) {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);

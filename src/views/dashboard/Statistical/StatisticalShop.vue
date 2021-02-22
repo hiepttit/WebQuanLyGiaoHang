@@ -5,9 +5,9 @@
         <v-select
           item-text="Name"
           item-value="Id"
-          :items="Users"
-          v-model="IdStaff"
-          label="Tên nhân viên*"
+          :items="Shop"
+          v-model="IdShop"
+          label="Tên Shop*"
           :rules="[(v) => !!v || 'Item is required']"
           required
           style="float: right"
@@ -92,7 +92,7 @@
               <tbody>
                 <template v-for="(item, i) in OrdersSuccess">
                   <tr :key="`r${i}`">
-                    <td>{{ i + 1 }}</td>
+                    <td>{{ i }}</td>
                     <td>{{ item.Id }}</td>
                     <td>{{ item.CustomerName }}</td>
                     <td>{{ item.TheAddresss }}</td>
@@ -161,7 +161,7 @@
               <tbody>
                 <template v-for="(item, i) in OrdersFail">
                   <tr :key="`r${i}`">
-                    <td>{{ i + 1 }}</td>
+                    <td>{{ i }}</td>
                     <td>{{ item.Id }}</td>
                     <td>{{ item.CustomerName }}</td>
                     <td>{{ item.TheAddresss }}</td>
@@ -230,7 +230,7 @@
               <tbody>
                 <template v-for="(item, i) in OrdersDelay">
                   <tr :key="`r${i}`">
-                    <td>{{ i + 1 }}</td>
+                    <td>{{ i }}</td>
                     <td>{{ item.Id }}</td>
                     <td>{{ item.CustomerName }}</td>
                     <td>{{ item.TheAddresss }}</td>
@@ -302,7 +302,7 @@
               <tbody>
                 <template v-for="(item, i) in OrdersHalf">
                   <tr :key="`r${i}`">
-                    <td>{{ i + 1 }}</td>
+                    <td>{{ i }}</td>
                     <td>{{ item.Id }}</td>
                     <td>{{ item.CustomerName }}</td>
                     <td>{{ item.TheAddresss }}</td>
@@ -330,11 +330,11 @@ export default {
   data() {
     return {
       total: 0,
-      IdStaff: "",
+      IdShop: "",
       DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       menu: false,
-      Users: [],
+      Shop: [],
       Orders: [],
       OrdersSuccess: [],
       OrdersDelay: [],
@@ -345,7 +345,7 @@ export default {
     };
   },
   async mounted() {
-    this.Users = await this.getUser();
+    this.Shop = await this.getShop();
     this.getDataFromApi();
   },
   watch: {
@@ -353,15 +353,15 @@ export default {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
       this.getDataFromApi();
     },
-    IdStaff(val) {
+    IdShop(val) {
       this.getDataFromApi();
     },
   },
 
   methods: {
-    async getUser() {
+    async getShop() {
       let resp = await this.$stores.api.get(
-        `${this.url}/TheUserView?$filter=IdRole eq 2&$orderby=Name asc`
+        `${this.url}/TheUserView?$filter=IdRole eq 3&$orderby=Name asc`
       );
       if (resp && resp.status == 200) {
         let data = await resp.json();
@@ -390,20 +390,15 @@ export default {
         this.Orders = data.items;
         this.OrdersSuccess = data.items.filter((_) => _.TheStatus == 1);
         this.OrdersFail = data.items.filter((_) => _.TheStatus == 2);
-        this.OrdersHalf = data.items.filter((_) => _.TheStatus == 4);
-        this.total = data.total;
-        this.loading = false;
-      });
-      this.getStockOrder().then((data) => {
-        this.Orders = data.items;
         this.OrdersDelay = data.items.filter((_) => _.TheStatus == 3);
+        this.OrdersHalf = data.items.filter((_) => _.TheStatus == 4);
         this.total = data.total;
         this.loading = false;
       });
     },
     async getDelivery() {
-      if (this.IdStaff) {
-        let url = `${this.url}/Orders?$expand=DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdStaff}')and CreatedAt eq ${this.DateOfIssueIdNumber}&$count=true`;
+      if (this.IdShop) {
+        let url = `${this.url}/Orders?$expand=StockOrders&$filter=IdShop eq '${this.IdShop}'and CreatedAt eq ${this.DateOfIssueIdNumber}&$count=true`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();
@@ -416,32 +411,6 @@ export default {
         return { total: 0, items: [] };
       }
       return { total: 0, items: [] };
-    },
-    async getStockOrder() {
-      if (this.IdStaff) {
-        let url = `${this.url}/Orders?$expand=StockOrders,DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdStaff}')and StockOrders/any(x:x/Id ne null) and CreatedAt eq ${this.DateOfIssueIdNumber} &$count=true`;
-        let resp = await this.$stores.api.get(`${url}`);
-        if (resp && resp.status == 200) {
-          let data = await resp.json();
-          let total = data["@odata.count"];
-          return {
-            total,
-            items: data.value,
-          };
-        }
-        return { total: 0, items: [] };
-      }
-      return { total: 0, items: [] };
-    },
-    async getDelayDate(idOrder) {
-      let resp = await this.$stores.api.get(
-        `${this.url}/StockOrder?$select=Delaydate&$filter=IdTheOrder eq '${idOrder}'`
-      );
-      if (resp && resp.status == 200) {
-        let data = await resp.json();
-        return data.value;
-      }
-      return null;
     },
     formatdelayDate(date) {
       if (date.length) {

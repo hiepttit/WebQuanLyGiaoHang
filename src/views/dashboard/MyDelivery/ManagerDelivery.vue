@@ -258,6 +258,7 @@ export default {
   watch: {
     DateOfIssueIdNumber(val) {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
+      this.getDataFromApi();
     },
     DateOfIssueIdNumberModal(val) {
       this.dateFormattedModal = this.formatDate(this.DateOfIssueIdNumberModal);
@@ -327,16 +328,19 @@ export default {
         top = `&$top=${itemsPerPage}`;
         skip = `&$skip=${(page - 1) * itemsPerPage}`;
       }
-      // let filter = search && ` contains(Name, '${search}')`;
-      let url = `${this.url}/Orders?$expand=DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdUser}')&$count=true${top}${skip}`;
-      let resp = await this.$stores.api.get(`${url}`);
-      if (resp && resp.status == 200) {
-        let data = await resp.json();
-        let total = data["@odata.count"];
-        return {
-          total,
-          items: data.value.filter((_) => _.DeliveryOrders.length > 0),
-        };
+      if (this.IdUser) {
+        // let filter = search && ` contains(Name, '${search}')`;
+        let url = `${this.url}/Orders?$expand=DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdUser}') and CreatedAt eq ${this.DateOfIssueIdNumber}&$count=true${top}${skip}`;
+        let resp = await this.$stores.api.get(`${url}`);
+        if (resp && resp.status == 200) {
+          let data = await resp.json();
+          let total = data["@odata.count"];
+          return {
+            total,
+            items: data.value.filter((_) => _.DeliveryOrders.length > 0),
+          };
+        }
+        return { total: 0, items: [] };
       }
       return { total: 0, items: [] };
     },

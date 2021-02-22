@@ -24,30 +24,16 @@
         >
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
+              class="disabled"
               v-model="dateFormatted"
-              label="Ngày:"
+              label="Hôm nay:"
               prepend-icon="mdi-calendar"
               v-bind="attrs"
               @blur="date = parseDate(dateFormatted)"
               v-on="on"
             ></v-text-field>
           </template>
-          <v-date-picker
-            v-model="DateOfIssueIdNumber"
-            @input="menu = false"
-          ></v-date-picker>
         </v-menu>
-      </v-col>
-      <v-col cols="4">
-        <v-btn
-          color="success"
-          style="float: right"
-          rounded
-          class="mr-0"
-          @click="(isShow = true), (objAddOrder = {})"
-        >
-          Thêm
-        </v-btn>
       </v-col>
       <v-col cols="12" md="12">
         <h1>Số lượng: {{ total }}</h1>
@@ -103,44 +89,15 @@
         </base-material-card>
       </v-col>
     </v-row>
-    <input-detail
-      :user="objAddOrder"
-      :isShow="isShow"
-      @update="
-        (e) => {
-          SaveModal(e);
-        }
-      "
-      @close="isShow = false"
-    />
-    <my-Modal :show="Show" :title="'In mã'" @close="Show = false">
-      <v-col cols="12">
-        <VueBarcode
-          v-bind:options="{ lineColor: '#0275d8', text: 'Scan' }"
-          id="printImg"
-          v-bind:value="IdOrder"
-        />
-      </v-col>
-      <template v-slot:m-foot>
-        <v-btn color="blue darken-1" text @click="PrintCode()">
-          In
-        </v-btn>
-      </template>
-    </my-Modal>
   </v-container>
 </template>
 
 <script>
-import InputDetail from "./Inputcomponents/InputOrderDetail.vue";
 import moment from "moment";
-import VueBarcode from "vue-barcode";
-import myModal from "./components/Modal.vue";
 
 export default {
-  components: { InputDetail, VueBarcode, myModal },
   name: "Orders",
   async mounted() {
-    this.Province = await this.getProvince();
     this.Shop = await this.getShop();
     this.getDataFromApi();
   },
@@ -148,69 +105,13 @@ export default {
     DateOfIssueIdNumber(val) {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
     },
-    async ProvinceId(val) {
-      if (val) {
-        let resp = await this.$stores.api.get(
-          `${this.url}/District?$filter=ProvinceId eq ${val}&$orderby=Name asc`
-        );
-        if (resp && resp.status == 200) {
-          let data = await resp.json();
-          this.District = data.value;
-        }
-        let respName = await this.$stores.api.get(
-          `${this.url}/Province?$filter=Id eq ${val}`
-        );
-        if (respName && respName.status == 200) {
-          let data = await respName.json();
-          this.ProvinceName = data.value[0].Name;
-        }
-      }
-    },
-    async DistrictId(val) {
-      if (val) {
-        let resp = await this.$stores.api.get(
-          `${this.url}/odata/Ward?$filter=DistrictId eq ${val}&$orderby=Name asc`
-        );
-        if (resp && resp.status == 200) {
-          let data = await resp.json();
-          this.Ward = data.value;
-        }
-        let respName = await this.$stores.api.get(
-          `${this.url}/odata/District?$filter=Id eq ${val}`
-        );
-        if (respName && respName.status == 200) {
-          let data = await respName.json();
-          this.DistrictName = data.value[0].Name;
-        }
-      }
-    },
-    async WardId(val) {
-      if (val) {
-        let respName = await this.$stores.api.get(
-          `${this.url}/odata/Ward?$filter=Id eq ${val}`
-        );
-        if (respName && respName.status == 200) {
-          let data = await respName.json();
-          this.WardName = data.value[0].Type + " " + data.value[0].Name;
-        }
-      }
-    },
     IdShop(val) {
       this.getDataFromApi();
     },
   },
   data() {
     return {
-      Province: [],
       IdShop: "",
-      ProvinceId: null,
-      ProvinceName: "",
-      District: [],
-      DistrictId: null,
-      DistrictName: "",
-      Ward: [],
-      WardId: null,
-      WardName: "",
       pageCount: 0,
       options: {},
       total: 0,
@@ -262,16 +163,6 @@ export default {
       }
       return [];
     },
-    async getProvince() {
-      let resp = await this.$stores.api.get(
-        `${this.url}/Province?$orderBy=Name asc`
-      );
-      if (resp && resp.status == 200) {
-        let data = await resp.json();
-        return data.value;
-      }
-      return null;
-    },
     formatDate(date) {
       if (!date) return null;
 
@@ -289,20 +180,6 @@ export default {
 
       const [month, day, year] = date.split("/");
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-    },
-    async SaveModal(e) {
-      this.objAddOrder = e;
-      this.objAddOrder.IdShop = this.IdShop;
-      let objAddOrder = this.objAddOrder;
-      let url = `${this.url}/Orders`;
-      let resp = await this.$stores.api.post(`${url}`, objAddOrder);
-      if (resp && resp.status == 200) {
-        alert("Updated successfully.");
-        this.isShow = false;
-        this.getDataFromApi();
-      } else {
-        alert("Updated failed.");
-      }
     },
     getDataFromApi() {
       this.loading = true;

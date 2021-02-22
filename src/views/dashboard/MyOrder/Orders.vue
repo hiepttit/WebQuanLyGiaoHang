@@ -44,7 +44,7 @@
           style="float: right"
           rounded
           class="mr-0"
-          @click="(isShow = true), (objAddOrder = {})"
+          @click="(isShow = true), (objAddOrder = {}), (IdProvince = [])"
         >
           Thêm
         </v-btn>
@@ -111,6 +111,7 @@
     </v-row>
     <input-detail
       :user="objAddOrder"
+      :IdProvince="IdProvince"
       :isShow="isShow"
       @update="
         (e) => {
@@ -146,60 +147,13 @@ export default {
   components: { InputDetail, VueBarcode, myModal },
   name: "Orders",
   async mounted() {
-    this.Province = await this.getProvince();
     this.Shop = await this.getShop();
     this.getDataFromApi();
   },
   watch: {
     DateOfIssueIdNumber(val) {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
-    },
-    async ProvinceId(val) {
-      if (val) {
-        let resp = await this.$stores.api.get(
-          `${this.url}/District?$filter=ProvinceId eq ${val}&$orderby=Name asc`
-        );
-        if (resp && resp.status == 200) {
-          let data = await resp.json();
-          this.District = data.value;
-        }
-        let respName = await this.$stores.api.get(
-          `${this.url}/Province?$filter=Id eq ${val}`
-        );
-        if (respName && respName.status == 200) {
-          let data = await respName.json();
-          this.ProvinceName = data.value[0].Name;
-        }
-      }
-    },
-    async DistrictId(val) {
-      if (val) {
-        let resp = await this.$stores.api.get(
-          `${this.url}/odata/Ward?$filter=DistrictId eq ${val}&$orderby=Name asc`
-        );
-        if (resp && resp.status == 200) {
-          let data = await resp.json();
-          this.Ward = data.value;
-        }
-        let respName = await this.$stores.api.get(
-          `${this.url}/odata/District?$filter=Id eq ${val}`
-        );
-        if (respName && respName.status == 200) {
-          let data = await respName.json();
-          this.DistrictName = data.value[0].Name;
-        }
-      }
-    },
-    async WardId(val) {
-      if (val) {
-        let respName = await this.$stores.api.get(
-          `${this.url}/odata/Ward?$filter=Id eq ${val}`
-        );
-        if (respName && respName.status == 200) {
-          let data = await respName.json();
-          this.WardName = data.value[0].Type + " " + data.value[0].Name;
-        }
-      }
+      this.getDataFromApi();
     },
     IdShop(val) {
       this.getDataFromApi();
@@ -207,20 +161,12 @@ export default {
   },
   data() {
     return {
-      Province: [],
       IdShop: "",
-      ProvinceId: null,
-      ProvinceName: "",
-      District: [],
-      DistrictId: null,
-      DistrictName: "",
-      Ward: [],
-      WardId: null,
-      WardName: "",
       pageCount: 0,
       options: {},
       total: 0,
       IdOrder: "",
+      IdProvince: null,
       DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       address: "",
@@ -266,16 +212,6 @@ export default {
         return data.value;
       }
       return [];
-    },
-    async getProvince() {
-      let resp = await this.$stores.api.get(
-        `${this.url}/Province?$orderBy=Name asc`
-      );
-      if (resp && resp.status == 200) {
-        let data = await resp.json();
-        return data.value;
-      }
-      return null;
     },
     formatDate(date) {
       if (!date) return null;
@@ -332,7 +268,7 @@ export default {
           skip = `&$skip=${(page - 1) * itemsPerPage}`;
         }
         // let filter = search && ` contains(Name, '${search}')`;
-        let url = `${this.url}/Orders?$filter=IdShop eq '${this.IdShop}'&$count=true${top}${skip}`;
+        let url = `${this.url}/Orders?$filter=IdShop eq '${this.IdShop}' and CreatedAt eq ${this.DateOfIssueIdNumber}&$count=true${top}${skip}`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();
