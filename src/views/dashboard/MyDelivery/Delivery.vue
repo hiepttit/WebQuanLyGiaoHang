@@ -49,6 +49,17 @@
           Thêm
         </v-btn>
       </v-col>
+      <v-col cols="4" md="4">
+        <v-btn
+          color="success"
+          style="float: right"
+          rounded
+          class="mr-0"
+          @click="exportExcel()"
+        >
+          xuất file
+        </v-btn>
+      </v-col>
       <v-col cols="12" md="12">
         <h1>Số lượng: {{ total }}</h1>
         <base-material-card color="green" class="px-5 py-3">
@@ -105,6 +116,18 @@
           label="Chọn mã:"
           dense
           outlined
+          multiple
+          v-model="IdTheOrder"
+        ></v-select>
+      </v-col>
+      <v-col v-if="CodeInStock.length" cols="12">
+        <v-select
+          item-text="id"
+          item-value="id"
+          :items="CodeInStock"
+          label="Hàng tồn kho:"
+          dense
+          outlined
           v-model="objAddDelivery.IdTheOrder"
         ></v-select>
       </v-col>
@@ -123,6 +146,7 @@
 <script>
 import moment from "moment";
 import myModal from "../components/Modal.vue";
+import XLSX from "xlsx";
 
 export default {
   components: { myModal },
@@ -156,11 +180,14 @@ export default {
         { text: "Tổng thu", value: "Sum" },
       ],
       Code: [],
+      IdTheOrder: [],
+      CodeInStock: [],
     };
   },
   async mounted() {
     this.Users = await this.getUser();
     this.Code = await this.getIdFromOrder();
+    this.CodeInStock = await this.getIdFromStockOrder();
     this.getDataFromApi();
   },
   watch: {
@@ -206,14 +233,20 @@ export default {
       this.objAddDelivery.IdStaff = this.IdStaff;
       let objAddDelivery = this.objAddDelivery;
       let url = `${this.url}/DeliveryOrders`;
-      let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
-      if (resp && resp.status == 200) {
-        alert("Updated successfully.");
-        this.Show = false;
-        this.getDataFromApi();
-        this.Code = await this.getIdFromOrder();
-      } else {
-        alert("Updated failed.");
+      let arr = this.IdTheOrder;
+      for (var i = 0; i < arr.length; i++) {
+        objAddDelivery.IdTheOrder = arr[i];
+        let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
+        if (resp && resp.status == 200 && i == arr.length - 1) {
+          alert("Updated successfully.");
+          this.Show = false;
+          this.getDataFromApi();
+          this.Code = await this.getIdFromOrder();
+        } else {
+          if (i == arr.length - 1) {
+            alert("Updated failed.");
+          }
+        }
       }
     },
     getDataFromApi() {
@@ -264,6 +297,74 @@ export default {
         return data;
       }
       return null;
+    },
+    async getIdFromStockOrder() {
+      let resp = await this.$stores.api.get(
+        `http://localhost:60189/Order/GetInStockId`
+      );
+      if (resp && resp.status == 200) {
+        let data = await resp.json();
+        return data;
+      }
+      return null;
+    },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map((v) => filterVal.map((j) => v[j]));
+    },
+    exportExcel() {
+      // const header = ["Id", "CustomerName", "PhoneNumber", "TheAddresss"];
+      const filterVal = ["Id", "CustomerName", "PhoneNumber", "TheAddresss"];
+      const headerDisplay = ["Mã", "Tên", "Số điện thoại", "Địa chỉ"];
+
+      const data = this.formatJson(filterVal, this.Orders);
+      const newData = [headerDisplay, ...data];
+      // const jsonWorkSheet = XLSX.utils.json_to_sheet(newData, {
+      //   header: header,
+      //   skipHeader: true,
+      // });
+
+      let wb = XLSX.utils.book_new(),
+        ws = XLSX.utils.aoa_to_sheet(newData);
+      ws.font = { size: 13 };
+      let wscols = [
+        { wch: 10 },
+        { wch: 40 },
+        { wch: 30 },
+        { wch: 5 },
+        { wch: 20 },
+      ];
+      ws["!cols"] = wscols;
+      debugger;
+      XLSX.utils.book_append_sheet(wb, ws, "sheet1");
+      // wb.Sheets["sheet1"]["A2"].s = {
+      //   fill: {
+      //     patternType: "none", // none / solid
+      //     fgColor: { rgb: "FF000000" },
+      //     bgColor: { rgb: "FFFFFFFF" },
+      //   },
+      //   font: {
+      //     name: "Times New Roman",
+      //     sz: 16,
+      //     color: { rgb: "#FF000000" },
+      //     bold: true,
+      //     italic: false,
+      //     underline: false,
+      //   },
+      //   border: {
+      //     top: { style: "thin", color: { auto: 1 } },
+      //     right: { style: "thin", color: { auto: 1 } },
+      //     bottom: { style: "thin", color: { auto: 1 } },
+      //     left: { style: "thin", color: { auto: 1 } },
+      //   },
+      // };
+      XLSX.writeFile(wb, "Rebot.xlsx");
+      // const workBook = {
+      //   SheetNames: ["sheet1"], // sheet name
+      //   Sheets: {
+      //     sheet1: jsonWorkSheet,
+      //   },
+      // };
+      // XLSX.writeFile(workBook, "test.xlsx");
     },
   },
 };
