@@ -1,7 +1,7 @@
 <template>
   <v-container id="dashboard" fluid tag="section">
     <v-row>
-      <v-col cols="4">
+      <v-col cols="12">
         <v-select
           item-text="Name"
           item-value="Id"
@@ -10,10 +10,8 @@
           label="Tên nhân viên*"
           :rules="[(v) => !!v || 'Item is required']"
           required
-          style="float: right"
+          style="width:40%;margin: 0 auto;"
         ></v-select>
-      </v-col>
-      <v-col cols="2">
         <v-menu
           v-model="menu"
           :close-on-content-click="false"
@@ -30,6 +28,7 @@
               v-bind="attrs"
               @blur="date = parseDate(dateFormatted)"
               v-on="on"
+              style="width:40%;margin: 0 auto;"
             ></v-text-field>
           </template>
           <v-date-picker
@@ -43,7 +42,7 @@
         <base-material-card color="green" class="px-5 py-3">
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
-              Shop
+              Đơn hàng
               <v-card-title style="width: 200px; float: right">
                 <v-text-field
                   append-icon="mdi-magnify"
@@ -55,7 +54,7 @@
             </div>
 
             <div class="subtitle-1 font-weight-light">
-              Danh sách tất cả Shop
+              Danh sách tất cả đơn hàng
             </div>
           </template>
           <v-card-text>
@@ -120,6 +119,14 @@
           </v-card-text>
         </base-material-card>
       </v-col>
+      <template v-if="check.length">
+        <v-col cols="12" md="12">
+          <StockTable
+            :IdUser="IdUser"
+            :DateOfIssueIdNumber="DateOfIssueIdNumber"
+          ></StockTable>
+        </v-col>
+      </template>
     </v-row>
     <my-Modal
       :show="Show"
@@ -197,13 +204,13 @@
 <script>
 import moment from "moment";
 import myModal from "../components/Modal.vue";
+import StockTable from "./MangerStock.vue";
 
 export default {
-  components: { myModal },
+  components: { myModal, StockTable },
   name: "Orders",
   data() {
     return {
-      Province: [],
       IdUser: "",
       pageCount: 0,
       options: {},
@@ -248,22 +255,24 @@ export default {
       IdKey: "",
       data: [],
       realReceive: null,
+      check: [],
     };
   },
   async mounted() {
-    this.Province = await this.getProvince();
     this.Users = await this.getUser();
     this.getDataFromApi();
   },
   watch: {
-    DateOfIssueIdNumber(val) {
+    async DateOfIssueIdNumber(val) {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
+      this.check = await this.checkInStock();
       this.getDataFromApi();
     },
     DateOfIssueIdNumberModal(val) {
       this.dateFormattedModal = this.formatDate(this.DateOfIssueIdNumberModal);
     },
-    IdUser(val) {
+    async IdUser(val) {
+      this.check = await this.checkInStock();
       this.getDataFromApi();
     },
   },
@@ -279,15 +288,15 @@ export default {
       }
       return [];
     },
-    async getProvince() {
-      let resp = await this.$stores.api.get(
-        `${this.url}/Province?$orderBy=Name asc`
-      );
+    async checkInStock() {
+      let url = `${this.url}/Orders?$expand=StockOrders,DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdUser}')and StockOrders/any(x:x/Id ne null) and StockOrders/any(x:x/DeletedAt eq ${this.DateOfIssueIdNumber})`;
+      let resp = await this.$stores.api.get(`${url}`);
       if (resp && resp.status == 200) {
         let data = await resp.json();
+        let total = data["@odata.count"];
         return data.value;
       }
-      return null;
+      return [];
     },
     formatDate(date) {
       if (!date) return null;

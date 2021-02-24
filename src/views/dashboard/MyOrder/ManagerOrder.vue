@@ -1,7 +1,7 @@
 <template>
   <v-container id="dashboard" fluid tag="section">
     <v-row>
-      <v-col cols="4">
+      <v-col cols="12">
         <v-select
           item-text="Name"
           item-value="Id"
@@ -10,10 +10,8 @@
           label="Tên Shop*"
           :rules="[(v) => !!v || 'Item is required']"
           required
-          style="float: right"
+          style="width:40%;margin: 0 auto;"
         ></v-select>
-      </v-col>
-      <v-col cols="2">
         <v-menu
           v-model="menu"
           :close-on-content-click="false"
@@ -28,6 +26,7 @@
               label="Ngày:"
               prepend-icon="mdi-calendar"
               v-bind="attrs"
+              style="width:40%;margin: 0 auto;"
               @blur="date = parseDate(dateFormatted)"
               v-on="on"
             ></v-text-field>
@@ -38,25 +37,27 @@
           ></v-date-picker>
         </v-menu>
       </v-col>
-      <v-col style="float: right;" cols="9" md="9">
-        <div style="background-color:#1867c0" class="statistical">
-          <h1>Đơn hàng đã thanh toán: {{ countSucess }}</h1>
-          <!-- <h1>Tổng phí Cod: {{ totalCodSucess }}</h1>
+      <v-row>
+        <v-col cols="6">
+          <div style="background-color:#1867c0;" class="statistical">
+            <h1>Đơn hàng đã thanh toán: {{ countSucess }}</h1>
+            <!-- <h1>Tổng phí Cod: {{ totalCodSucess }}</h1>
           <h1>Tổng phí Ship: {{ totalShipSucess }}</h1>
           <h1>Tổng phí ban đầu: {{ totalCodSucess + totalShipSucess }}</h1> -->
-          <h1>Tổng phí đã trả: {{ totalRealSucess }}</h1>
-        </div>
-      </v-col>
-      <v-col cols="3" md="3">
-        <div style="background-color:#fb8c00;float:left" class="statistical">
-          <h1>Đơn hàng chưa thanh toán: {{ countUnSucess }}</h1>
-          <h1>Đơn hàng đã xong: {{ countRealUnSucess }}</h1>
-          <!-- <h1>Tổng phí Cod: {{ totalCodUnSucess }}</h1>
+            <h1>Tổng phí đã trả: {{ totalRealSucess }}</h1>
+          </div>
+        </v-col>
+        <v-col cols="6">
+          <div style="background-color:#fb8c00;float:left" class="statistical">
+            <h1>Đơn hàng chưa thanh toán: {{ countUnSucess }}</h1>
+            <h1>Đơn hàng đã xong: {{ countRealUnSucess }}</h1>
+            <!-- <h1>Tổng phí Cod: {{ totalCodUnSucess }}</h1>
           <h1>Tổng phí Ship: {{ totalShipUnSucess }}</h1>
           <h1>Tổng phí ban đầu: {{ totalCodUnSucess + totalShipUnSucess }}</h1> -->
-          <h1>Tổng phí phải trả: {{ totalRealUnSucess }}</h1>
-        </div>
-      </v-col>
+            <h1>Tổng phí phải trả: {{ totalRealUnSucess }}</h1>
+          </div>
+        </v-col>
+      </v-row>
       <v-col cols="12" md="12">
         <h1>Số lượng: {{ total }}</h1>
         <base-material-card color="green" class="px-5 py-3">

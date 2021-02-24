@@ -1,7 +1,7 @@
 <template>
   <v-container id="dashboard" fluid tag="section">
     <v-row>
-      <v-col cols="4">
+      <v-col cols="12">
         <v-select
           item-text="Name"
           item-value="Id"
@@ -10,10 +10,8 @@
           label="Tên Shop*"
           :rules="[(v) => !!v || 'Item is required']"
           required
-          style="float: right"
+          style="width:40%;margin: 0 auto;"
         ></v-select>
-      </v-col>
-      <v-col cols="2">
         <v-menu
           v-model="menu"
           :close-on-content-click="false"
@@ -29,6 +27,7 @@
               prepend-icon="mdi-calendar"
               v-bind="attrs"
               @blur="date = parseDate(dateFormatted)"
+              style="width:40%;margin: 0 auto;"
               v-on="on"
             ></v-text-field>
           </template>
@@ -37,8 +36,6 @@
             @input="menu = false"
           ></v-date-picker>
         </v-menu>
-      </v-col>
-      <v-col cols="4">
         <v-btn
           color="success"
           style="float: right"

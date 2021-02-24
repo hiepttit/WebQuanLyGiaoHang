@@ -1,7 +1,7 @@
 <template>
   <v-container id="dashboard" fluid tag="section">
     <v-row>
-      <v-col cols="4" md="4">
+      <v-col cols="12">
         <v-select
           item-text="Name"
           item-value="Id"
@@ -10,10 +10,8 @@
           label="Tên nhân viên*"
           :rules="[(v) => !!v || 'Item is required']"
           required
-          style="float: right"
+          style="width:40%;margin: 0 auto;"
         ></v-select>
-      </v-col>
-      <v-col cols="2">
         <v-menu
           v-model="menu"
           :close-on-content-click="false"
@@ -29,6 +27,7 @@
               prepend-icon="mdi-calendar"
               v-bind="attrs"
               @blur="date = parseDate(dateFormatted)"
+              style="width:40%;margin: 0 auto;"
               v-on="on"
             ></v-text-field>
           </template>
@@ -396,7 +395,7 @@ export default {
       });
       this.getStockOrder().then((data) => {
         this.Orders = data.items;
-        this.OrdersDelay = data.items.filter((_) => _.TheStatus == 3);
+        this.OrdersDelay = data.items.filter((_) => _.IsInStock == 1);
         this.total = data.total;
         this.loading = false;
       });
@@ -419,7 +418,7 @@ export default {
     },
     async getStockOrder() {
       if (this.IdStaff) {
-        let url = `${this.url}/Orders?$expand=StockOrders,DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdStaff}')and StockOrders/any(x:x/Id ne null) and CreatedAt eq ${this.DateOfIssueIdNumber} &$count=true`;
+        let url = `${this.url}/Orders?$expand=StockOrders,DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdStaff}')and StockOrders/any(x:x/Id ne null) and StockOrders/any(x:x/CreatedAt eq ${this.DateOfIssueIdNumber}) &$count=true`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();

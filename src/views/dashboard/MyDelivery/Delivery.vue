@@ -1,7 +1,7 @@
 <template>
   <v-container id="dashboard" fluid tag="section">
     <v-row>
-      <v-col cols="4" md="4">
+      <v-col cols="12" style="text-align: center;">
         <v-select
           item-text="Name"
           item-value="Id"
@@ -10,10 +10,8 @@
           label="Tên nhân viên*"
           :rules="[(v) => !!v || 'Item is required']"
           required
-          style="float: right"
+          style="width:40%;margin: 0 auto;"
         ></v-select>
-      </v-col>
-      <v-col cols="2">
         <v-menu
           v-model="menu"
           :close-on-content-click="false"
@@ -28,6 +26,7 @@
               label="Ngày:"
               prepend-icon="mdi-calendar"
               v-bind="attrs"
+              style="width:40%;margin: 0 auto;"
               @blur="date = parseDate(dateFormatted)"
               v-on="on"
             ></v-text-field>
@@ -37,19 +36,31 @@
             @input="menu = false"
           ></v-date-picker>
         </v-menu>
-      </v-col>
-      <v-col cols="4" md="4">
         <v-btn
           color="success"
-          style="float: right"
           rounded
           class="mr-0"
-          @click="Show = true"
+          @click="
+            Show = true;
+            hasStock = false;
+          "
         >
-          Thêm
+          Giao hàng
+        </v-btn>
+        <v-btn
+          v-if="CodeInStock.length"
+          color="warning"
+          rounded
+          class="mr-0"
+          @click="
+            Show = true;
+            hasStock = true;
+          "
+        >
+          Giao đơn tồn kho
         </v-btn>
       </v-col>
-      <v-col cols="4" md="4">
+      <!-- <v-col cols="4" md="4">
         <v-btn
           color="success"
           style="float: right"
@@ -59,7 +70,7 @@
         >
           xuất file
         </v-btn>
-      </v-col>
+      </v-col> -->
       <v-col cols="12" md="12">
         <h1>Số lượng: {{ total }}</h1>
         <base-material-card color="green" class="px-5 py-3">
@@ -106,9 +117,18 @@
           </v-card-text>
         </base-material-card>
       </v-col>
+      <template v-if="check.length">
+        <v-col cols="12" md="12">
+          <StockTable
+            :IdUser="IdStaff"
+            :DateOfIssueIdNumber="DateOfIssueIdNumber"
+            :isCreate="true"
+          ></StockTable>
+        </v-col>
+      </template>
     </v-row>
     <my-Modal :show="Show" :title="'THÊM ĐƠN GIAO HÀNG'" @close="Show = false">
-      <v-col cols="12">
+      <v-col v-if="!hasStock" cols="12">
         <v-select
           item-text="id"
           item-value="id"
@@ -120,19 +140,31 @@
           v-model="IdTheOrder"
         ></v-select>
       </v-col>
-      <v-col v-if="CodeInStock.length" cols="12">
-        <v-select
-          item-text="id"
-          item-value="id"
-          :items="CodeInStock"
-          label="Hàng tồn kho:"
-          dense
-          outlined
-          v-model="objAddDelivery.IdTheOrder"
-        ></v-select>
-      </v-col>
+      <template v-else-if="CodeInStock.length">
+        <v-col cols="12">
+          <v-select
+            item-text="id"
+            item-value="id"
+            :items="CodeInStock"
+            label="Hàng tồn kho:"
+            dense
+            outlined
+            multiple
+            v-model="IdInStock"
+          ></v-select>
+        </v-col>
+      </template>
+
       <template v-slot:m-foot>
-        <v-btn depressed color="primary" @click="SaveModal()">
+        <v-btn
+          v-if="CodeInStock.length && hasStock"
+          depressed
+          color="warning"
+          @click="DeliveryInStock()"
+        >
+          Ok
+        </v-btn>
+        <v-btn v-else depressed color="primary" @click="SaveModal()">
           Ok
         </v-btn>
         <v-btn depressed color="error">
@@ -147,9 +179,10 @@
 import moment from "moment";
 import myModal from "../components/Modal.vue";
 import XLSX from "xlsx";
+import StockTable from "./MangerStock.vue";
 
 export default {
-  components: { myModal },
+  components: { myModal, StockTable },
   name: "Orders",
   data() {
     return {
@@ -163,6 +196,7 @@ export default {
       menu: false,
       Show: false,
       loading: true,
+      hasStock: false,
       Users: [],
       Orders: [],
       nameShop: "",
@@ -182,6 +216,8 @@ export default {
       Code: [],
       IdTheOrder: [],
       CodeInStock: [],
+      IdInStock: [],
+      check: [],
     };
   },
   async mounted() {
@@ -191,14 +227,16 @@ export default {
     this.getDataFromApi();
   },
   watch: {
-    DateOfIssueIdNumber(val) {
+    async DateOfIssueIdNumber(val) {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
+      this.check = await this.checkInStock();
       this.getDataFromApi();
     },
     DateOfIssueIdNumberModal(val) {
       this.dateFormattedModal = this.formatDate(this.DateOfIssueIdNumberModal);
     },
-    IdStaff(val) {
+    async IdStaff(val) {
+      this.check = await this.checkInStock();
       this.getDataFromApi();
     },
   },
@@ -242,6 +280,31 @@ export default {
           this.Show = false;
           this.getDataFromApi();
           this.Code = await this.getIdFromOrder();
+        } else {
+          if (i == arr.length - 1) {
+            alert("Updated failed.");
+          }
+        }
+      }
+    },
+    async DeliveryInStock() {
+      this.objAddDelivery.IdStaff = this.IdStaff;
+      let objAddDelivery = this.objAddDelivery;
+      let url = `${this.url}/DeliveryOrders`;
+      let arr = this.IdInStock;
+      for (var i = 0; i < arr.length; i++) {
+        objAddDelivery.TheStatus = 1;
+        let resp = await this.$stores.api.patch(
+          `${url}/${arr[i]}`,
+          objAddDelivery
+        );
+        if (resp && resp.status == 200 && i == arr.length - 1) {
+          alert("Updated successfully.");
+          this.Show = false;
+          this.getDataFromApi();
+          this.Code = await this.getIdFromOrder();
+          this.check = await this.checkInStock();
+          this.CodeInStock = await this.getIdFromStockOrder();
         } else {
           if (i == arr.length - 1) {
             alert("Updated failed.");
@@ -310,6 +373,16 @@ export default {
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map((v) => filterVal.map((j) => v[j]));
+    },
+    async checkInStock() {
+      let url = `${this.url}/Orders?$expand=StockOrders,DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdStaff}')and StockOrders/any(x:x/Id ne null) and StockOrders/any(x:x/DeletedAt eq ${this.DateOfIssueIdNumber})`;
+      let resp = await this.$stores.api.get(`${url}`);
+      if (resp && resp.status == 200) {
+        let data = await resp.json();
+        let total = data["@odata.count"];
+        return data.value;
+      }
+      return [];
     },
     exportExcel() {
       // const header = ["Id", "CustomerName", "PhoneNumber", "TheAddresss"];
