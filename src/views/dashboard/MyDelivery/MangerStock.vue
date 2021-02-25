@@ -11,6 +11,7 @@
                 <v-text-field
                   append-icon="mdi-magnify"
                   label="Search"
+                  v-model="search"
                   single-line
                   hide-details
                 ></v-text-field>
@@ -170,6 +171,7 @@ export default {
       Orders: [],
       nameShop: "",
       Receive: 0,
+      search: "",
       objAddOrder: {},
       url: "http://localhost:60189/odata",
       headers: [
@@ -215,6 +217,11 @@ export default {
     IdUser(val) {
       this.getDataFromApi();
     },
+    search: {
+      handler(val) {
+        this.getDataFromApi();
+      },
+    },
   },
   methods: {
     formatDate(date) {
@@ -243,14 +250,14 @@ export default {
     },
     async fakeApiCall() {
       const { sortBy, page, itemsPerPage } = this.options;
-
-      let data = await this.getOrders(page, itemsPerPage);
+      const search = this.search;
+      let data = await this.getOrders(page, itemsPerPage, search);
       return {
         items: data.items,
         total: data.total,
       };
     },
-    async getOrders(page, itemsPerPage) {
+    async getOrders(page, itemsPerPage, search) {
       let top = "";
       let skip = "";
       if (itemsPerPage > 0) {
@@ -258,8 +265,8 @@ export default {
         skip = `&$skip=${(page - 1) * itemsPerPage}`;
       }
       if (this.IdUser) {
-        // let filter = search && ` contains(Name, '${search}')`;
-        let url = `${this.url}/Orders?$expand=StockOrders,DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdUser}')and StockOrders/any(x:x/Id ne null) and StockOrders/any(x:x/DeletedAt eq ${this.DateOfIssueIdNumber})&$count=true${top}${skip}`;
+        let filter = search && ` and contains(Id, '${search}')`;
+        let url = `${this.url}/Orders?$expand=StockOrders,DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdUser}')and StockOrders/any(x:x/Id ne null) and StockOrders/any(x:x/DeletedAt eq ${this.DateOfIssueIdNumber})${filter}&$count=true${top}${skip}`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();

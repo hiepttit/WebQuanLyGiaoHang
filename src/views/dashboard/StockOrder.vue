@@ -45,6 +45,7 @@
                   append-icon="mdi-magnify"
                   label="Search"
                   single-line
+                  v-model="search"
                   hide-details
                 ></v-text-field>
               </v-card-title>
@@ -107,6 +108,11 @@ export default {
     IdShop(val) {
       this.getDataFromApi();
     },
+    search: {
+      handler(val) {
+        this.getDataFromApi();
+      },
+    },
   },
   data() {
     return {
@@ -125,6 +131,7 @@ export default {
       Shop: [],
       Orders: [],
       objAddOrder: {},
+      search: "",
       url: "http://localhost:60189/odata",
       headers: [
         {
@@ -190,14 +197,14 @@ export default {
     },
     async fakeApiCall() {
       const { sortBy, page, itemsPerPage } = this.options;
-
-      let data = await this.getStockOrders(page, itemsPerPage);
+      const search = this.search;
+      let data = await this.getStockOrders(page, itemsPerPage, search);
       return {
         items: data.items,
         total: data.total,
       };
     },
-    async getStockOrders(page, itemsPerPage) {
+    async getStockOrders(page, itemsPerPage, search) {
       let top = "";
       let skip = "";
       if (this.IdShop) {
@@ -205,8 +212,8 @@ export default {
           top = `&$top=${itemsPerPage}`;
           skip = `&$skip=${(page - 1) * itemsPerPage}`;
         }
-        // let filter = search && ` contains(Name, '${search}')`;
-        let url = `${this.url}/Orders?$expand=StockOrders&$filter=StockOrders/any(x:x/Delaydate ne null) and IdShop eq '${this.IdShop}'&$count=true${top}${skip}`;
+        let filter = search && ` and contains(Id, '${search}')`;
+        let url = `${this.url}/Orders?$expand=StockOrders&$filter=StockOrders/any(x:x/Delaydate ne null) and IdShop eq '${this.IdShop}'${filter}&$count=true${top}${skip}`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();

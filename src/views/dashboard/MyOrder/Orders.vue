@@ -1,7 +1,7 @@
 <template>
   <v-container id="dashboard" fluid tag="section">
     <v-row>
-      <v-col cols="12">
+      <v-col cols="12" style="text-align: center;">
         <v-select
           item-text="Name"
           item-value="Id"
@@ -38,7 +38,6 @@
         </v-menu>
         <v-btn
           color="success"
-          style="float: right"
           rounded
           class="mr-0"
           @click="(isShow = true), (objAddOrder = {}), (IdProvince = [])"
@@ -83,10 +82,9 @@
                 <div>{{ item.ShipFee + item.Cod }}</div>
               </template>
               <template v-slot:item.Action="{ item }">
-                <div>
+                <div class="text-left">
                   <v-btn
                     color="success"
-                    style="float: right"
                     rounded
                     class="mr-0"
                     @click="(Show = true), (IdOrder = item.Id)"

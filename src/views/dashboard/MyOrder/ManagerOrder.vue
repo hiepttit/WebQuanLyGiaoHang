@@ -68,6 +68,7 @@
                 <v-text-field
                   append-icon="mdi-magnify"
                   label="Search"
+                  v-model="search"
                   single-line
                   hide-details
                 ></v-text-field>
@@ -140,6 +141,11 @@ export default {
     IdShop(val) {
       this.getDataFromApi();
     },
+    search: {
+      handler(val) {
+        this.getDataFromApi();
+      },
+    },
   },
   data() {
     return {
@@ -148,6 +154,7 @@ export default {
       options: {},
       total: 0,
       IdOrder: "",
+      search: "",
       DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       menu: false,
@@ -280,14 +287,14 @@ export default {
     },
     async fakeApiCall() {
       const { sortBy, page, itemsPerPage } = this.options;
-
-      let data = await this.getOrders(page, itemsPerPage);
+      const search = this.search;
+      let data = await this.getOrders(page, itemsPerPage, search);
       return {
         items: data.items,
         total: data.total,
       };
     },
-    async getOrders(page, itemsPerPage) {
+    async getOrders(page, itemsPerPage, search) {
       let top = "";
       let skip = "";
       if (this.IdShop) {
@@ -295,8 +302,8 @@ export default {
           top = `&$top=${itemsPerPage}`;
           skip = `&$skip=${(page - 1) * itemsPerPage}`;
         }
-        // let filter = search && ` contains(Name, '${search}')`;
-        let url = `${this.url}/Orders?$filter=IdShop eq '${this.IdShop}'and CreatedAt eq ${this.DateOfIssueIdNumber}&$count=true${top}${skip}`;
+        let filter = search && ` and contains(Id, '${search}')`;
+        let url = `${this.url}/Orders?$filter=IdShop eq '${this.IdShop}'and CreatedAt eq ${this.DateOfIssueIdNumber}${filter}&$count=true${top}${skip}`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();

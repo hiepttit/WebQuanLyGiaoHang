@@ -83,6 +83,7 @@
                   label="Search"
                   single-line
                   hide-details
+                  v-model="search"
                 ></v-text-field>
               </v-card-title>
             </div>
@@ -218,6 +219,7 @@ export default {
       CodeInStock: [],
       IdInStock: [],
       check: [],
+      search: "",
     };
   },
   async mounted() {
@@ -238,6 +240,11 @@ export default {
     async IdStaff(val) {
       this.check = await this.checkInStock();
       this.getDataFromApi();
+    },
+    search: {
+      handler(val) {
+        this.getDataFromApi();
+      },
     },
   },
 
@@ -322,22 +329,23 @@ export default {
     },
     async fakeApiCall() {
       const { sortBy, page, itemsPerPage } = this.options;
-
-      let data = await this.getDelivery(page, itemsPerPage);
+      const search = this.search;
+      let data = await this.getDelivery(page, itemsPerPage, search);
       return {
         items: data.items,
         total: data.total,
       };
     },
-    async getDelivery(page, itemsPerPage) {
+    async getDelivery(page, itemsPerPage, search) {
       let top = "";
       let skip = "";
+      let filter = search && ` and contains(Id, '${search}')`;
       if (this.IdStaff) {
         if (itemsPerPage > 0) {
           top = `&$top=${itemsPerPage}`;
           skip = `&$skip=${(page - 1) * itemsPerPage}`;
         }
-        let url = `${this.url}/Orders?$expand=DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdStaff}')and CreatedAt eq ${this.DateOfIssueIdNumber}&$count=true${top}${skip}`;
+        let url = `${this.url}/Orders?$expand=DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdStaff}')and CreatedAt eq ${this.DateOfIssueIdNumber}${filter}&$count=true${top}${skip}`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();

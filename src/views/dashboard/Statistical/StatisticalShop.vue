@@ -1,7 +1,7 @@
 <template>
   <v-container id="dashboard" fluid tag="section">
-    <v-row>
-      <v-col cols="12" md="12">
+    <v-row id="printed-content">
+      <v-col cols="12" md="12" style="text-align:center">
         <v-select
           item-text="Name"
           item-value="Id"
@@ -36,6 +36,15 @@
             @input="menu = false"
           ></v-date-picker>
         </v-menu>
+        <v-btn
+          color="success"
+          id="btnPrint"
+          rounded
+          class="mr-3"
+          @click="print()"
+        >
+          In
+        </v-btn>
       </v-col>
       <v-col cols="12" md="12">
         <h1>Số lượng: {{ OrdersSuccess.length }}</h1>
@@ -553,6 +562,9 @@ export default {
         return r + a[key];
       }, 0);
     },
+    print() {
+      window.print();
+    },
   },
 };
 </script>
@@ -569,14 +581,14 @@ export default {
   body {
     visibility: hidden;
   }
-  #printImg {
+  #printed-content {
     visibility: visible;
     position: absolute;
     left: 0;
     top: 0;
   }
-  svg {
-    width: 90%;
+  #btnPrint {
+    display: none;
   }
   header {
     left: 0;
