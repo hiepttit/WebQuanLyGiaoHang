@@ -290,7 +290,7 @@ export default {
         top = `&$top=${itemsPerPage}`;
         skip = `&$skip=${(page - 1) * itemsPerPage}`;
       }
-      let filter = searchStaff && ` contains(Name, '${searchStaff}')`;
+      let filter = searchStaff && `and contains(Name, '${searchStaff}')`;
       let url = `${this.url}/TheUserView?$count=true${top}${skip}&$filter=IdRole eq 2 ${filter}`;
       // let url = `http://localhost:60189/odata/District?$count=true${top}${skip}`;
       let resp = await this.$stores.api.get(`${url}`);

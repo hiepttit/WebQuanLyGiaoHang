@@ -293,7 +293,7 @@ export default {
       let url = `${this.url}/DeliveryOrders`;
       let arr = this.IdInStock;
       for (var i = 0; i < arr.length; i++) {
-        objAddDelivery.TheStatus = 1;
+        objAddDelivery.TheStatus = 0;
         let resp = await this.$stores.api.patch(
           `${url}/${arr[i]}`,
           objAddDelivery

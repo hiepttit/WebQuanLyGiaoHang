@@ -39,6 +39,7 @@
       </v-col>
       <v-col cols="12" md="12">
         <h1>Số lượng: {{ OrdersSuccess.length }}</h1>
+        <h1>Tổng: {{ totalSuccess }}</h1>
         <base-material-card color="green" class="px-5 py-3">
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
@@ -106,8 +107,85 @@
           </v-card-text>
         </base-material-card>
       </v-col>
+      <template v-if="OrdersSuccessStock.length">
+        <v-col cols="12" md="12">
+          <h1>Số lượng: {{ OrdersSuccessStock.length }}</h1>
+          <h1>Tổng: {{ totalSuccessStock }}</h1>
+          <base-material-card color="#1867c0" class="px-5 py-3">
+            <template v-slot:heading>
+              <div class="display-2 font-weight-light">
+                Đơn hàng tồn kho đã hoàn thành
+                <v-card-title style="width: 200px; float: right">
+                  <v-text-field
+                    append-icon="mdi-magnify"
+                    label="Search"
+                    single-line
+                    hide-details
+                  ></v-text-field>
+                </v-card-title>
+              </div>
+
+              <div class="subtitle-1 font-weight-light">
+                Danh sách tất cả đơn hàng tồn kho đã hoàn thành
+              </div>
+            </template>
+            <v-card-text>
+              <v-simple-table>
+                <thead>
+                  <tr>
+                    <th class="primary--text">
+                      Stt
+                    </th>
+                    <th class="primary--text">
+                      Mã
+                    </th>
+                    <th class="primary--text">
+                      Tên khách hàng
+                    </th>
+                    <th class="primary--text">
+                      Địa chỉ
+                    </th>
+                    <th class="primary--text">
+                      Số điện thoại
+                    </th>
+                    <th class="primary--text">
+                      COD
+                    </th>
+                    <th class="primary--text">
+                      Ship
+                    </th>
+                    <th class="primary--text">
+                      Tổng thu
+                    </th>
+                    <th class="primary--text">
+                      Thực thu
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <template v-for="(item, i) in OrdersSuccessStock">
+                    <tr :key="`r${i}`">
+                      <td>{{ i + 1 }}</td>
+                      <td>{{ item.Id }}</td>
+                      <td>{{ item.CustomerName }}</td>
+                      <td>{{ item.TheAddresss }}</td>
+                      <td>{{ item.PhoneNumber }}</td>
+                      <td>{{ item.Cod }}</td>
+                      <td>{{ item.ShipFee }}</td>
+                      <td>{{ item.Cod + item.ShipFee }}</td>
+                      <td>{{ item.RealReceive }}</td>
+                    </tr>
+                  </template>
+                </tbody>
+              </v-simple-table>
+            </v-card-text>
+          </base-material-card>
+        </v-col>
+      </template>
       <v-col cols="12" md="12">
         <h1>Số lượng: {{ OrdersFail.length }}</h1>
+        <h1>Tổng: {{ totalFail }}</h1>
         <base-material-card color="error" class="px-5 py-3">
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
@@ -177,6 +255,7 @@
       </v-col>
       <v-col cols="12" md="12">
         <h1>Số lượng: {{ OrdersDelay.length }}</h1>
+        <h1>Tổng: {{ totalDelay }}</h1>
         <base-material-card color="warning" class="px-5 py-3">
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
@@ -246,6 +325,7 @@
       </v-col>
       <v-col cols="12" md="12">
         <h1>Số lượng: {{ OrdersHalf.length }}</h1>
+        <h1>Tổng: {{ totalHalf }}</h1>
         <base-material-card color="#5cbbf6" class="px-5 py-3">
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
@@ -336,9 +416,15 @@ export default {
       Users: [],
       Orders: [],
       OrdersSuccess: [],
+      OrdersSuccessStock: [],
       OrdersDelay: [],
       OrdersFail: [],
       OrdersHalf: [],
+      totalSuccess: 0,
+      totalDelay: 0,
+      totalFail: 0,
+      totalHalf: 0,
+      totalSuccessStock: 0,
       Receive: 0,
       url: "http://localhost:60189/odata",
     };
@@ -391,11 +477,39 @@ export default {
         this.OrdersFail = data.items.filter((_) => _.TheStatus == 2);
         this.OrdersHalf = data.items.filter((_) => _.TheStatus == 4);
         this.total = data.total;
+        this.totalSuccess = this.sum(
+          data.items.filter((_) => _.TheStatus == 1),
+          "RealReceive"
+        );
+        this.totalFail = this.sum(
+          data.items.filter((_) => _.TheStatus == 2),
+          "RealReceive"
+        );
+        this.totalHalf = this.sum(
+          data.items.filter((_) => _.TheStatus == 4),
+          "RealReceive"
+        );
         this.loading = false;
       });
       this.getStockOrder().then((data) => {
         this.Orders = data.items;
         this.OrdersDelay = data.items.filter((_) => _.IsInStock == 1);
+        this.total = data.total;
+        this.totalDelay = this.sum(
+          data.items.filter((_) => _.IsInStock == 1),
+          "RealReceive"
+        );
+        this.loading = false;
+      });
+      this.getSuccessStockOrder().then((data) => {
+        this.Orders = data.items;
+        this.OrdersSuccessStock = data.items.filter(
+          (_) => _.IsInStock == 1 && _.TheStatus != 3
+        );
+        this.totalSuccessStock = this.sum(
+          data.items.filter((_) => _.IsInStock == 1 && _.TheStatus != 3),
+          "RealReceive"
+        );
         this.total = data.total;
         this.loading = false;
       });
@@ -432,6 +546,22 @@ export default {
       }
       return { total: 0, items: [] };
     },
+    async getSuccessStockOrder() {
+      if (this.IdStaff) {
+        let url = `${this.url}/Orders?$expand=StockOrders,DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdStaff}')and StockOrders/any(x:x/Id ne null) and StockOrders/any(x:x/DeletedAt eq ${this.DateOfIssueIdNumber}) &$count=true`;
+        let resp = await this.$stores.api.get(`${url}`);
+        if (resp && resp.status == 200) {
+          let data = await resp.json();
+          let total = data["@odata.count"];
+          return {
+            total,
+            items: data.value,
+          };
+        }
+        return { total: 0, items: [] };
+      }
+      return { total: 0, items: [] };
+    },
     async getDelayDate(idOrder) {
       let resp = await this.$stores.api.get(
         `${this.url}/StockOrder?$select=Delaydate&$filter=IdTheOrder eq '${idOrder}'`
@@ -449,6 +579,11 @@ export default {
         );
       }
     },
+    sum(array, key) {
+      return array.reduce(function(r, a) {
+        return r + a[key];
+      }, 0);
+    },
   },
 };
 </script>
@@ -461,28 +596,28 @@ export default {
   background-color: #eef1f6;
   border-color: #d1dbe5;
 }
-@media print {
-  body {
-    visibility: hidden;
-  }
-  #printImg {
-    visibility: visible;
-    position: absolute;
-    left: 0;
-    top: 0;
-  }
-  svg {
-    width: 90%;
-  }
-  header {
-    left: 0;
-  }
-  #core-navigation-drawer {
-    display: none;
-    transform: translateX(-100%);
-  }
-  .v-main {
-    padding: 75px 0px 0px !important;
-  }
-}
+// @media print {
+//   body {
+//     visibility: hidden;
+//   }
+//   #printImg {
+//     visibility: visible;
+//     position: absolute;
+//     left: 0;
+//     top: 0;
+//   }
+//   svg {
+//     width: 90%;
+//   }
+//   header {
+//     left: 0;
+//   }
+//   #core-navigation-drawer {
+//     display: none;
+//     transform: translateX(-100%);
+//   }
+//   .v-main {
+//     padding: 75px 0px 0px !important;
+//   }
+// }
 </style>
