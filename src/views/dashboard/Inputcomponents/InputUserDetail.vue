@@ -224,7 +224,7 @@ export default {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
     },
     async ProvinceId(val) {
-      if (val) {
+      if (val.length) {
         let resp = await this.$stores.api.get(
           `${this.url}/District?$filter=ProvinceId eq ${val}&$orderby=Name asc`
         );
@@ -242,7 +242,7 @@ export default {
       }
     },
     async DistrictId(val) {
-      if (val) {
+      if (val.length) {
         let resp = await this.$stores.api.get(
           `${this.url}/Ward?$filter=DistrictId eq ${val}&$orderby=Name asc`
         );
@@ -260,7 +260,7 @@ export default {
       }
     },
     async WardId(val) {
-      if (val) {
+      if (val.length) {
         let respName = await this.$stores.api.get(
           `${this.url}/Ward?$filter=Id eq ${val}`
         );

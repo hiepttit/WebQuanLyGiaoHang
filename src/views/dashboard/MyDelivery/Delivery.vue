@@ -104,8 +104,14 @@
               <template v-slot:item.Stt="{ index }">
                 {{ index + 1 }}
               </template>
+              <template v-slot:item.Cod="{ item }">
+                <div>{{ formatNumber(item.Cod) }}</div>
+              </template>
+              <template v-slot:item.ShipFee="{ item }">
+                <div>{{ formatNumber(item.ShipFee) }}</div>
+              </template>
               <template v-slot:item.Sum="{ item }">
-                <div>{{ item.ShipFee + item.Cod }}</div>
+                <div>{{ formatNumber(item.ShipFee + item.Cod) }}</div>
               </template>
             </v-data-table>
             <div class="text-center pt-2">
@@ -168,7 +174,7 @@
         <v-btn v-else depressed color="primary" @click="SaveModal()">
           Ok
         </v-btn>
-        <v-btn depressed color="error">
+        <v-btn depressed @click="scan()" color="error">
           Quét
         </v-btn>
       </template>
@@ -181,7 +187,17 @@ import moment from "moment";
 import myModal from "../components/Modal.vue";
 import XLSX from "xlsx";
 import StockTable from "./MangerStock.vue";
-
+import Vue from "vue";
+import VueBarcodeScanner from "vue-barcode-scanner";
+let options = {
+  sound: true, // default is false
+  soundSrc: "/static/sound.wav", // default is blank
+  sensitivity: 300, // default is 100
+  requiredAttr: true, // default is false
+  controlSequenceKeys: ["NumLock", "Clear"], // default is null
+  callbackAfterTimeout: true, // default is false
+};
+Vue.use(VueBarcodeScanner, options);
 export default {
   components: { myModal, StockTable },
   name: "Orders",
@@ -274,7 +290,18 @@ export default {
       const [month, day, year] = date.split("/");
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
+    scan() {
+      this.$barcodeScanner.init(this.onBarcodeScanned());
+    },
+    onBarcodeScanned(barcode) {
+      console.log(barcode);
+      // do something...
+    },
     async SaveModal() {
+      if (!this.IdStaff) {
+        alert("Tên nhân viên không được để trống");
+        return;
+      }
       this.objAddDelivery.IdStaff = this.IdStaff;
       let objAddDelivery = this.objAddDelivery;
       let url = `${this.url}/DeliveryOrders`;
@@ -447,6 +474,12 @@ export default {
       // };
       // XLSX.writeFile(workBook, "test.xlsx");
     },
+    formatNumber(value) {
+      return value.toLocaleString("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      });
+    },
   },
 };
 </script>
@@ -458,29 +491,5 @@ export default {
   background-image: none;
   background-color: #eef1f6;
   border-color: #d1dbe5;
-}
-@media print {
-  body {
-    visibility: hidden;
-  }
-  #printImg {
-    visibility: visible;
-    position: absolute;
-    left: 0;
-    top: 0;
-  }
-  svg {
-    width: 90%;
-  }
-  header {
-    left: 0;
-  }
-  #core-navigation-drawer {
-    display: none;
-    transform: translateX(-100%);
-  }
-  .v-main {
-    padding: 75px 0px 0px !important;
-  }
 }
 </style>

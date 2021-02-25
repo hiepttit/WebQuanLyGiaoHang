@@ -67,8 +67,14 @@
               <template v-slot:item.Stt="{ index }">
                 {{ index + 1 }}
               </template>
+              <template v-slot:item.Cod="{ item }">
+                <div>{{ formatNumber(item.Cod) }}</div>
+              </template>
+              <template v-slot:item.ShipFee="{ item }">
+                <div>{{ formatNumber(item.ShipFee) }}</div>
+              </template>
               <template v-slot:item.Sum="{ item }">
-                <div>{{ item.ShipFee + item.Cod }}</div>
+                <div>{{ formatNumber(item.ShipFee + item.Cod) }}</div>
               </template>
               <template v-slot:item.DelayDate="{ item }">
                 <div>
@@ -228,6 +234,12 @@ export default {
     },
     PrintCode() {
       window.print();
+    },
+    formatNumber(value) {
+      return value.toLocaleString("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      });
     },
   },
 };

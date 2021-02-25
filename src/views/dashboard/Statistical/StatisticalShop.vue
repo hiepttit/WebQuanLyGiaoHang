@@ -46,375 +46,59 @@
           In
         </v-btn>
       </v-col>
-      <v-col cols="12" md="12">
-        <h1>Số lượng: {{ OrdersSuccess.length }}</h1>
-        <h1>Tổng: {{ totalSuccess }}</h1>
-        <base-material-card color="green" class="px-5 py-3">
-          <template v-slot:heading>
-            <div class="display-2 font-weight-light">
-              Đơn hàng thành công
-              <v-card-title style="width: 200px; float: right">
-                <v-text-field
-                  append-icon="mdi-magnify"
-                  label="Search"
-                  single-line
-                  hide-details
-                ></v-text-field>
-              </v-card-title>
-            </div>
-
-            <div class="subtitle-1 font-weight-light">
-              Danh sách tất cả đơn hàng thành công
-            </div>
-          </template>
-          <v-card-text>
-            <v-simple-table>
-              <thead>
-                <tr>
-                  <th class="primary--text">
-                    Stt
-                  </th>
-                  <th class="primary--text">
-                    Mã
-                  </th>
-                  <th class="primary--text">
-                    Tên khách hàng
-                  </th>
-                  <th class="primary--text">
-                    Địa chỉ
-                  </th>
-                  <th class="primary--text">
-                    Số điện thoại
-                  </th>
-                  <th class="primary--text">
-                    COD
-                  </th>
-                  <th class="primary--text">
-                    Ship
-                  </th>
-                  <th class="primary--text">
-                    Tổng thu
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <template v-for="(item, i) in OrdersSuccess">
-                  <tr :key="`r${i}`">
-                    <td>{{ i }}</td>
-                    <td>{{ item.Id }}</td>
-                    <td>{{ item.CustomerName }}</td>
-                    <td>{{ item.TheAddresss }}</td>
-                    <td>{{ item.PhoneNumber }}</td>
-                    <td>{{ item.Cod }}</td>
-                    <td>{{ item.ShipFee }}</td>
-                    <td>{{ item.RealReceive }}</td>
-                  </tr>
-                </template>
-              </tbody>
-            </v-simple-table>
-          </v-card-text>
-        </base-material-card>
-      </v-col>
+      <tableStatic
+        :list="OrdersSuccess"
+        :number="OrdersSuccess.length"
+        :total="totalSuccess"
+        :header="'Đơn hàng thành công'"
+        :detail="'Danh sách tất cả đơn hàng thành công'"
+        :color="'success'"
+      />
       <template v-if="OrdersSuccessStock.length">
-        <v-col cols="12" md="12">
-          <h1>Số lượng: {{ OrdersSuccessStock.length }}</h1>
-          <h1>Tổng: {{ totalSuccessStock }}</h1>
-          <base-material-card color="#1867c0" class="px-5 py-3">
-            <template v-slot:heading>
-              <div class="display-2 font-weight-light">
-                Đơn hàng tồn kho đã hoàn thành
-                <v-card-title style="width: 200px; float: right">
-                  <v-text-field
-                    append-icon="mdi-magnify"
-                    label="Search"
-                    single-line
-                    hide-details
-                  ></v-text-field>
-                </v-card-title>
-              </div>
-
-              <div class="subtitle-1 font-weight-light">
-                Danh sách tất cả đơn hàng tồn kho đã hoàn thành
-              </div>
-            </template>
-            <v-card-text>
-              <v-simple-table>
-                <thead>
-                  <tr>
-                    <th class="primary--text">
-                      Stt
-                    </th>
-                    <th class="primary--text">
-                      Mã
-                    </th>
-                    <th class="primary--text">
-                      Tên khách hàng
-                    </th>
-                    <th class="primary--text">
-                      Địa chỉ
-                    </th>
-                    <th class="primary--text">
-                      Số điện thoại
-                    </th>
-                    <th class="primary--text">
-                      COD
-                    </th>
-                    <th class="primary--text">
-                      Ship
-                    </th>
-                    <th class="primary--text">
-                      Tổng thu
-                    </th>
-                    <th class="primary--text">
-                      Thực thu
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  <template v-for="(item, i) in OrdersSuccessStock">
-                    <tr :key="`r${i}`">
-                      <td>{{ i + 1 }}</td>
-                      <td>{{ item.Id }}</td>
-                      <td>{{ item.CustomerName }}</td>
-                      <td>{{ item.TheAddresss }}</td>
-                      <td>{{ item.PhoneNumber }}</td>
-                      <td>{{ item.Cod }}</td>
-                      <td>{{ item.ShipFee }}</td>
-                      <td>{{ item.Cod + item.ShipFee }}</td>
-                      <td>{{ item.RealReceive }}</td>
-                    </tr>
-                  </template>
-                </tbody>
-              </v-simple-table>
-            </v-card-text>
-          </base-material-card>
-        </v-col>
+        <tableStatic
+          :list="OrdersSuccessStock"
+          :number="OrdersSuccessStock.length"
+          :total="totalSuccessStock"
+          :header="'Đơn hàng tồn kho đã hoàn thành'"
+          :detail="'Danh sách tất cả đơn hàng tồn kho đã hoàn thành'"
+          :color="'#1867c0'"
+        />
       </template>
-      <v-col cols="12" md="12">
-        <h1>Số lượng: {{ OrdersFail.length }}</h1>
-        <h1>Tổng: {{ totalFail }}</h1>
-        <base-material-card color="error" class="px-5 py-3">
-          <template v-slot:heading>
-            <div class="display-2 font-weight-light">
-              Đơn hàng trả
-              <v-card-title style="width: 200px; float: right">
-                <v-text-field
-                  append-icon="mdi-magnify"
-                  label="Search"
-                  single-line
-                  hide-details
-                ></v-text-field>
-              </v-card-title>
-            </div>
-
-            <div class="subtitle-1 font-weight-light">
-              Danh sách tất cả đơn hàng trả
-            </div>
-          </template>
-          <v-card-text>
-            <v-simple-table>
-              <thead>
-                <tr>
-                  <th class="primary--text">
-                    Stt
-                  </th>
-                  <th class="primary--text">
-                    Mã
-                  </th>
-                  <th class="primary--text">
-                    Tên khách hàng
-                  </th>
-                  <th class="primary--text">
-                    Địa chỉ
-                  </th>
-                  <th class="primary--text">
-                    Số điện thoại
-                  </th>
-                  <th class="primary--text">
-                    COD
-                  </th>
-                  <th class="primary--text">
-                    Ship
-                  </th>
-                  <th class="primary--text">
-                    Tổng thu
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <template v-for="(item, i) in OrdersFail">
-                  <tr :key="`r${i}`">
-                    <td>{{ i }}</td>
-                    <td>{{ item.Id }}</td>
-                    <td>{{ item.CustomerName }}</td>
-                    <td>{{ item.TheAddresss }}</td>
-                    <td>{{ item.PhoneNumber }}</td>
-                    <td>{{ item.Cod }}</td>
-                    <td>{{ item.ShipFee }}</td>
-                    <td>{{ item.RealReceive }}</td>
-                  </tr>
-                </template>
-              </tbody>
-            </v-simple-table>
-          </v-card-text>
-        </base-material-card>
-      </v-col>
-      <v-col cols="12" md="12">
-        <h1>Số lượng: {{ OrdersDelay.length }}</h1>
-        <h1>Tổng: {{ totalDelay }}</h1>
-        <base-material-card color="warning" class="px-5 py-3">
-          <template v-slot:heading>
-            <div class="display-2 font-weight-light">
-              Đơn hàng hoãn
-              <v-card-title style="width: 200px; float: right">
-                <v-text-field
-                  append-icon="mdi-magnify"
-                  label="Search"
-                  single-line
-                  hide-details
-                ></v-text-field>
-              </v-card-title>
-            </div>
-
-            <div class="subtitle-1 font-weight-light">
-              Danh sách tất cả đơn hàng hoãn
-            </div>
-          </template>
-          <v-card-text>
-            <v-simple-table>
-              <thead>
-                <tr>
-                  <th class="primary--text">
-                    Stt
-                  </th>
-                  <th class="primary--text">
-                    Mã
-                  </th>
-                  <th class="primary--text">
-                    Tên khách hàng
-                  </th>
-                  <th class="primary--text">
-                    Địa chỉ
-                  </th>
-                  <th class="primary--text">
-                    Số điện thoại
-                  </th>
-                  <th class="primary--text">
-                    COD
-                  </th>
-                  <th class="primary--text">
-                    Ship
-                  </th>
-                  <th class="primary--text">
-                    Hoãn tới
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <template v-for="(item, i) in OrdersDelay">
-                  <tr :key="`r${i}`">
-                    <td>{{ i }}</td>
-                    <td>{{ item.Id }}</td>
-                    <td>{{ item.CustomerName }}</td>
-                    <td>{{ item.TheAddresss }}</td>
-                    <td>{{ item.PhoneNumber }}</td>
-                    <td>{{ item.Cod }}</td>
-                    <td>{{ item.ShipFee }}</td>
-                    <td>{{ formatdelayDate(item.StockOrders) }}</td>
-                  </tr>
-                </template>
-              </tbody>
-            </v-simple-table>
-          </v-card-text>
-        </base-material-card>
-      </v-col>
-      <v-col cols="12" md="12">
-        <h1>Số lượng: {{ OrdersHalf.length }}</h1>
-        <h1>Tổng: {{ totalHalf }}</h1>
-        <base-material-card color="#5cbbf6" class="px-5 py-3">
-          <template v-slot:heading>
-            <div class="display-2 font-weight-light">
-              Đơn hàng thành công một phần
-              <v-card-title style="width: 200px; float: right">
-                <v-text-field
-                  append-icon="mdi-magnify"
-                  label="Search"
-                  single-line
-                  hide-details
-                ></v-text-field>
-              </v-card-title>
-            </div>
-
-            <div class="subtitle-1 font-weight-light">
-              Danh sách tất cả đơn hàng thành công 1 phần
-            </div>
-          </template>
-          <v-card-text>
-            <v-simple-table>
-              <thead>
-                <tr>
-                  <th class="primary--text">
-                    Stt
-                  </th>
-                  <th class="primary--text">
-                    Mã
-                  </th>
-                  <th class="primary--text">
-                    Tên khách hàng
-                  </th>
-                  <th class="primary--text">
-                    Địa chỉ
-                  </th>
-                  <th class="primary--text">
-                    Số điện thoại
-                  </th>
-                  <th class="primary--text">
-                    COD
-                  </th>
-                  <th class="primary--text">
-                    Ship
-                  </th>
-                  <th class="primary--text">
-                    Tổng thu
-                  </th>
-                  <th class="primary--text">
-                    Thực thu
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <template v-for="(item, i) in OrdersHalf">
-                  <tr :key="`r${i}`">
-                    <td>{{ i }}</td>
-                    <td>{{ item.Id }}</td>
-                    <td>{{ item.CustomerName }}</td>
-                    <td>{{ item.TheAddresss }}</td>
-                    <td>{{ item.PhoneNumber }}</td>
-                    <td>{{ item.Cod }}</td>
-                    <td>{{ item.ShipFee }}</td>
-                    <td>{{ item.Cod + item.ShipFee }}</td>
-                    <td>{{ item.RealReceive }}</td>
-                  </tr>
-                </template>
-              </tbody>
-            </v-simple-table>
-          </v-card-text>
-        </base-material-card>
-      </v-col>
+      <tableStatic
+        :list="OrdersFail"
+        :number="OrdersFail.length"
+        :total="totalFail"
+        :header="'Đơn hàng trả'"
+        :detail="'Danh sách tất cả đơn hàng trả'"
+        :color="'error'"
+      />
+      <tableStatic
+        :list="OrdersDelay"
+        :number="OrdersDelay.length"
+        :total="totalDelay"
+        :header="'Đơn hàng hoãn'"
+        :detail="'Danh sách tất cả đơn hàng hoãn'"
+        :color="'warning'"
+        :delay="true"
+      />
+      <tableStatic
+        :list="OrdersHalf"
+        :number="OrdersHalf.length"
+        :total="totalHalf"
+        :header="'Đơn hàng thành công một phần'"
+        :detail="'Danh sách tất cả đơn hàng thành công 1 phần'"
+        :color="'#5cbbf6'"
+      />
     </v-row>
   </v-container>
 </template>
 
 <script>
 import moment from "moment";
-
+import tableStatic from "./TableStatistical";
 export default {
   name: "Orders",
+  components: { tableStatic },
   data() {
     return {
       total: 0,
@@ -520,7 +204,7 @@ export default {
     },
     async getDelivery() {
       if (this.IdShop) {
-        let url = `${this.url}/Orders?$expand=StockOrders&$filter=IdShop eq '${this.IdShop}'and StockOrders/any(x:x/CreatedAt eq ${this.DateOfIssueIdNumber})&$count=true`;
+        let url = `${this.url}/Orders?$expand=StockOrders&$filter=IdShop eq '${this.IdShop}'and CreatedAt eq ${this.DateOfIssueIdNumber}&$count=true`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();
@@ -534,6 +218,22 @@ export default {
       }
       return { total: 0, items: [] };
     },
+    // async getStockDelivery() {
+    //   if (this.IdShop) {
+    //     let url = `${this.url}/Orders?$expand=StockOrders&$filter=IdShop eq '${this.IdShop}'and StockOrders/any(x:x/CreatedAt eq ${this.DateOfIssueIdNumber})&$count=true`;
+    //     let resp = await this.$stores.api.get(`${url}`);
+    //     if (resp && resp.status == 200) {
+    //       let data = await resp.json();
+    //       let total = data["@odata.count"];
+    //       return {
+    //         total,
+    //         items: data.value,
+    //       };
+    //     }
+    //     return { total: 0, items: [] };
+    //   }
+    //   return { total: 0, items: [] };
+    // },
     async getStockDelivery() {
       if (this.IdShop) {
         let url = `${this.url}/Orders?$expand=StockOrders&$filter=IdShop eq '${this.IdShop}'and StockOrders/any(x:x/DeletedAt eq ${this.DateOfIssueIdNumber})&$count=true`;

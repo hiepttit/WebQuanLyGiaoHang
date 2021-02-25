@@ -24,7 +24,7 @@
           In
         </v-btn>
       </v-col>
-      <v-col cols="12" md="12">
+      <v-col class="post-content" cols="12" md="12">
         <base-material-card
           id="printed-content"
           color="warning"
@@ -351,6 +351,16 @@ export default {
   }
   .v-main {
     padding: 75px 0px 0px !important;
+  }
+  .book-date {
+    page-break-after: always;
+  }
+
+  .post-content {
+    page-break-before: always;
+  }
+  p {
+    page-break-inside: avoid;
   }
 }
 </style>

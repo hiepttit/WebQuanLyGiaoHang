@@ -35,11 +35,17 @@
                 <template v-slot:item.Stt="{ index }">
                   {{ index + 1 }}
                 </template>
+                <template v-slot:item.Cod="{ item }">
+                  <div>{{ formatNumber(item.Cod) }}</div>
+                </template>
+                <template v-slot:item.ShipFee="{ item }">
+                  <div>{{ formatNumber(item.ShipFee) }}</div>
+                </template>
                 <template v-slot:item.Sum="{ item }">
                   <div v-if="item.RealReceive == null">
-                    {{ item.ShipFee + item.Cod }}
+                    {{ formatNumber(item.ShipFee + item.Cod) }}
                   </div>
-                  <div v-else>{{ item.RealReceive }}</div>
+                  <div v-else>{{ formatNumber(item.RealReceive) }}</div>
                 </template>
               </v-data-table>
             </template>
@@ -55,11 +61,17 @@
                 <template v-slot:item.Stt="{ index }">
                   {{ index + 1 }}
                 </template>
+                <template v-slot:item.Cod="{ item }">
+                  <div>{{ formatNumber(item.Cod) }}</div>
+                </template>
+                <template v-slot:item.ShipFee="{ item }">
+                  <div>{{ formatNumber(item.ShipFee) }}</div>
+                </template>
                 <template v-slot:item.Sum="{ item }">
                   <div v-if="item.RealReceive == null">
-                    {{ item.ShipFee + item.Cod }}
+                    {{ formatNumber(item.ShipFee + item.Cod) }}
                   </div>
-                  <div v-else>{{ item.RealReceive }}</div>
+                  <div v-else>{{ formatNumber(item.RealReceive) }}</div>
                 </template>
                 <template v-slot:item.Action="{ item }">
                   <template
@@ -346,6 +358,12 @@ export default {
       if (item.TheStatus == 3) {
         this.Show = true;
       }
+    },
+    formatNumber(value) {
+      return value.toLocaleString("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      });
     },
   },
 };

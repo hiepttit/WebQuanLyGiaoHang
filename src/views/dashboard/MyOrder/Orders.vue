@@ -1,6 +1,6 @@
 <template>
   <v-container id="dashboard" fluid tag="section">
-    <v-row>
+    <v-row id="table">
       <v-col cols="12" style="text-align: center;">
         <v-select
           item-text="Name"
@@ -44,6 +44,9 @@
         >
           Thêm
         </v-btn>
+        <v-btn color="success" rounded class="mr-0" @click="ShowAll = true">
+          In tất cả
+        </v-btn>
       </v-col>
       <v-col cols="12" md="12">
         <h1>Số lượng: {{ total }}</h1>
@@ -78,8 +81,14 @@
               <template v-slot:item.Stt="{ index }">
                 {{ index + 1 }}
               </template>
+              <template v-slot:item.Cod="{ item }">
+                <div>{{ formatNumber(item.Cod) }}</div>
+              </template>
+              <template v-slot:item.ShipFee="{ item }">
+                <div>{{ formatNumber(item.ShipFee) }}</div>
+              </template>
               <template v-slot:item.Sum="{ item }">
-                <div>{{ item.ShipFee + item.Cod }}</div>
+                <div>{{ formatNumber(item.ShipFee + item.Cod) }}</div>
               </template>
               <template v-slot:item.Action="{ item }">
                 <div class="text-left">
@@ -120,9 +129,26 @@
       <v-col cols="12">
         <VueBarcode
           v-bind:options="{ lineColor: '#0275d8', text: 'Scan' }"
-          id="printImg"
+          id="printContent"
           v-bind:value="IdOrder"
         />
+      </v-col>
+      <template v-slot:m-foot>
+        <v-btn color="blue darken-1" text @click="PrintCode()">
+          In
+        </v-btn>
+      </template>
+    </my-Modal>
+    <my-Modal :show="ShowAll" :title="'In mã'" @close="ShowAll = false">
+      <v-col cols="12">
+        <div id="printContent">
+          <span v-for="(item, i) in allId" :key="i">
+            <VueBarcode
+              v-bind:options="{ lineColor: '#0275d8', text: 'Scan' }"
+              v-bind:value="item"
+            />
+          </span>
+        </div>
       </v-col>
       <template v-slot:m-foot>
         <v-btn color="blue darken-1" text @click="PrintCode()">
@@ -167,6 +193,7 @@ export default {
       options: {},
       total: 0,
       IdOrder: "",
+      allId: [],
       search: "",
       IdProvince: null,
       DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
@@ -176,7 +203,7 @@ export default {
       isShow: false,
       Show: false,
       loading: true,
-
+      ShowAll: false,
       Shop: [],
       Orders: [],
       objAddOrder: {},
@@ -232,6 +259,10 @@ export default {
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
     async SaveModal(e) {
+      if (!this.IdShop) {
+        alert("Tên shop không được để trống");
+        return;
+      }
       this.objAddOrder = e;
       this.objAddOrder.IdShop = this.IdShop;
       let objAddOrder = this.objAddOrder;
@@ -249,6 +280,7 @@ export default {
       this.loading = true;
       this.fakeApiCall().then((data) => {
         this.Orders = data.items;
+        this.allId = data.items.map((_) => _.Id);
         this.total = data.total;
         this.loading = false;
       });
@@ -284,6 +316,12 @@ export default {
       }
       return { total: 0, items: [] };
     },
+    formatNumber(value) {
+      return value.toLocaleString("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      });
+    },
     PrintCode() {
       window.print();
     },
@@ -303,7 +341,7 @@ export default {
   body {
     visibility: hidden;
   }
-  #printImg {
+  #printContent {
     visibility: visible;
     position: absolute;
     left: 0;
@@ -321,6 +359,24 @@ export default {
   }
   .v-main {
     padding: 75px 0px 0px !important;
+  }
+  .book-date {
+    page-break-after: always;
+  }
+
+  .post-content {
+    page-break-before: always;
+  }
+  p {
+    page-break-inside: avoid;
+  }
+  #table {
+    display: none;
+  }
+  .v-card__text {
+    width: 100vw;
+    height: 100vh;
+    page-break-after: always;
   }
 }
 </style>
