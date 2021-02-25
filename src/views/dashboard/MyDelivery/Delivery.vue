@@ -187,17 +187,17 @@ import moment from "moment";
 import myModal from "../components/Modal.vue";
 import XLSX from "xlsx";
 import StockTable from "./MangerStock.vue";
-import Vue from "vue";
-import VueBarcodeScanner from "vue-barcode-scanner";
-let options = {
-  sound: true, // default is false
-  soundSrc: "/static/sound.wav", // default is blank
-  sensitivity: 300, // default is 100
-  requiredAttr: true, // default is false
-  controlSequenceKeys: ["NumLock", "Clear"], // default is null
-  callbackAfterTimeout: true, // default is false
-};
-Vue.use(VueBarcodeScanner, options);
+// import Vue from "vue";
+// import VueBarcodeScanner from "vue-barcode-scanner";
+// let options = {
+//   sound: true, // default is false
+//   soundSrc: "/static/sound.wav", // default is blank
+//   sensitivity: 300, // default is 100
+//   requiredAttr: true, // default is false
+//   controlSequenceKeys: ["NumLock", "Clear"], // default is null
+//   callbackAfterTimeout: true, // default is false
+// };
+// Vue.use(VueBarcodeScanner, options);
 export default {
   components: { myModal, StockTable },
   name: "Orders",
@@ -291,12 +291,12 @@ export default {
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
     scan() {
-      this.$barcodeScanner.init(this.onBarcodeScanned());
+      // this.$barcodeScanner.init(this.onBarcodeScanned());
     },
-    onBarcodeScanned(barcode) {
-      console.log(barcode);
-      // do something...
-    },
+    // onBarcodeScanned(barcode) {
+    //   console.log(barcode);
+    //   // do something...
+    // },
     async SaveModal() {
       if (!this.IdStaff) {
         alert("Tên nhân viên không được để trống");
