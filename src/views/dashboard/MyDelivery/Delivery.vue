@@ -442,29 +442,7 @@ export default {
         { wch: 20 },
       ];
       ws["!cols"] = wscols;
-      debugger;
       XLSX.utils.book_append_sheet(wb, ws, "sheet1");
-      // wb.Sheets["sheet1"]["A2"].s = {
-      //   fill: {
-      //     patternType: "none", // none / solid
-      //     fgColor: { rgb: "FF000000" },
-      //     bgColor: { rgb: "FFFFFFFF" },
-      //   },
-      //   font: {
-      //     name: "Times New Roman",
-      //     sz: 16,
-      //     color: { rgb: "#FF000000" },
-      //     bold: true,
-      //     italic: false,
-      //     underline: false,
-      //   },
-      //   border: {
-      //     top: { style: "thin", color: { auto: 1 } },
-      //     right: { style: "thin", color: { auto: 1 } },
-      //     bottom: { style: "thin", color: { auto: 1 } },
-      //     left: { style: "thin", color: { auto: 1 } },
-      //   },
-      // };
       XLSX.writeFile(wb, "Rebot.xlsx");
       // const workBook = {
       //   SheetNames: ["sheet1"], // sheet name

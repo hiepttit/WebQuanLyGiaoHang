@@ -45,6 +45,15 @@
         >
           In
         </v-btn>
+        <v-btn
+          color="success"
+          id="btnPrint"
+          rounded
+          class="mr-3"
+          @click="exportExcel()"
+        >
+          Xuất excel
+        </v-btn>
       </v-col>
       <tableStatic
         :list="OrdersSuccess"
@@ -96,6 +105,7 @@
 <script>
 import moment from "moment";
 import tableStatic from "./TableStatistical";
+import XLSX from "xlsx";
 export default {
   name: "Orders",
   components: { tableStatic },
@@ -107,7 +117,6 @@ export default {
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       menu: false,
       Users: [],
-      Orders: [],
       OrdersSuccess: [],
       OrdersSuccessStock: [],
       OrdersDelay: [],
@@ -165,7 +174,6 @@ export default {
     getDataFromApi() {
       this.loading = true;
       this.getDelivery().then((data) => {
-        this.Orders = data.items;
         this.OrdersSuccess = data.items.filter((_) => _.TheStatus == 1);
         this.OrdersFail = data.items.filter((_) => _.TheStatus == 2);
         this.OrdersHalf = data.items.filter((_) => _.TheStatus == 4);
@@ -185,7 +193,6 @@ export default {
         this.loading = false;
       });
       this.getStockOrder().then((data) => {
-        this.Orders = data.items;
         this.OrdersDelay = data.items.filter((_) => _.IsInStock == 1);
         this.total = data.total;
         this.totalDelay = this.sum(
@@ -195,7 +202,6 @@ export default {
         this.loading = false;
       });
       this.getSuccessStockOrder().then((data) => {
-        this.Orders = data.items;
         this.OrdersSuccessStock = data.items.filter(
           (_) => _.IsInStock == 1 && _.TheStatus != 3
         );
@@ -279,6 +285,97 @@ export default {
     },
     print() {
       window.print();
+    },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map((v) => filterVal.map((j) => v[j]));
+    },
+    formatJsonDelay(filterVal, jsonData) {
+      let temp = [];
+      jsonData.map((v) =>
+        filterVal.map((j) => {
+          if (j != "StockOrders") {
+            temp.push(v[j]);
+          } else {
+            temp.push(this.formatdelayDate(v[j]));
+          }
+        })
+      );
+      return [temp];
+    },
+    exportExcel() {
+      const filterVal = [
+        "Id",
+        "CustomerName",
+        "TheAddresss",
+        "PhoneNumber",
+        "Cod",
+        "ShipFee",
+        "RealReceive",
+      ];
+      const headerDisplay = [
+        "Mã",
+        "Tên",
+        "Địa chỉ",
+        "Số điện thoại",
+        "COD",
+        "Ship",
+        "Tổng",
+      ];
+      const filterValDelay = [
+        "Id",
+        "CustomerName",
+        "TheAddresss",
+        "PhoneNumber",
+        "Cod",
+        "ShipFee",
+        "StockOrders",
+      ];
+      const headerDisplayDalay = [
+        "Mã",
+        "Tên",
+        "Địa chỉ",
+        "Số điện thoại",
+        "COD",
+        "Ship",
+        "Hoãn tới",
+      ];
+
+      const dataSuccess = this.formatJson(filterVal, this.OrdersSuccess);
+
+      const newDataSuccess = [headerDisplay, ...dataSuccess];
+      const dataHalf = this.formatJson(filterVal, this.OrdersHalf);
+      const newDataHalf = [headerDisplay, ...dataHalf];
+      const dataFail = this.formatJson(filterVal, this.OrdersFail);
+      const newDataFail = [headerDisplay, ...dataFail];
+      const dataDelay = this.formatJsonDelay(filterValDelay, this.OrdersDelay);
+
+      const newDataDelay = [headerDisplayDalay, ...dataDelay];
+
+      let wb = XLSX.utils.book_new(),
+        ws = XLSX.utils.aoa_to_sheet(newDataSuccess),
+        wsh = XLSX.utils.aoa_to_sheet(newDataHalf),
+        wsd = XLSX.utils.aoa_to_sheet(newDataDelay),
+        wsf = XLSX.utils.aoa_to_sheet(newDataFail);
+
+      ws.font = { size: 13 };
+      let wscols = [
+        { wch: 20 },
+        { wch: 15 },
+        { wch: 40 },
+        { wch: 10 },
+        { wch: 5 },
+        { wch: 5 },
+        { wch: 15 },
+      ];
+      ws["!cols"] = wscols;
+      wsh["!cols"] = wscols;
+      wsd["!cols"] = wscols;
+      wsf["!cols"] = wscols;
+      XLSX.utils.book_append_sheet(wb, ws, "ThanhCong");
+      XLSX.utils.book_append_sheet(wb, wsh, "ThanhCong1Phan");
+      XLSX.utils.book_append_sheet(wb, wsd, "Hoan");
+      XLSX.utils.book_append_sheet(wb, wsf, "Tra");
+      XLSX.writeFile(wb, "ThongKeNhanVien.xlsx");
     },
   },
 };

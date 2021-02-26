@@ -45,11 +45,12 @@
               <th class="primary--text">
                 Ship
               </th>
-              <th class="primary--text">
-                Tổng thu
-              </th>
+
               <th v-if="delay" class="primary--text">
                 Hoãn tới
+              </th>
+              <th v-else class="primary--text">
+                Tổng thu
               </th>
             </tr>
           </thead>
@@ -64,8 +65,13 @@
                 <td>{{ item.PhoneNumber }}</td>
                 <td>{{ formatNumber(item.Cod) }}</td>
                 <td>{{ formatNumber(item.ShipFee) }}</td>
-                <td>{{ formatNumber(item.RealReceive) }}</td>
                 <td v-if="delay">{{ formatdelayDate(item.StockOrders) }}</td>
+                <td v-else>
+                  <span v-if="item.RealReceive == null">
+                    {{ formatNumber(item.ShipFee + item.Cod) }}
+                  </span>
+                  <span v-else>{{ formatNumber(item.RealReceive) }}</span>
+                </td>
               </tr>
             </template>
           </tbody>
@@ -90,10 +96,12 @@ export default {
       }
     },
     formatNumber(value) {
-      return value.toLocaleString("vi-VN", {
-        style: "currency",
-        currency: "VND",
-      });
+      if (value) {
+        return value.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        });
+      }
     },
   },
 };
