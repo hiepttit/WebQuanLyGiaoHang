@@ -339,17 +339,26 @@ export default {
         "Ship",
         "Hoãn tới",
       ];
+      const Name = this.Users.filter((_) => _.Id == this.IdStaff).map(
+        (_) => _.Name
+      );
+      Name.push(this.dateFormatted);
 
       const dataSuccess = this.formatJson(filterVal, this.OrdersSuccess);
+      const successData = [headerDisplay, ...dataSuccess];
+      const newDataSuccess = [Name, ...successData];
 
-      const newDataSuccess = [headerDisplay, ...dataSuccess];
       const dataHalf = this.formatJson(filterVal, this.OrdersHalf);
-      const newDataHalf = [headerDisplay, ...dataHalf];
-      const dataFail = this.formatJson(filterVal, this.OrdersFail);
-      const newDataFail = [headerDisplay, ...dataFail];
-      const dataDelay = this.formatJsonDelay(filterValDelay, this.OrdersDelay);
+      const HalfData = [headerDisplay, ...dataHalf];
+      const newDataHalf = [Name, ...HalfData];
 
-      const newDataDelay = [headerDisplayDalay, ...dataDelay];
+      const dataFail = this.formatJson(filterVal, this.OrdersFail);
+      const FailData = [headerDisplay, ...dataFail];
+      const newDataFail = [Name, ...FailData];
+
+      const dataDelay = this.formatJsonDelay(filterValDelay, this.OrdersDelay);
+      const DelayData = [headerDisplayDalay, ...dataDelay];
+      const newDataDelay = [Name, ...DelayData];
 
       let wb = XLSX.utils.book_new(),
         ws = XLSX.utils.aoa_to_sheet(newDataSuccess),

@@ -276,6 +276,22 @@ export default {
     print() {
       window.print();
     },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map((v) => filterVal.map((j) => v[j]));
+    },
+    formatJsonDelay(filterVal, jsonData) {
+      let temp = [];
+      jsonData.map((v) =>
+        filterVal.map((j) => {
+          if (j != "StockOrders") {
+            temp.push(v[j]);
+          } else {
+            temp.push(this.formatdelayDate(v[j]));
+          }
+        })
+      );
+      return [temp];
+    },
     exportExcel() {
       const filterVal = [
         "Id",
@@ -313,17 +329,26 @@ export default {
         "Ship",
         "Hoãn tới",
       ];
+      const Name = this.Shop.filter((_) => _.Id == this.IdShop).map(
+        (_) => _.Name
+      );
+      Name.push(this.dateFormatted);
 
       const dataSuccess = this.formatJson(filterVal, this.OrdersSuccess);
+      const successData = [headerDisplay, ...dataSuccess];
+      const newDataSuccess = [Name, ...successData];
 
-      const newDataSuccess = [headerDisplay, ...dataSuccess];
       const dataHalf = this.formatJson(filterVal, this.OrdersHalf);
-      const newDataHalf = [headerDisplay, ...dataHalf];
-      const dataFail = this.formatJson(filterVal, this.OrdersFail);
-      const newDataFail = [headerDisplay, ...dataFail];
-      const dataDelay = this.formatJsonDelay(filterValDelay, this.OrdersDelay);
+      const HalfData = [headerDisplay, ...dataHalf];
+      const newDataHalf = [Name, ...HalfData];
 
-      const newDataDelay = [headerDisplayDalay, ...dataDelay];
+      const dataFail = this.formatJson(filterVal, this.OrdersFail);
+      const FailData = [headerDisplay, ...dataFail];
+      const newDataFail = [Name, ...FailData];
+
+      const dataDelay = this.formatJsonDelay(filterValDelay, this.OrdersDelay);
+      const DelayData = [headerDisplayDalay, ...dataDelay];
+      const newDataDelay = [Name, ...DelayData];
 
       let wb = XLSX.utils.book_new(),
         ws = XLSX.utils.aoa_to_sheet(newDataSuccess),
@@ -349,7 +374,7 @@ export default {
       XLSX.utils.book_append_sheet(wb, wsh, "ThanhCong1Phan");
       XLSX.utils.book_append_sheet(wb, wsd, "Hoan");
       XLSX.utils.book_append_sheet(wb, wsf, "Tra");
-      XLSX.writeFile(wb, "ThongKeNhanVien.xlsx");
+      XLSX.writeFile(wb, "ThongKeShop.xlsx");
     },
   },
 };
