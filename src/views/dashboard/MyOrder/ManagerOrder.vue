@@ -366,28 +366,4 @@ export default {
   border-radius: 4px;
   padding: 5px 20px;
 }
-@media print {
-  body {
-    visibility: hidden;
-  }
-  #printImg {
-    visibility: visible;
-    position: absolute;
-    left: 0;
-    top: 0;
-  }
-  svg {
-    width: 90%;
-  }
-  header {
-    left: 0;
-  }
-  #core-navigation-drawer {
-    display: none;
-    transform: translateX(-100%);
-  }
-  .v-main {
-    padding: 75px 0px 0px !important;
-  }
-}
 </style>
