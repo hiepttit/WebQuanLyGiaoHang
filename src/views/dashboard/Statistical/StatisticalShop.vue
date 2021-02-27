@@ -36,6 +36,72 @@
             @input="menu = false"
           ></v-date-picker>
         </v-menu>
+        <v-row>
+          <v-col cols="4">
+            <v-menu
+              v-model="menuFrom"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="fromDate"
+                  label="Từ Ngày:"
+                  prepend-icon="mdi-calendar"
+                  v-bind="attrs"
+                  @blur="date = parseDate(fromDate)"
+                  style="float:right;margin: 0 auto;"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="FromDate"
+                @input="menuFrom = false"
+              ></v-date-picker>
+            </v-menu>
+          </v-col>
+          <v-col cols="4">
+            <v-menu
+              v-model="menuTo"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="toDate"
+                  label="Đến Ngày:"
+                  prepend-icon="mdi-calendar"
+                  v-bind="attrs"
+                  @blur="date = parseDate(toDate)"
+                  style="float:left;margin: 0 auto;"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="ToDate"
+                @input="menuTo = false"
+              ></v-date-picker>
+            </v-menu>
+          </v-col>
+          <v-col cols="4">
+            <v-btn
+              color="success"
+              id="btnPrint"
+              rounded
+              style="float: left"
+              class="mr-3"
+              @click="filterGroupDate()"
+            >
+              Thống kê
+            </v-btn>
+          </v-col>
+        </v-row>
         <v-btn
           color="success"
           id="btnPrint"
@@ -130,6 +196,12 @@ export default {
       totalFail: 0,
       totalHalf: 0,
       totalSuccessStock: 0,
+      FromDate: new Date().toISOString().substr(0, 10),
+      fromDate: this.formatDate(new Date().toISOString().substr(0, 10)),
+      ToDate: new Date().toISOString().substr(0, 10),
+      toDate: this.formatDate(new Date().toISOString().substr(0, 10)),
+      menuFrom: false,
+      menuTo: false,
       url: "http://localhost:60189/odata",
     };
   },
@@ -144,6 +216,12 @@ export default {
     },
     IdShop(val) {
       this.getDataFromApi();
+    },
+    FromDate(val) {
+      this.fromDate = this.formatDate(this.FromDate);
+    },
+    ToDate(val) {
+      this.toDate = this.formatDate(this.ToDate);
     },
   },
 
@@ -248,6 +326,77 @@ export default {
     async getStockDelivery() {
       if (this.IdShop) {
         let url = `${this.url}/Orders?$expand=StockOrders&$filter=IdShop eq '${this.IdShop}'and StockOrders/any(x:x/DeletedAt eq ${this.DateOfIssueIdNumber})&$count=true`;
+        let resp = await this.$stores.api.get(`${url}`);
+        if (resp && resp.status == 200) {
+          let data = await resp.json();
+          let total = data["@odata.count"];
+          return {
+            total,
+            items: data.value,
+          };
+        }
+        return { total: 0, items: [] };
+      }
+      return { total: 0, items: [] };
+    },
+    async filterGroupDate() {
+      this.getDeliveryDate().then((data) => {
+        this.Orders = data.items;
+        this.OrdersSuccess = data.items.filter((_) => _.TheStatus == 1);
+        this.OrdersFail = data.items.filter((_) => _.TheStatus == 2);
+        this.OrdersDelay = data.items.filter((_) => _.IsInStock == 1);
+        this.OrdersHalf = data.items.filter((_) => _.TheStatus == 4);
+        this.totalSuccess = this.sum(
+          data.items.filter((_) => _.TheStatus == 1),
+          "RealReceive"
+        );
+        this.totalFail = this.sum(
+          data.items.filter((_) => _.TheStatus == 2),
+          "RealReceive"
+        );
+        this.totalDelay = this.sum(
+          data.items.filter((_) => _.IsInStock == 1),
+          "RealReceive"
+        );
+        this.totalHalf = this.sum(
+          data.items.filter((_) => _.TheStatus == 4),
+          "RealReceive"
+        );
+        this.total = data.total;
+        this.loading = false;
+      });
+      this.getStockDeliveryDate().then((data) => {
+        this.Orders = data.items;
+        this.OrdersSuccessStock = data.items.filter(
+          (_) => _.IsInStock == 1 && _.TheStatus != 3
+        );
+        this.totalSuccessStock = this.sum(
+          data.items.filter((_) => _.IsInStock == 1 && _.TheStatus != 3),
+          "RealReceive"
+        );
+        this.total = data.total;
+        this.loading = false;
+      });
+    },
+    async getDeliveryDate() {
+      if (this.IdShop) {
+        let url = `${this.url}/Orders?$expand=StockOrders&$filter=IdShop eq '${this.IdShop}'and CreatedAt ge ${this.FromDate} and CreatedAt le ${this.ToDate}&$count=true`;
+        let resp = await this.$stores.api.get(`${url}`);
+        if (resp && resp.status == 200) {
+          let data = await resp.json();
+          let total = data["@odata.count"];
+          return {
+            total,
+            items: data.value,
+          };
+        }
+        return { total: 0, items: [] };
+      }
+      return { total: 0, items: [] };
+    },
+    async getStockDeliveryDate() {
+      if (this.IdShop) {
+        let url = `${this.url}/Orders?$expand=StockOrders&$filter=IdShop eq '${this.IdShop}'and StockOrders/any(x:x/DeletedAt ge ${this.FromDate}) and StockOrders/any(x:x/DeletedAt le ${this.ToDate})&$count=true`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();
