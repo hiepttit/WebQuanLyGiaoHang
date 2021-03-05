@@ -101,6 +101,7 @@ export default {
   },
   async mounted() {
     this.roles = await this.getRoles();
+    this.Province = await this.getProvince();
   },
   watch: {
     user: {
@@ -110,14 +111,15 @@ export default {
       },
     },
     async IdProvince(val) {
-      this.Province = await this.getProvince();
-      this.ProvinceId = val;
-      this.DistrictId = val;
-      this.WardId = val;
-      this.District = [];
-      this.Ward = [];
-      this.address = "";
-      this.WardId = val;
+      if (val) {
+        this.Province = await this.getProvince();
+        this.ProvinceId = val;
+        this.DistrictId = null;
+        this.WardId = null;
+        this.District = [];
+        this.Ward = [];
+        this.address = "";
+      }
     },
     DateOfIssueIdNumber(val) {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
@@ -141,7 +143,7 @@ export default {
       }
     },
     async DistrictId(val) {
-      if (val.length) {
+      if (val) {
         let resp = await this.$stores.api.get(
           `${this.url}/Ward?$filter=DistrictId eq ${val}&$orderby=Name asc`
         );
@@ -159,7 +161,7 @@ export default {
       }
     },
     async WardId(val) {
-      if (val.length) {
+      if (val) {
         let respName = await this.$stores.api.get(
           `${this.url}/Ward?$filter=Id eq ${val}`
         );
@@ -205,15 +207,22 @@ export default {
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
     Save() {
-      this.objAddOrder.TheAddresss =
-        this.address +
-        ", " +
-        this.WardName +
-        ", " +
-        this.DistrictName +
-        ", " +
-        this.ProvinceName;
-      this.$emit("update", this.objAddOrder);
+      let obj = JSON.parse(JSON.stringify(this.objAddOrder));
+      if (this.address && this.WardName && this.District && this.ProvinceName) {
+        obj.TheAddresss =
+          this.address +
+          ", " +
+          this.WardName +
+          ", " +
+          this.DistrictName +
+          ", " +
+          this.ProvinceName;
+      }
+
+      if (Object.keys(obj).length < 5) {
+        obj = "";
+        this.$emit("update", obj);
+      } else this.$emit("update", obj);
     },
   },
 };

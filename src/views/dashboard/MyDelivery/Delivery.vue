@@ -113,6 +113,18 @@
               <template v-slot:item.Sum="{ item }">
                 <div>{{ formatNumber(item.ShipFee + item.Cod) }}</div>
               </template>
+              <template v-slot:item.Action="{ item }">
+                <div v-if="item.TheStatus == 0" class="text-left">
+                  <v-btn
+                    color="warning"
+                    rounded
+                    class="mr-0"
+                    @click="(isShow = true), (IdOrder = item.Id)"
+                  >
+                    Đổi người
+                  </v-btn>
+                </div>
+              </template>
             </v-data-table>
             <div class="text-center pt-2">
               <v-pagination
@@ -179,6 +191,29 @@
         </v-btn>
       </template>
     </my-Modal>
+    <my-Modal
+      :show="isShow"
+      :title="'ĐỔI NGƯỜI VẬN CHUYỂN'"
+      @close="isShow = false"
+    >
+      <v-col cols="12">
+        <v-select
+          item-text="Name"
+          item-value="Id"
+          :items="Users.filter((_) => _.Id != IdStaff)"
+          v-model="IdNewStaff"
+          label="Chọn nhân viên*"
+          :rules="[(v) => !!v || 'Item is required']"
+          required
+          style="width:40%;margin: 0 auto;"
+        ></v-select>
+      </v-col>
+      <template v-slot:m-foot>
+        <v-btn depressed color="warning" @click="changeStaff()">
+          Ok
+        </v-btn>
+      </template>
+    </my-Modal>
   </v-container>
 </template>
 
@@ -200,18 +235,20 @@ import StockTable from "./MangerStock.vue";
 // Vue.use(VueBarcodeScanner, options);
 export default {
   components: { myModal, StockTable },
-  name: "Orders",
   data() {
     return {
       pageCount: 0,
       options: {},
       total: 0,
       IdStaff: "",
+      IdNewStaff: "",
+      IdOrder: "",
       DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       address: "",
       menu: false,
       Show: false,
+      isShow: false,
       loading: true,
       hasStock: false,
       Users: [],
@@ -229,6 +266,7 @@ export default {
         { text: "COD", value: "Cod" },
         { text: "Ship", value: "ShipFee" },
         { text: "Tổng thu", value: "Sum" },
+        { text: "Tác vụ", value: "Action" },
       ],
       Code: [],
       IdTheOrder: [],
@@ -343,6 +381,24 @@ export default {
           if (i == arr.length - 1) {
             alert("Updated failed.");
           }
+        }
+      }
+    },
+    async changeStaff() {
+      let obj = {};
+      obj.IdStaff = this.IdNewStaff;
+      let url = `${this.url}/DeliveryOrders`;
+      let resp = await this.$stores.api.patch(`${url}/${this.IdOrder}`, obj);
+      if (resp && resp.status == 200) {
+        alert("Updated successfully.");
+        this.isShow = false;
+        this.getDataFromApi();
+        this.Code = await this.getIdFromOrder();
+        this.check = await this.checkInStock();
+        this.CodeInStock = await this.getIdFromStockOrder();
+      } else {
+        if (i == arr.length - 1) {
+          alert("Updated failed.");
         }
       }
     },

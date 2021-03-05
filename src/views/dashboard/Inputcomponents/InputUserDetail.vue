@@ -213,12 +213,11 @@ export default {
     async IdProvince(val) {
       this.Province = await this.getProvince();
       this.ProvinceId = val;
-      this.DistrictId = val;
-      this.WardId = val;
+      this.DistrictId = null;
+      this.WardId = null;
       this.District = [];
       this.Ward = [];
       this.address = "";
-      this.WardId = val;
     },
     DateOfIssueIdNumber(val) {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);

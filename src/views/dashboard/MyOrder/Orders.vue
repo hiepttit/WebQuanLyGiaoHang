@@ -101,6 +101,20 @@
                     In
                   </v-btn>
                 </div>
+                <div class="text-left">
+                  <v-btn
+                    color="warning"
+                    rounded
+                    class="mr-0"
+                    @click="
+                      (isShowUp = true),
+                        (objAddOrder = item),
+                        (IdOrder = item.Id)
+                    "
+                  >
+                    Sửa
+                  </v-btn>
+                </div>
               </template>
             </v-data-table>
             <div class="text-center pt-2">
@@ -124,6 +138,17 @@
         }
       "
       @close="isShow = false"
+    />
+    <input-detail
+      :user="objAddOrder"
+      :IdProvince="IdProvince"
+      :isShow="isShowUp"
+      @update="
+        (e) => {
+          changeInfo(e);
+        }
+      "
+      @close="isShowUp = false"
     />
     <my-Modal :show="Show" :title="'In mã'" @close="Show = false">
       <v-col cols="12">
@@ -164,6 +189,8 @@ import InputDetail from "../Inputcomponents/InputOrderDetail.vue";
 import moment from "moment";
 import VueBarcode from "vue-barcode";
 import myModal from "../components/Modal.vue";
+import Datepicker from "vuejs-datepicker";
+import { vi } from "vuejs-datepicker/dist/locale";
 
 export default {
   components: { InputDetail, VueBarcode, myModal },
@@ -188,6 +215,7 @@ export default {
   },
   data() {
     return {
+      vi: vi,
       IdShop: "",
       pageCount: 0,
       options: {},
@@ -201,6 +229,7 @@ export default {
       address: "",
       menu: false,
       isShow: false,
+      isShowUp: false,
       Show: false,
       loading: true,
       ShowAll: false,
@@ -261,6 +290,10 @@ export default {
     async SaveModal(e) {
       if (!this.IdShop) {
         alert("Tên shop không được để trống");
+        return;
+      }
+      if (!e) {
+        alert("Bạn phải nhập đủ thông tin");
         return;
       }
       this.objAddOrder = e;
@@ -324,6 +357,21 @@ export default {
     },
     PrintCode() {
       window.print();
+    },
+    async changeInfo(e) {
+      e;
+      this.objAddOrder = e;
+      this.objAddOrder.IdShop = this.IdShop;
+      let objAddOrder = this.objAddOrder;
+      let url = `${this.url}/Orders/${this.IdOrder}`;
+      let resp = await this.$stores.api.patch(`${url}`, objAddOrder);
+      if (resp && resp.status == 200) {
+        alert("Updated successfully.");
+        this.isShow = false;
+        this.getDataFromApi();
+      } else {
+        alert("Updated failed.");
+      }
     },
   },
 };
