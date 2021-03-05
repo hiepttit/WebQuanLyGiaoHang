@@ -37,7 +37,7 @@
           ></v-date-picker>
         </v-menu>
         <v-row>
-          <v-col cols="4">
+          <v-col cols="4" class="inputDate">
             <v-menu
               v-model="menuFrom"
               :close-on-content-click="false"
@@ -63,7 +63,7 @@
               ></v-date-picker>
             </v-menu>
           </v-col>
-          <v-col cols="4">
+          <v-col cols="4" class="inputDate">
             <v-menu
               v-model="menuTo"
               :close-on-content-click="false"
@@ -588,6 +588,9 @@ export default {
   }
   .v-main {
     padding: 75px 0px 0px !important;
+  }
+  .inputDate {
+    display: none;
   }
 }
 </style>

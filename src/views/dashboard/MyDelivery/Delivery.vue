@@ -1,6 +1,6 @@
 <template>
   <v-container id="dashboard" fluid tag="section">
-    <v-row>
+    <v-row id="printed-content">
       <v-col cols="12" style="text-align: center;">
         <v-select
           item-text="Name"
@@ -39,7 +39,7 @@
         <v-btn
           color="success"
           rounded
-          class="mr-0"
+          class="mr-0 btnDelivery"
           @click="
             Show = true;
             hasStock = false;
@@ -51,7 +51,7 @@
           v-if="CodeInStock.length"
           color="warning"
           rounded
-          class="mr-0"
+          class="mr-0 btnDelivery"
           @click="
             Show = true;
             hasStock = true;
@@ -59,18 +59,23 @@
         >
           Giao đơn tồn kho
         </v-btn>
-      </v-col>
-      <!-- <v-col cols="4" md="4">
         <v-btn
           color="success"
-          style="float: right"
           rounded
-          class="mr-0"
+          class="mr-0 btnDelivery"
           @click="exportExcel()"
         >
-          xuất file
+          Xuất Excel
         </v-btn>
-      </v-col> -->
+        <v-btn
+          color="success"
+          rounded
+          class="mr-0 btnDelivery"
+          @click="print()"
+        >
+          In
+        </v-btn>
+      </v-col>
       <v-col cols="12" md="12">
         <h1>Số lượng: {{ total }}</h1>
         <base-material-card color="green" class="px-5 py-3">
@@ -142,6 +147,11 @@
             :IdUser="IdStaff"
             :DateOfIssueIdNumber="DateOfIssueIdNumber"
             :isCreate="true"
+            @stockOrder="
+              (e) => {
+                stockOrders = e;
+              }
+            "
           ></StockTable>
         </v-col>
       </template>
@@ -222,17 +232,17 @@ import moment from "moment";
 import myModal from "../components/Modal.vue";
 import XLSX from "xlsx";
 import StockTable from "./MangerStock.vue";
-// import Vue from "vue";
-// import VueBarcodeScanner from "vue-barcode-scanner";
-// let options = {
-//   sound: true, // default is false
-//   soundSrc: "/static/sound.wav", // default is blank
-//   sensitivity: 300, // default is 100
-//   requiredAttr: true, // default is false
-//   controlSequenceKeys: ["NumLock", "Clear"], // default is null
-//   callbackAfterTimeout: true, // default is false
-// };
-// Vue.use(VueBarcodeScanner, options);
+import Vue from "vue";
+import VueBarcodeScanner from "vue-barcode-scanner";
+let options = {
+  sound: true, // default is false
+  soundSrc: "/static/sound.wav", // default is blank
+  sensitivity: 300, // default is 100
+  requiredAttr: true, // default is false
+  controlSequenceKeys: ["NumLock", "Clear"], // default is null
+  callbackAfterTimeout: true, // default is false
+};
+Vue.use(VueBarcodeScanner, options);
 export default {
   components: { myModal, StockTable },
   data() {
@@ -253,7 +263,7 @@ export default {
       hasStock: false,
       Users: [],
       Orders: [],
-      nameShop: "",
+      stockOrders: [],
       Receive: 0,
       objAddDelivery: {},
       url: "http://localhost:60189/odata",
@@ -329,12 +339,12 @@ export default {
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
     scan() {
-      // this.$barcodeScanner.init(this.onBarcodeScanned());
+      this.$barcodeScanner.init(this.onBarcodeScanned());
     },
-    // onBarcodeScanned(barcode) {
-    //   console.log(barcode);
-    //   // do something...
-    // },
+    onBarcodeScanned(barcode) {
+      console.log(barcode);
+      // do something...
+    },
     async SaveModal() {
       if (!this.IdStaff) {
         alert("Tên nhân viên không được để trống");
@@ -475,44 +485,67 @@ export default {
       }
       return [];
     },
-    exportExcel() {
-      // const header = ["Id", "CustomerName", "PhoneNumber", "TheAddresss"];
-      const filterVal = ["Id", "CustomerName", "PhoneNumber", "TheAddresss"];
-      const headerDisplay = ["Mã", "Tên", "Số điện thoại", "Địa chỉ"];
-
-      const data = this.formatJson(filterVal, this.Orders);
-      const newData = [headerDisplay, ...data];
-      // const jsonWorkSheet = XLSX.utils.json_to_sheet(newData, {
-      //   header: header,
-      //   skipHeader: true,
-      // });
-
-      let wb = XLSX.utils.book_new(),
-        ws = XLSX.utils.aoa_to_sheet(newData);
-      ws.font = { size: 13 };
-      let wscols = [
-        { wch: 10 },
-        { wch: 40 },
-        { wch: 30 },
-        { wch: 5 },
-        { wch: 20 },
-      ];
-      ws["!cols"] = wscols;
-      XLSX.utils.book_append_sheet(wb, ws, "sheet1");
-      XLSX.writeFile(wb, "Rebot.xlsx");
-      // const workBook = {
-      //   SheetNames: ["sheet1"], // sheet name
-      //   Sheets: {
-      //     sheet1: jsonWorkSheet,
-      //   },
-      // };
-      // XLSX.writeFile(workBook, "test.xlsx");
-    },
     formatNumber(value) {
       return value.toLocaleString("vi-VN", {
         style: "currency",
         currency: "VND",
       });
+    },
+    print() {
+      window.print();
+    },
+    exportExcel() {
+      const filterVal = [
+        "Id",
+        "CustomerName",
+        "TheAddresss",
+        "PhoneNumber",
+        "Cod",
+        "ShipFee",
+      ];
+      const headerDisplay = [
+        "Mã",
+        "Tên",
+        "Địa chỉ",
+        "Số điện thoại",
+        "COD",
+        "Ship",
+      ];
+
+      const Name = this.Users.filter((_) => _.Id == this.IdStaff).map(
+        (_) => _.Name
+      );
+      Name.push(this.dateFormatted);
+
+      const dataSuccess = this.formatJson(filterVal, this.Orders);
+      const successData = [headerDisplay, ...dataSuccess];
+      const newDataSuccess = [Name, ...successData];
+
+      const dataHalf = this.formatJson(filterVal, this.stockOrders);
+      const HalfData = [headerDisplay, ...dataHalf];
+      const newDataHalf = [Name, ...HalfData];
+
+      let wb = XLSX.utils.book_new(),
+        ws = XLSX.utils.aoa_to_sheet(newDataSuccess),
+        wsh = XLSX.utils.aoa_to_sheet(newDataHalf);
+
+      ws.font = { size: 13 };
+      let wscols = [
+        { wch: 20 },
+        { wch: 15 },
+        { wch: 40 },
+        { wch: 10 },
+        { wch: 5 },
+        { wch: 5 },
+        { wch: 15 },
+      ];
+      ws["!cols"] = wscols;
+      wsh["!cols"] = wscols;
+
+      XLSX.utils.book_append_sheet(wb, ws, "DonHangGiao");
+      XLSX.utils.book_append_sheet(wb, wsh, "ThanhCong1Phan");
+
+      XLSX.writeFile(wb, "DonHangNhanVien.xlsx");
     },
   },
 };
@@ -525,5 +558,29 @@ export default {
   background-image: none;
   background-color: #eef1f6;
   border-color: #d1dbe5;
+}
+@media print {
+  body {
+    visibility: hidden;
+  }
+  #printed-content {
+    visibility: visible;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  header {
+    left: 0;
+  }
+  #core-navigation-drawer {
+    display: none;
+    transform: translateX(-100%);
+  }
+  .v-main {
+    padding: 75px 0px 0px !important;
+  }
+  .btnDelivery {
+    display: none;
+  }
 }
 </style>

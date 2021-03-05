@@ -45,7 +45,10 @@
           Thêm
         </v-btn>
         <v-btn color="success" rounded class="mr-0" @click="ShowAll = true">
-          In tất cả
+          In tất cả Mã
+        </v-btn>
+        <v-btn color="success" rounded class="mr-0" @click="exportExcel()">
+          Xuất excel
         </v-btn>
       </v-col>
       <v-col cols="12" md="12">
@@ -191,6 +194,7 @@ import VueBarcode from "vue-barcode";
 import myModal from "../components/Modal.vue";
 import Datepicker from "vuejs-datepicker";
 import { vi } from "vuejs-datepicker/dist/locale";
+import XLSX from "xlsx";
 
 export default {
   components: { InputDetail, VueBarcode, myModal },
@@ -359,7 +363,6 @@ export default {
       window.print();
     },
     async changeInfo(e) {
-      e;
       this.objAddOrder = e;
       this.objAddOrder.IdShop = this.IdShop;
       let objAddOrder = this.objAddOrder;
@@ -367,11 +370,60 @@ export default {
       let resp = await this.$stores.api.patch(`${url}`, objAddOrder);
       if (resp && resp.status == 200) {
         alert("Updated successfully.");
-        this.isShow = false;
+        this.isShowUp = false;
         this.getDataFromApi();
       } else {
         alert("Updated failed.");
       }
+    },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map((v) => filterVal.map((j) => v[j]));
+    },
+    exportExcel() {
+      const filterVal = [
+        "Id",
+        "CustomerName",
+        "TheAddresss",
+        "PhoneNumber",
+        "Cod",
+        "ShipFee",
+      ];
+      const headerDisplay = [
+        "Mã",
+        "Tên",
+        "Địa chỉ",
+        "Số điện thoại",
+        "COD",
+        "Ship",
+      ];
+
+      const Name = this.Shop.filter((_) => _.Id == this.IdShop).map(
+        (_) => _.Name
+      );
+      Name.push(this.dateFormatted);
+
+      const dataSuccess = this.formatJson(filterVal, this.Orders);
+      const successData = [headerDisplay, ...dataSuccess];
+      const newDataSuccess = [Name, ...successData];
+
+      let wb = XLSX.utils.book_new(),
+        ws = XLSX.utils.aoa_to_sheet(newDataSuccess);
+
+      ws.font = { size: 13 };
+      let wscols = [
+        { wch: 20 },
+        { wch: 15 },
+        { wch: 40 },
+        { wch: 10 },
+        { wch: 5 },
+        { wch: 5 },
+        { wch: 15 },
+      ];
+      ws["!cols"] = wscols;
+
+      XLSX.utils.book_append_sheet(wb, ws, "DonHang");
+
+      XLSX.writeFile(wb, "DonHangShop.xlsx");
     },
   },
 };

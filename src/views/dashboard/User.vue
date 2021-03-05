@@ -57,8 +57,7 @@
               :loading="loadingStaff"
               @page-count="pageCountStaff = $event"
             >
-              <template v-slot:item.Stt="{ index, item }">
-                <span v-if="item.UserName == objAddUser.UserName">New</span>
+              <template v-slot:item.Stt="{ index }">
                 {{ index + 1 }}
               </template>
               <template v-slot:item.CMND="{ item }">
@@ -233,6 +232,10 @@ export default {
       return moment(date).format("DD/MM/YYYY");
     },
     async SaveModal(e) {
+      if (!e) {
+        alert("Bạn phải nhập đủ thông tin");
+        return;
+      }
       this.objAddUser = e;
       let objAddUser = this.objAddUser;
       let url = `http://localhost:60189/api/Authenticate/register-admin`;

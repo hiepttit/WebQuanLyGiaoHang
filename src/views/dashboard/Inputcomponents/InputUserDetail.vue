@@ -223,6 +223,7 @@ export default {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
     },
     async ProvinceId(val) {
+      debugger;
       if (val) {
         let resp = await this.$stores.api.get(
           `${this.url}/District?$filter=ProvinceId eq ${val}&$orderby=Name asc`
@@ -305,16 +306,22 @@ export default {
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
     Save() {
-      this.objAddUser.TheAddress =
-        this.address +
-        ", " +
-        this.WardName +
-        ", " +
-        this.DistrictName +
-        ", " +
-        this.ProvinceName;
-      this.objAddUser.DateOfIssueIdNumber = this.DateOfIssueIdNumber;
-      this.$emit("update", this.objAddUser);
+      let obj = JSON.parse(JSON.stringify(this.objAddUser));
+      if (this.address && this.WardName && this.District && this.ProvinceName) {
+        obj.TheAddresss =
+          this.address +
+          ", " +
+          this.WardName +
+          ", " +
+          this.DistrictName +
+          ", " +
+          this.ProvinceName;
+      }
+
+      if (Object.keys(obj).length < 5) {
+        obj = "";
+        this.$emit("update", obj);
+      } else this.$emit("update", obj);
     },
   },
 };

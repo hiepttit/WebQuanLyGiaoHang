@@ -255,6 +255,7 @@ export default {
       this.loading = true;
       this.fakeApiCall().then((data) => {
         this.Orders = data.items;
+        this.$emit("stockOrder", this.Orders);
         this.$emit("hasStock", this.Orders);
         this.total = data.total;
         this.loading = false;
