@@ -73,6 +73,11 @@
           class="mr-0 btnDelivery"
           @click="print()"
         >
+          <i
+            aria-hidden="true"
+            class="v-icon notranslate mdi mdi-cloud-print"
+            style="margin-right:10px"
+          ></i>
           In
         </v-btn>
       </v-col>

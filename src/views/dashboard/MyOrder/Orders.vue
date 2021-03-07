@@ -95,28 +95,21 @@
               </template>
               <template v-slot:item.Action="{ item }">
                 <div class="text-left">
-                  <v-btn
-                    color="success"
-                    rounded
-                    class="mr-0"
+                  <i
+                    aria-hidden="true"
+                    class="v-icon notranslate mdi mdi-cloud-print"
                     @click="(Show = true), (IdOrder = item.Id)"
-                  >
-                    In
-                  </v-btn>
-                </div>
-                <div class="text-left">
-                  <v-btn
-                    color="warning"
-                    rounded
-                    class="mr-0"
+                  ></i>
+                  <i
+                    aria-hidden="true"
+                    class="v-icon notranslate mdi mdi-pencil-plus"
+                    style="margin-left: 10px"
                     @click="
                       (isShowUp = true),
                         (objAddOrder = item),
                         (IdOrder = item.Id)
                     "
-                  >
-                    Sửa
-                  </v-btn>
+                  ></i>
                 </div>
               </template>
             </v-data-table>
