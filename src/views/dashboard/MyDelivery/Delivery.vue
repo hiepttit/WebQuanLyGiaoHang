@@ -51,6 +51,7 @@
           v-if="CodeInStock.length"
           color="warning"
           rounded
+          style="margin-left: 10px"
           class="mr-0 btnDelivery"
           @click="
             Show = true;
@@ -62,6 +63,7 @@
         <v-btn
           color="success"
           rounded
+          style="margin-left: 10px"
           class="mr-0 btnDelivery"
           @click="exportExcel()"
         >
@@ -71,6 +73,7 @@
           color="success"
           rounded
           class="mr-0 btnDelivery"
+          style="margin-left: 10px"
           @click="print()"
         >
           <i

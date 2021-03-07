@@ -44,10 +44,22 @@
         >
           Thêm
         </v-btn>
-        <v-btn color="success" rounded class="mr-0" @click="ShowAll = true">
+        <v-btn
+          color="success"
+          style="margin-left: 10px"
+          rounded
+          class="mr-0"
+          @click="ShowAll = true"
+        >
           In tất cả Mã
         </v-btn>
-        <v-btn color="success" rounded class="mr-0" @click="exportExcel()">
+        <v-btn
+          color="success"
+          style="margin-left: 10px"
+          rounded
+          class="mr-0"
+          @click="exportExcel()"
+        >
           Xuất excel
         </v-btn>
       </v-col>
@@ -97,13 +109,14 @@
                 <div class="text-left">
                   <i
                     aria-hidden="true"
+                    style="cursor: pointer;"
                     class="v-icon notranslate mdi mdi-cloud-print"
                     @click="(Show = true), (IdOrder = item.Id)"
                   ></i>
                   <i
                     aria-hidden="true"
                     class="v-icon notranslate mdi mdi-pencil-plus"
-                    style="margin-left: 10px"
+                    style="margin-left: 10px;cursor: pointer;"
                     @click="
                       (isShowUp = true),
                         (objAddOrder = item),
