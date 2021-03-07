@@ -158,7 +158,7 @@
     </v-row>
     <my-Modal :show="Show" :title="'THÊM ĐƠN GIAO HÀNG'" @close="Show = false">
       <v-col v-if="!hasStock" cols="12">
-        <v-select
+        <v-combobox
           item-text="id"
           item-value="id"
           :items="Code"
@@ -167,7 +167,7 @@
           outlined
           multiple
           v-model="IdTheOrder"
-        ></v-select>
+        ></v-combobox>
       </v-col>
       <template v-else-if="CodeInStock.length">
         <v-col cols="12">
