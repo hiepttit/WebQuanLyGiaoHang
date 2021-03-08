@@ -162,7 +162,11 @@
     <my-Modal :show="Show" :title="'In mã'" @close="Show = false">
       <v-col cols="12">
         <VueBarcode
-          v-bind:options="{ lineColor: '#0275d8', text: 'Scan' }"
+          v-bind:options="{
+            lineColor: '#0275d8',
+            text: 'Scan',
+            format: 'CODE39',
+          }"
           id="printContent"
           v-bind:value="IdOrder"
         />
@@ -454,7 +458,7 @@ export default {
     top: 0;
   }
   svg {
-    width: 90%;
+    width: 40%;
   }
   header {
     left: 0;
