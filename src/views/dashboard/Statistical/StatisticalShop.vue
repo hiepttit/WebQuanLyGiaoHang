@@ -175,6 +175,9 @@ import XLSX from "xlsx";
 
 export default {
   components: { tableStatic },
+  metaInfo: {
+    title: "Thong Ke Shop",
+  },
   data() {
     return {
       total: 0,

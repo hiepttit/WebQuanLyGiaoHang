@@ -239,6 +239,9 @@ import XLSX from "xlsx";
 import StockTable from "./MangerStock.vue";
 
 export default {
+  metaInfo: {
+    title: "Tao Giao Hang",
+  },
   components: { myModal, StockTable },
   data() {
     return {

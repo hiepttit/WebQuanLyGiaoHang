@@ -102,6 +102,9 @@
 import moment from "moment";
 
 export default {
+  metaInfo: {
+    title: "Quan Ly Ton Kho",
+  },
   async mounted() {
     this.Shop = await this.getShop();
     this.getDataFromApi();

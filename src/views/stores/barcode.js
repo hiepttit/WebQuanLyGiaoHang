@@ -12,7 +12,6 @@ Vue.use(VueBarcodeScanner, options)
 export default {
     created () {
       // Add barcode scan listener and pass the callback function
-    debugger
       this.$barcodeScanner.init(this.onBarcodeScanned)
     },
     destroyed () {

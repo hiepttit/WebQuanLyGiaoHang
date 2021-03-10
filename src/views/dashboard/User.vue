@@ -156,6 +156,9 @@ import InputDetail from "./Inputcomponents/InputUserDetail.vue";
 import moment from "moment";
 export default {
   components: { InputDetail },
+  metaInfo: {
+    title: "Quan Ly Nguoi Dung",
+  },
   async mounted() {
     this.getDataFromApi();
     this.getDataShopFromApi();

@@ -207,6 +207,9 @@ import { vi } from "vuejs-datepicker/dist/locale";
 import XLSX from "xlsx";
 
 export default {
+  metaInfo: {
+    title: "Tao Don Hang",
+  },
   components: { InputDetail, VueBarcode, myModal },
   async mounted() {
     this.Shop = await this.getShop();

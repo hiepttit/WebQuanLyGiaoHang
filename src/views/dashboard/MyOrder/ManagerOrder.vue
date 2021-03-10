@@ -134,7 +134,9 @@
 import moment from "moment";
 
 export default {
-  name: "Orders",
+  metaInfo: {
+    title: "Quan Ly Don Hang",
+  },
   async mounted() {
     this.Shop = await this.getShop();
     this.getDataFromApi();

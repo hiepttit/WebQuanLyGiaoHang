@@ -214,6 +214,9 @@ import myModal from "../components/Modal.vue";
 import StockTable from "./MangerStock.vue";
 
 export default {
+  metaInfo: {
+    title: "Quan Ly Giao Hang",
+  },
   components: { myModal, StockTable },
   data() {
     return {

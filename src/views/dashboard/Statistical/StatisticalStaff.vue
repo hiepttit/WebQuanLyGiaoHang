@@ -174,6 +174,9 @@ import tableStatic from "./TableStatistical";
 import XLSX from "xlsx";
 export default {
   components: { tableStatic },
+  metaInfo: {
+    title: "Thong Ke Nhan Vien",
+  },
   data() {
     return {
       total: 0,
