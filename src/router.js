@@ -4,7 +4,7 @@ import Router from 'vue-router'
 Vue.use(Router)
 
 export default new Router({
-  mode: 'hash',
+  mode: 'history',
   base: process.env.BASE_URL,
   routes: [
     {
@@ -14,56 +14,56 @@ export default new Router({
         // Dashboard
         {
           name: 'Dashboard',
-          path: '',
+          path: '/dashboard',
           component: () => import('@/views/dashboard/Dashboard'),
         },
         // Pages
         // Table
         {
           name: 'Quản lý người dùng',
-          path: 'datatable',
+          path: '',
           component: () => import('@/views/dashboard/User'),
         },
         // Order
         {
           name: 'Tạo đơn hàng',
-          path: 'orders',
+          path: 'TaoDonHang',
           component: () => import('@/views/dashboard/MyOrder/Orders'),
         },
         // Delevery
         {
           name: 'Tạo giao hàng',
-          path: 'Create_delivery',
+          path: 'TaoGiaoHang',
           component: () => import('@/views/dashboard/MyDelivery/Delivery'),
         },
         // Manager Delevery
         {
           name: 'Quản lý giao hàng',
-          path: 'Manager_delivery',
+          path: 'QuanLyGiaoHang',
           component: () => import('@/views/dashboard/MyDelivery/ManagerDelivery'),
         },
          // Manager Stock Orders
         {
           name: 'Quản lý tồn kho',
-          path: 'Manager_stock_orders',
+          path: 'QuanLyTonKho',
           component: () => import('@/views/dashboard/StockOrder'),
         },
         // Manager Orders
         {
           name: 'Quản lý đơn hàng',
-          path: 'Manager_orders',
+          path: 'QuanLyDonHang',
           component: () => import('@/views/dashboard/MyOrder/ManagerOrder'),
         },
         // Statistical Staff
         {
           name: 'Thống kê nhân viên',
-          path: 'Statistical_Staff',
+          path: 'ThongKeNhanVien',
           component: () => import('@/views/dashboard/Statistical/StatisticalStaff'),
         },
         // Statistical Shop
         {
           name: 'Thống kê Shop',
-          path: 'Statistical_Shop',
+          path: 'ThongKeShop',
           component: () => import('@/views/dashboard/Statistical/StatisticalShop'),
         },
       ],

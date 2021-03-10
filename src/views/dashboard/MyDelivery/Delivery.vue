@@ -204,9 +204,6 @@
         <v-btn v-else depressed color="primary" @click="SaveModal()">
           Ok
         </v-btn>
-        <v-btn depressed @click="scan()" color="error">
-          Quét
-        </v-btn>
       </template>
     </my-Modal>
     <my-Modal
@@ -240,17 +237,7 @@ import moment from "moment";
 import myModal from "../components/Modal.vue";
 import XLSX from "xlsx";
 import StockTable from "./MangerStock.vue";
-import Vue from "vue";
-import VueBarcodeScanner from "vue-barcode-scanner";
-let options = {
-  sound: true, // default is false
-  soundSrc: "/static/sound.wav", // default is blank
-  sensitivity: 300, // default is 100
-  requiredAttr: true, // default is false
-  controlSequenceKeys: ["NumLock", "Clear"], // default is null
-  callbackAfterTimeout: true, // default is false
-};
-Vue.use(VueBarcodeScanner, options);
+
 export default {
   components: { myModal, StockTable },
   data() {
@@ -345,13 +332,6 @@ export default {
 
       const [month, day, year] = date.split("/");
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-    },
-    scan() {
-      this.$barcodeScanner.init(this.onBarcodeScanned());
-    },
-    onBarcodeScanned(barcode) {
-      console.log(barcode);
-      // do something...
     },
     async SaveModal() {
       if (!this.IdStaff) {

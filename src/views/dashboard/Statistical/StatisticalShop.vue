@@ -174,7 +174,6 @@ import tableStatic from "./TableStatistical";
 import XLSX from "xlsx";
 
 export default {
-  name: "Orders",
   components: { tableStatic },
   data() {
     return {
@@ -307,22 +306,6 @@ export default {
       }
       return { total: 0, items: [] };
     },
-    // async getStockDelivery() {
-    //   if (this.IdShop) {
-    //     let url = `${this.url}/Orders?$expand=StockOrders&$filter=IdShop eq '${this.IdShop}'and StockOrders/any(x:x/CreatedAt eq ${this.DateOfIssueIdNumber})&$count=true`;
-    //     let resp = await this.$stores.api.get(`${url}`);
-    //     if (resp && resp.status == 200) {
-    //       let data = await resp.json();
-    //       let total = data["@odata.count"];
-    //       return {
-    //         total,
-    //         items: data.value,
-    //       };
-    //     }
-    //     return { total: 0, items: [] };
-    //   }
-    //   return { total: 0, items: [] };
-    // },
     async getStockDelivery() {
       if (this.IdShop) {
         let url = `${this.url}/Orders?$expand=StockOrders&$filter=IdShop eq '${this.IdShop}'and StockOrders/any(x:x/DeletedAt eq ${this.DateOfIssueIdNumber})&$count=true`;

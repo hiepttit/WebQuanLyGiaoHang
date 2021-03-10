@@ -156,7 +156,6 @@ import InputDetail from "./Inputcomponents/InputUserDetail.vue";
 import moment from "moment";
 export default {
   components: { InputDetail },
-  name: "User",
   async mounted() {
     this.getDataFromApi();
     this.getDataShopFromApi();

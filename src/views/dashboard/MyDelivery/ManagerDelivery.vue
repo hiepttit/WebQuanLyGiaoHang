@@ -215,7 +215,6 @@ import StockTable from "./MangerStock.vue";
 
 export default {
   components: { myModal, StockTable },
-  name: "Orders",
   data() {
     return {
       IdUser: "",

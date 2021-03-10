@@ -63,7 +63,7 @@
         <base-material-card color="green" class="px-5 py-3">
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
-              Shop
+              Đơn hàng
               <v-card-title style="width: 200px; float: right">
                 <v-text-field
                   append-icon="mdi-magnify"
@@ -76,7 +76,7 @@
             </div>
 
             <div class="subtitle-1 font-weight-light">
-              Danh sách tất cả Shop
+              Danh sách tất cả đơn hàng
             </div>
           </template>
           <v-card-text>
@@ -259,27 +259,11 @@ export default {
       this.fakeApiCall().then((data) => {
         this.Orders = data.items;
         this.total = data.total;
-        // this.totalCodSucess = this.sum(
-        //   data.items.filter((_) => _.IsSuccess == 1),
-        //   "Cod"
-        // );
         this.countSucess = data.items.filter((_) => _.IsSuccess == 1).length;
         this.countUnSucess = data.items.filter((_) => _.IsSuccess == 0).length;
         this.countRealUnSucess = data.items.filter(
           (_) => _.IsSuccess == 0 && _.RealReceive != null
         ).length;
-        // this.totalShipSucess = this.sum(
-        //   data.items.filter((_) => _.IsSuccess == 1),
-        //   "ShipFee"
-        // );
-        // this.totalCodUnSucess = this.sum(
-        //   data.items.filter((_) => _.IsSuccess == 0),
-        //   "Cod"
-        // );
-        // this.totalShipUnSucess = this.sum(
-        //   data.items.filter((_) => _.IsSuccess == 0),
-        //   "ShipFee"
-        // );
         this.totalRealSucess = this.sum(
           data.items.filter((_) => _.IsSuccess == 1),
           "RealReceive"
@@ -322,12 +306,6 @@ export default {
       }
       return { total: 0, items: [] };
     },
-    // async onState(item) {
-    //   this.IdKey = item.Id;
-    //   if (item.IsSuccess == 0) {
-    //     this.Show = true;
-    //   }
-    // },
     sum(array, key) {
       return array.reduce(function(r, a) {
         return r + a[key];

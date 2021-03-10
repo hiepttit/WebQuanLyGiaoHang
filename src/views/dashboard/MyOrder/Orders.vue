@@ -68,7 +68,7 @@
         <base-material-card color="green" class="px-5 py-3">
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
-              Shop
+              Đơn hàng
               <v-card-title style="width: 200px; float: right">
                 <v-text-field
                   append-icon="mdi-magnify"
@@ -81,7 +81,7 @@
             </div>
 
             <div class="subtitle-1 font-weight-light">
-              Danh sách tất cả Shop
+              Danh sách tất cả đơn hàng
             </div>
           </template>
           <v-card-text>
@@ -208,7 +208,6 @@ import XLSX from "xlsx";
 
 export default {
   components: { InputDetail, VueBarcode, myModal },
-  name: "Orders",
   async mounted() {
     this.Shop = await this.getShop();
     this.getDataFromApi();
@@ -458,7 +457,7 @@ export default {
     top: 0;
   }
   svg {
-    width: 40%;
+    width: 60%;
   }
   header {
     left: 0;

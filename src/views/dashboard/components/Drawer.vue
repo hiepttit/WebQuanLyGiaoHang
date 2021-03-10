@@ -20,14 +20,15 @@
     <v-list dense nav>
       <v-list-item>
         <v-list-item-avatar class="align-self-center" color="white" contain>
-          <v-img
-            src="https://demos.creative-tim.com/vuetify-material-dashboard/favicon.ico"
-            max-height="30"
-          />
+          <v-img src="../../../assets/devship.jpg" max-height="30" />
         </v-list-item-avatar>
 
         <v-list-item-content>
-          <v-list-item-title class="display-1" v-text="profile.title" />
+          <v-list-item-title
+            style="line-height:normal; font-size:15px !important"
+            class="display-1"
+            v-text="profile.title"
+          />
         </v-list-item-content>
       </v-list-item>
     </v-list>
@@ -35,8 +36,6 @@
     <v-divider class="mb-2" />
 
     <v-list expand nav>
-      <!-- Style cascading bug  -->
-      <!-- https://github.com/vuetifyjs/vuetify/pull/8574 -->
       <div />
 
       <template v-for="(item, i) in computedItems">
@@ -46,9 +45,6 @@
 
         <base-item v-else :key="`item-${i}`" :item="item" />
       </template>
-
-      <!-- Style cascading bug  -->
-      <!-- https://github.com/vuetifyjs/vuetify/pull/8574 -->
       <div />
     </v-list>
 
@@ -80,50 +76,50 @@ export default {
 
   data: () => ({
     items: [
-      {
-        icon: "mdi-view-dashboard",
-        title: "dashboard",
-        to: "/",
-      },
+      // {
+      //   icon: "mdi-view-dashboard",
+      //   title: "dashboard",
+      //   to: "/",
+      // },
       {
         title: "Quản lý người dùng",
         icon: "mdi-account-tie",
-        to: "/datatable",
+        to: "/",
       },
       {
         title: "Tạo Đơn Hàng",
         icon: "mdi-pencil-outline",
-        to: "/orders",
+        to: "/TaoDonHang",
       },
       {
         title: "Tạo Giao Hàng",
         icon: "mdi-pencil-outline",
-        to: "/Create_delivery",
+        to: "/TaoGiaoHang",
       },
       {
         title: "Quản lý giao hàng",
         icon: "mdi-mouse",
-        to: "/Manager_delivery",
+        to: "/QuanLyGiaoHang",
       },
       {
         title: "Quản lý tồn kho",
         icon: "mdi-mouse",
-        to: "/Manager_stock_orders",
+        to: "/QuanLyTonKho",
       },
       {
         title: "Quản lý đơn hàng",
         icon: "mdi-mouse",
-        to: "/Manager_orders",
+        to: "/QuanLyDonHang",
       },
       {
         title: "Thống kê nhân viên",
         icon: "mdi-mouse",
-        to: "/Statistical_Staff",
+        to: "/ThongKeNhanVien",
       },
       {
         title: "Thống kê Shop",
         icon: "mdi-mouse",
-        to: "/Statistical_Shop",
+        to: "/ThongKeShop",
       },
     ],
   }),
@@ -144,7 +140,7 @@ export default {
     profile() {
       return {
         avatar: true,
-        title: this.$t("avatar"),
+        title: "QUẢN LÝ GIAO HÀNG",
       };
     },
   },

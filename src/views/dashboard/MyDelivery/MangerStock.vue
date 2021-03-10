@@ -170,7 +170,6 @@ import myModal from "../components/Modal.vue";
 export default {
   props: ["IdUser", "DateOfIssueIdNumber", "isCreate"],
   components: { myModal },
-  name: "Orders",
   data() {
     return {
       pageCount: 0,

@@ -173,7 +173,6 @@ import moment from "moment";
 import tableStatic from "./TableStatistical";
 import XLSX from "xlsx";
 export default {
-  name: "Orders",
   components: { tableStatic },
   data() {
     return {
