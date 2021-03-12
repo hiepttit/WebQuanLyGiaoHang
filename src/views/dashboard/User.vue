@@ -24,117 +24,119 @@
           In
         </v-btn>
       </v-col>
-      <v-col class="post-content" cols="12" md="12">
-        <base-material-card
-          id="printed-content"
-          color="warning"
-          class="px-5 py-3"
-        >
-          <template v-slot:heading>
-            <div class="display-2 font-weight-light">
-              Nhân viên
-              <v-card-title style="width: 200px; float: right">
-                <v-text-field
-                  v-model="searchStaff"
-                  append-icon="mdi-magnify"
-                  label="Search"
-                  single-line
-                  hide-details
-                ></v-text-field>
-              </v-card-title>
-            </div>
+      <v-row id="printed-content">
+        <v-col class="post-content" cols="12" md="12">
+          <base-material-card color="warning" class="px-5 py-3">
+            <template v-slot:heading>
+              <div class="display-2 font-weight-light">
+                Nhân viên
+                <v-card-title style="width: 200px; float: right">
+                  <v-text-field
+                    v-model="searchStaff"
+                    append-icon="mdi-magnify"
+                    label="Search"
+                    single-line
+                    hide-details
+                  ></v-text-field>
+                </v-card-title>
+              </div>
 
-            <div class="subtitle-1 font-weight-light">
-              Danh sách tất cả nhân viên
-            </div>
-          </template>
-          <v-card-text>
-            <v-data-table
-              :headers="headers"
-              :items="Staffs"
-              :options.sync="optionsStaff"
-              :server-items-length="totalStaffs"
-              :loading="loadingStaff"
-              @page-count="pageCountStaff = $event"
-            >
-              <template v-slot:item.Stt="{ index }">
-                {{ index + 1 }}
-              </template>
-              <template v-slot:item.CMND="{ item }">
-                Số: {{ item.IdNumber }}
-                <div>Ngày cấp: {{ monentDate(item.DateOfIssueIdNumber) }}</div>
-                <div>Nơi cấp: {{ item.PlaceOfIssueIdNumber }}</div>
-              </template>
-              <template v-slot:item.Bank="{ item }">
-                Số: {{ item.BankAccountNumber }}
-                <div>Ngân hàng: {{ item.BankName }}</div>
-              </template>
-            </v-data-table>
-            <div class="text-center pt-2">
-              <v-pagination
-                v-model="optionsStaff.page"
-                :length="pageCountStaff"
-                :total-visible="7"
-              ></v-pagination>
-            </div>
-          </v-card-text>
-        </base-material-card>
-      </v-col>
-      <v-col cols="6" md="6">
-        <h1 class="ml-10">Tổng Shop: {{ totalShop }}</h1>
-      </v-col>
-      <v-col cols="12" md="12">
-        <base-material-card color="green" class="px-5 py-3">
-          <template v-slot:heading>
-            <div class="display-2 font-weight-light">
-              Shop
-              <v-card-title style="width: 200px; float: right">
-                <v-text-field
-                  v-model="searchShop"
-                  append-icon="mdi-magnify"
-                  label="Search"
-                  single-line
-                  hide-details
-                ></v-text-field>
-              </v-card-title>
-            </div>
+              <div class="subtitle-1 font-weight-light">
+                Danh sách tất cả nhân viên
+              </div>
+            </template>
+            <v-card-text>
+              <v-data-table
+                :headers="headers"
+                :items="Staffs"
+                :options.sync="optionsStaff"
+                :server-items-length="totalStaffs"
+                :loading="loadingStaff"
+                @page-count="pageCountStaff = $event"
+              >
+                <template v-slot:item.Stt="{ index }">
+                  {{ index + 1 }}
+                </template>
+                <template v-slot:item.CMND="{ item }">
+                  Số: {{ item.IdNumber }}
+                  <div>
+                    Ngày cấp: {{ monentDate(item.DateOfIssueIdNumber) }}
+                  </div>
+                  <div>Nơi cấp: {{ item.PlaceOfIssueIdNumber }}</div>
+                </template>
+                <template v-slot:item.Bank="{ item }">
+                  Số: {{ item.BankAccountNumber }}
+                  <div>Ngân hàng: {{ item.BankName }}</div>
+                </template>
+              </v-data-table>
+              <div class="text-center pt-2">
+                <v-pagination
+                  v-model="optionsStaff.page"
+                  :length="pageCountStaff"
+                  :total-visible="7"
+                ></v-pagination>
+              </div>
+            </v-card-text>
+          </base-material-card>
+        </v-col>
+        <v-col cols="6" md="6">
+          <h1 class="ml-10">Tổng Shop: {{ totalShop }}</h1>
+        </v-col>
+        <v-col cols="12" md="12">
+          <base-material-card color="green" class="px-5 py-3">
+            <template v-slot:heading>
+              <div class="display-2 font-weight-light">
+                Shop
+                <v-card-title style="width: 200px; float: right">
+                  <v-text-field
+                    v-model="searchShop"
+                    append-icon="mdi-magnify"
+                    label="Search"
+                    single-line
+                    hide-details
+                  ></v-text-field>
+                </v-card-title>
+              </div>
 
-            <div class="subtitle-1 font-weight-light">
-              Danh sách tất cả Shop
-            </div>
-          </template>
-          <v-card-text>
-            <v-data-table
-              :headers="headers"
-              :items="Shop"
-              :options.sync="optionsShop"
-              :server-items-length="totalShop"
-              :loading="loadingShop"
-              @page-count="pageCountShop = $event"
-            >
-              <template v-slot:item.Stt="{ index }">
-                {{ index + 1 }}
-              </template>
-              <template v-slot:item.CMND="{ item }">
-                Số: {{ item.IdNumber }}
-                <div>Ngày cấp: {{ monentDate(item.DateOfIssueIdNumber) }}</div>
-                <div>Nơi cấp: {{ item.PlaceOfIssueIdNumber }}</div>
-              </template>
-              <template v-slot:item.Bank="{ item }">
-                Số: {{ item.BankAccountNumber }}
-                <div>Ngân hàng: {{ item.BankName }}</div>
-              </template>
-            </v-data-table>
-            <div class="text-center pt-2">
-              <v-pagination
-                v-model="optionsShop.page"
-                :length="pageCountShop"
-                :total-visible="7"
-              ></v-pagination>
-            </div>
-          </v-card-text>
-        </base-material-card>
-      </v-col>
+              <div class="subtitle-1 font-weight-light">
+                Danh sách tất cả Shop
+              </div>
+            </template>
+            <v-card-text>
+              <v-data-table
+                :headers="headers"
+                :items="Shop"
+                :options.sync="optionsShop"
+                :server-items-length="totalShop"
+                :loading="loadingShop"
+                @page-count="pageCountShop = $event"
+              >
+                <template v-slot:item.Stt="{ index }">
+                  {{ index + 1 }}
+                </template>
+                <template v-slot:item.CMND="{ item }">
+                  Số: {{ item.IdNumber }}
+                  <div>
+                    Ngày cấp: {{ monentDate(item.DateOfIssueIdNumber) }}
+                  </div>
+                  <div>Nơi cấp: {{ item.PlaceOfIssueIdNumber }}</div>
+                </template>
+                <template v-slot:item.Bank="{ item }">
+                  Số: {{ item.BankAccountNumber }}
+                  <div>Ngân hàng: {{ item.BankName }}</div>
+                </template>
+              </v-data-table>
+              <div class="text-center pt-2">
+                <v-pagination
+                  v-model="optionsShop.page"
+                  :length="pageCountShop"
+                  :total-visible="7"
+                ></v-pagination>
+              </div>
+            </v-card-text>
+          </base-material-card>
+        </v-col>
+      </v-row>
     </v-row>
     <input-detail
       :user="objAddUser"

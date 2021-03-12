@@ -209,7 +209,7 @@ export default {
     Save() {
       let obj = JSON.parse(JSON.stringify(this.objAddOrder));
       if (this.address && this.WardName && this.District && this.ProvinceName) {
-        obj.TheAddresss =
+        obj.TheAddress =
           this.address +
           ", " +
           this.WardName +
@@ -218,7 +218,6 @@ export default {
           ", " +
           this.ProvinceName;
       }
-
       if (Object.keys(obj).length < 5) {
         obj = "";
         this.$emit("update", obj);

@@ -188,7 +188,6 @@ export default {
       }
       return _;
     });
-    console.log(this.roles);
   },
   watch: {
     user: {
@@ -294,7 +293,7 @@ export default {
     Save() {
       let obj = JSON.parse(JSON.stringify(this.objAddUser));
       if (this.address && this.WardName && this.District && this.ProvinceName) {
-        obj.TheAddresss =
+        obj.TheAddress =
           this.address +
           ", " +
           this.WardName +
@@ -303,7 +302,7 @@ export default {
           ", " +
           this.ProvinceName;
       }
-
+      obj.DateOfIssueIdNumber = this.DateOfIssueIdNumber;
       if (Object.keys(obj).length < 5) {
         obj = "";
         this.$emit("update", obj);
