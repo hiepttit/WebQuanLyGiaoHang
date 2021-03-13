@@ -43,6 +43,7 @@
           @click="
             Show = true;
             hasStock = false;
+            Code = []
           "
         >
           Giao hàng
@@ -56,6 +57,7 @@
           @click="
             Show = true;
             hasStock = true;
+            CodeInStock= []
           "
         >
           Giao đơn tồn kho
@@ -269,7 +271,7 @@ export default {
         { text: "Stt", align: "center", sortable: false, value: "Stt" },
         { text: "Mã", align: "start", sortable: false, value: "Id" },
         { text: "Tên khách hàng", align: "start", value: "CustomerName" },
-        { text: "Địa chỉ", value: "TheAddresss", align: "left" },
+        { text: "Địa chỉ", value: "TheAddress", align: "left" },
         { text: "Số điện thoại", value: "PhoneNumber" },
         { text: "COD", value: "Cod" },
         { text: "Ship", value: "ShipFee" },
@@ -489,7 +491,7 @@ export default {
       const filterVal = [
         "Id",
         "CustomerName",
-        "TheAddresss",
+        "TheAddress",
         "PhoneNumber",
         "Cod",
         "ShipFee",

@@ -61,7 +61,7 @@
                 <td>{{ i }}</td>
                 <td>{{ item.Id }}</td>
                 <td>{{ item.CustomerName }}</td>
-                <td>{{ item.TheAddresss }}</td>
+                <td>{{ item.TheAddress }}</td>
                 <td>{{ item.PhoneNumber }}</td>
                 <td>{{ formatNumber(item.Cod) }}</td>
                 <td>{{ formatNumber(item.ShipFee) }}</td>

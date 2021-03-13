@@ -155,7 +155,7 @@ export default {
           value: "Id",
         },
         { text: "Tên khách hàng", align: "start", value: "CustomerName" },
-        { text: "Địa chỉ", value: "TheAddresss", align: "left" },
+        { text: "Địa chỉ", value: "TheAddress", align: "left" },
         { text: "Số điện thoại", value: "PhoneNumber" },
         { text: "COD", value: "Cod" },
         { text: "Ship", value: "ShipFee" },

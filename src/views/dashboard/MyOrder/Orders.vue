@@ -180,10 +180,11 @@
     <my-Modal :show="ShowAll" :title="'In mã'" @close="ShowAll = false">
       <v-col cols="12">
         <div id="printContent">
-          <span v-for="(item, i) in allId" :key="i">
+          <span v-for="(item, i) in Orders" :key="i">
+            {{item.CustomerName}}
             <VueBarcode
               v-bind:options="{ lineColor: '#0275d8', text: 'Scan' }"
-              v-bind:value="item"
+              v-bind:value="item.Id"
             />
           </span>
         </div>
@@ -267,7 +268,7 @@ export default {
           value: "Id",
         },
         { text: "Tên khách hàng", align: "start", value: "CustomerName" },
-        { text: "Địa chỉ", value: "TheAddresss", align: "left" },
+        { text: "Địa chỉ", value: "TheAddress", align: "left" },
         { text: "Số điện thoại", value: "PhoneNumber" },
         { text: "COD", value: "Cod" },
         { text: "Ship", value: "ShipFee" },
@@ -395,7 +396,7 @@ export default {
       const filterVal = [
         "Id",
         "CustomerName",
-        "TheAddresss",
+        "TheAddress",
         "PhoneNumber",
         "Cod",
         "ShipFee",
@@ -464,10 +465,6 @@ export default {
   }
   header {
     left: 0;
-  }
-  #core-navigation-drawer {
-    display: none;
-    transform: translateX(-100%);
   }
   .v-main {
     padding: 75px 0px 0px !important;

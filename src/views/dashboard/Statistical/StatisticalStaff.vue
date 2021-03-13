@@ -476,7 +476,7 @@ export default {
       const filterVal = [
         "Id",
         "CustomerName",
-        "TheAddresss",
+        "TheAddress",
         "PhoneNumber",
         "Cod",
         "ShipFee",
@@ -494,7 +494,7 @@ export default {
       const filterValDelay = [
         "Id",
         "CustomerName",
-        "TheAddresss",
+        "TheAddress",
         "PhoneNumber",
         "Cod",
         "ShipFee",

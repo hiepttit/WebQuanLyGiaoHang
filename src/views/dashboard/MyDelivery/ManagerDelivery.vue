@@ -247,7 +247,7 @@ export default {
         { text: "Stt", align: "center", sortable: false, value: "Stt" },
         { text: "Mã", align: "start", sortable: false, value: "Id" },
         { text: "Tên khách hàng", align: "start", value: "CustomerName" },
-        { text: "Địa chỉ", value: "TheAddresss", align: "left" },
+        { text: "Địa chỉ", value: "TheAddress", align: "left" },
         { text: "Số điện thoại", value: "PhoneNumber" },
         { text: "COD", value: "Cod" },
         { text: "Ship", value: "ShipFee" },
