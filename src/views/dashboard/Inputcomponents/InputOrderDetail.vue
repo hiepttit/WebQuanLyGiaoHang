@@ -1,18 +1,29 @@
 <template>
   <my-Modal :show="isShow" :title="'Tạo người dùng'" @close="$emit('close')">
     <v-col cols="12" sm="6" md="6">
-      <v-text-field
+      <v-combobox
+        item-text="CustomerName"
+        item-value="CustomerName"
+        :items="Code"
         label="Họ tên khách hàng:*"
+        dense
+        outlined
         v-model="objAddOrder.CustomerName"
         required
-      ></v-text-field>
+      ></v-combobox>
     </v-col>
     <v-col cols="12" sm="6" md="6">
-      <v-text-field
-        label="Số điện thoại"
+      <v-combobox
+        item-text="PhoneNumber"
+        item-value="PhoneNumber"
+        :items="Code"
+        label="Số điện thoại:*"
+        dense
+        outlined
         v-model="objAddOrder.PhoneNumber"
+        required
         type="number"
-      ></v-text-field>
+      ></v-combobox>
     </v-col>
     <v-col cols="3">
       <v-text-field v-model="address" label="Địa chỉ:" required></v-text-field>

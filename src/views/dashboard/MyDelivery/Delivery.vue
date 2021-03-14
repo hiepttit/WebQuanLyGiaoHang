@@ -43,7 +43,7 @@
           @click="
             Show = true;
             hasStock = false;
-            Code = []
+            IdTheOrder=[]
           "
         >
           Giao hàng
@@ -56,8 +56,8 @@
           class="mr-0 btnDelivery"
           @click="
             Show = true;
-            hasStock = true;
-            CodeInStock= []
+            hasStock = true;    
+            IdTheOrder=[];       
           "
         >
           Giao đơn tồn kho
@@ -181,7 +181,7 @@
       </v-col>
       <template v-else-if="CodeInStock.length">
         <v-col cols="12">
-          <v-select
+          <v-combobox
             item-text="id"
             item-value="id"
             :items="CodeInStock"
@@ -190,7 +190,7 @@
             outlined
             multiple
             v-model="IdInStock"
-          ></v-select>
+          ></v-combobox>
         </v-col>
       </template>
 
@@ -348,7 +348,7 @@ export default {
       let url = `${this.url}/DeliveryOrders`;
       let arr = this.IdTheOrder;
       for (var i = 0; i < arr.length; i++) {
-        objAddDelivery.IdTheOrder = arr[i];
+        objAddDelivery.IdTheOrder = arr[i].id;
         let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
         if (resp && resp.status == 200 && i == arr.length - 1) {
           alert("Updated successfully.");
@@ -370,7 +370,7 @@ export default {
       for (var i = 0; i < arr.length; i++) {
         objAddDelivery.TheStatus = 0;
         let resp = await this.$stores.api.patch(
-          `${url}/${arr[i]}`,
+          `${url}/${arr[i].id}`,
           objAddDelivery
         );
         if (resp && resp.status == 200 && i == arr.length - 1) {
