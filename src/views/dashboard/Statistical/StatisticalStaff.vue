@@ -311,7 +311,7 @@ export default {
     },
     async getStockOrder() {
       if (this.IdStaff) {
-        let url = `${this.url}/Orders?$expand=StockOrders,DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdStaff}')and StockOrders/any(x:x/Id ne null) and StockOrders/any(x:x/CreatedAt eq ${this.DateOfIssueIdNumber}) &$count=true`;
+        let url = `${this.url}/Orders?$expand=StockOrders,DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdStaff}')and StockOrders/any(x:x/Id ne null) and CreatedAt eq ${this.DateOfIssueIdNumber} &$count=true`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();
@@ -343,7 +343,7 @@ export default {
     },
     async getDelayDate(idOrder) {
       let resp = await this.$stores.api.get(
-        `${this.url}/StockOrder?$select=Delaydate&$filter=IdTheOrder eq '${idOrder}'`
+        `${this.url}/StockOrders?$select=Delaydate&$filter=IdTheOrder eq '${idOrder}'`
       );
       if (resp && resp.status == 200) {
         let data = await resp.json();
