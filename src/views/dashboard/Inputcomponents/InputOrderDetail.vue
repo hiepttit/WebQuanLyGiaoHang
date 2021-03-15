@@ -4,7 +4,7 @@
       <v-combobox
         item-text="CustomerName"
         item-value="CustomerName"
-        :items="Code"
+        :items="objOrder"
         label="Họ tên khách hàng:*"
         dense
         outlined
@@ -16,7 +16,7 @@
       <v-combobox
         item-text="PhoneNumber"
         item-value="PhoneNumber"
-        :items="Code"
+        :items="objOrder"
         label="Số điện thoại:*"
         dense
         outlined
@@ -60,6 +60,32 @@
         required
       ></v-select>
     </v-col>
+    <v-col cols="12">
+      <v-menu
+        v-model="menu"
+        :close-on-content-click="false"
+        :nudge-right="40"
+        transition="scale-transition"
+        offset-y
+        min-width="auto"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-text-field
+            v-model="dateFormatted"
+            label="Ngày:"
+            prepend-icon="mdi-calendar"
+            v-bind="attrs"
+            @blur="date = parseDate(dateFormatted)"
+            style="width:40%;margin: 0 auto;"
+            v-on="on"
+          ></v-text-field>
+        </template>
+        <v-date-picker
+          v-model="DateOfIssueIdNumber"
+          @input="menu = false"
+        ></v-date-picker>
+      </v-menu>
+    </v-col>
     <v-col cols="6">
       <v-text-field
         type="number"
@@ -94,6 +120,7 @@ export default {
     return {
       menu: false,
       objAddOrder: {},
+      objOrder: [],
       Province: [],
       ProvinceId: null,
       ProvinceName: "",
@@ -113,12 +140,24 @@ export default {
   async mounted() {
     this.roles = await this.getRoles();
     this.Province = await this.getProvince();
+    this.objOrder = await this.getOrder();
   },
   watch: {
     user: {
       deep: true,
       handler(val) {
         this.objAddOrder = val;
+      },
+    },
+    objAddOrder: {
+      deep: true,
+      handler(val) {
+        if (val.CustomerName) {
+          this.objAddOrder.PhoneNumber = val.CustomerName.PhoneNumber;
+          this.objAddOrder.TheAddress = val.CustomerName.TheAddress;
+          this.objAddOrder.ShipFee = val.CustomerName.ShipFee;
+          this.objAddOrder.Cod = val.CustomerName.Cod;
+        }
       },
     },
     async IdProvince(val) {
@@ -204,6 +243,16 @@ export default {
       }
       return [];
     },
+    async getOrder() {
+      let resp = await this.$stores.api.get(
+        `http://localhost:60189/odata/Orders?$orderby=CustomerName asc`
+      );
+      if (resp && resp.status == 200) {
+        let data = await resp.json();
+        return data.value;
+      }
+      return [];
+    },
     formatDate(date) {
       if (!date) return null;
 
@@ -218,7 +267,12 @@ export default {
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
     Save() {
+      if (this.objAddOrder.CustomerName.CustomerName) {
+        this.objAddOrder.CustomerName = this.objAddOrder.CustomerName.CustomerName;
+      }
       let obj = JSON.parse(JSON.stringify(this.objAddOrder));
+      obj.CreatedAt = this.DateOfIssueIdNumber;
+
       if (this.address && this.WardName && this.District && this.ProvinceName) {
         obj.TheAddress =
           this.address +
@@ -229,7 +283,7 @@ export default {
           ", " +
           this.ProvinceName;
       }
-      if (Object.keys(obj).length < 5) {
+      if (Object.keys(obj).length < 6) {
         obj = "";
         this.$emit("update", obj);
       } else this.$emit("update", obj);
