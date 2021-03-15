@@ -49,7 +49,7 @@
           style="margin-left: 10px"
           rounded
           class="mr-0"
-          @click="ShowAll = true"
+          @click="PrintCode()"
         >
           In tất cả Mã
         </v-btn>
@@ -138,7 +138,6 @@
       </v-col>
     </v-row>
     <input-detail
-      :user="objAddOrder"
       :IdProvince="IdProvince"
       :isShow="isShow"
       @update="
@@ -177,24 +176,29 @@
         </v-btn>
       </template>
     </my-Modal>
-    <my-Modal :show="ShowAll" :title="'In mã'" @close="ShowAll = false">
-      <v-col cols="12">
-        <div id="printContent">
-          <span v-for="(item, i) in Orders" :key="i">
-            {{item.CustomerName}}
+    <div id="printContentAll">
+      <span v-for="(item, i) in Orders" :key="i">
+        <div style="border: 1px solid;margin-top:0.3rem">
+          <div style="text-align:center">Họ tên: {{ item.CustomerName }}</div>
+          <div style="text-align:center">
+            Số điện thoại: {{ item.PhoneNumber }}
+          </div>
+          <div style="text-align:center">Địa chỉ: {{ item.TheAddress }}</div>
+          <div style="text-align:center">Cod: {{ item.Cod }}</div>
+          <div style="text-align:center">Ship: {{ item.ShipFee }}</div>
+          <div style="text-align:center">
+            Tổng phí: {{ item.ShipFee + item.Cod }}
+          </div>
+          <div style="text-align:center">
             <VueBarcode
               v-bind:options="{ lineColor: '#0275d8', text: 'Scan' }"
               v-bind:value="item.Id"
             />
-          </span>
+          </div>
         </div>
-      </v-col>
-      <template v-slot:m-foot>
-        <v-btn color="blue darken-1" text @click="PrintCode()">
-          In
-        </v-btn>
-      </template>
-    </my-Modal>
+        <div class="pagebreak"></div>
+      </span>
+    </div>
   </v-container>
 </template>
 
@@ -249,7 +253,6 @@ export default {
       isShowUp: false,
       Show: false,
       loading: true,
-      ShowAll: false,
       Shop: [],
       Orders: [],
       objAddOrder: {},
@@ -450,15 +453,33 @@ export default {
   background-color: #eef1f6;
   border-color: #d1dbe5;
 }
+#printContentAll {
+  display: none;
+}
 @media print {
+  @page {
+    size: A5;
+  }
+  header,
+  nav,
+  footer {
+    display: none;
+  }
   body {
     visibility: hidden;
   }
   #printContent {
     visibility: visible;
     position: absolute;
-    left: 0;
+  }
+  #printContentAll {
+    visibility: visible;
+    position: absolute;
+    display: block;
     top: 0;
+  }
+  .v-dialog:not(.v-dialog--fullscreen) {
+    max-width: 100%;
   }
   svg {
     width: 60%;
@@ -469,22 +490,14 @@ export default {
   .v-main {
     padding: 75px 0px 0px !important;
   }
-  .book-date {
-    page-break-after: always;
-  }
-
-  .post-content {
-    page-break-before: always;
-  }
-  p {
-    page-break-inside: avoid;
-  }
   #table {
     display: none;
   }
   .v-card__text {
     width: 100vw;
     height: 100vh;
+  }
+  .pagebreak {
     page-break-after: always;
   }
 }
