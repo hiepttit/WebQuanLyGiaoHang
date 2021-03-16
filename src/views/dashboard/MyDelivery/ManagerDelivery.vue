@@ -460,7 +460,7 @@ export default {
       let data = await this.getShopById(item.IdShop);
       this.nameShop = data[0].Name;
       this.Receive = item.Cod + item.ShipFee;
-      if (item.TheStatus == 0 || item.TheStatus == 3) {
+      if (item.TheStatus == 0) {
         this.Show = true;
       }
       if (item.TheStatus == 3) {
