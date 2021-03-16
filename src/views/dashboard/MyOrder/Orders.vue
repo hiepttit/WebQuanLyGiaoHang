@@ -461,7 +461,7 @@ export default {
   },
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .disabled {
   pointer-events: none;
   color: #bfcbd9;
@@ -473,10 +473,13 @@ export default {
 .hidePrint {
   display: none;
 }
+@page {
+  size: A5;
+}
 @media print {
-  @page {
-    size: A5;
-  }
+  // @page {
+  //   size: 5cm 10cm;
+  // }
   header,
   nav,
   footer {
@@ -512,10 +515,10 @@ export default {
   #table {
     display: none;
   }
-  .v-card__text {
-    width: 100vw;
-    height: 100vh;
-  }
+  // .v-card__text {
+  //   width: 100vw;
+  //   height: 100vh;
+  // }
   .pagebreak {
     page-break-after: always;
   }
