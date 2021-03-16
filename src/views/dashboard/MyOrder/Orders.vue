@@ -111,7 +111,7 @@
                     aria-hidden="true"
                     style="cursor: pointer;"
                     class="v-icon notranslate mdi mdi-cloud-print"
-                    @click="(Show = true), (IdOrder = item.Id)"
+                    @click="PrintOne(item.Id)"
                   ></i>
                   <i
                     aria-hidden="true"
@@ -158,25 +158,17 @@
       "
       @close="isShowUp = false"
     />
-    <my-Modal :show="Show" :title="'In mã'" @close="Show = false">
-      <v-col cols="12">
-        <VueBarcode
-          v-bind:options="{
-            lineColor: '#0275d8',
-            text: 'Scan',
-            format: 'CODE39',
-          }"
-          id="printContent"
-          v-bind:value="IdOrder"
-        />
-      </v-col>
-      <template v-slot:m-foot>
-        <v-btn color="blue darken-1" text @click="PrintCode()">
-          In
-        </v-btn>
-      </template>
-    </my-Modal>
-    <div id="printContentAll">
+    <div :id="`${printOne && !printAll ? 'print-One' : ''}`" class="hidePrint">
+      <VueBarcode
+        v-bind:options="{
+          lineColor: '#0275d8',
+          text: 'Scan',
+          format: 'CODE39',
+        }"
+        v-bind:value="IdOrder"
+      />
+    </div>
+    <div :id="`${printAll && !printOne ? 'print-All' : ''}`" class="hidePrint">
       <span v-for="(item, i) in Orders" :key="i">
         <div style="border: 1px solid;margin-top:0.3rem">
           <div style="text-align:center">Họ tên: {{ item.CustomerName }}</div>
@@ -199,6 +191,16 @@
         <div class="pagebreak"></div>
       </span>
     </div>
+    <my-Modal :show="Show" :title="'In mã'" @close="Show = false">
+      <v-col cols="12" style="text-align: center">
+        Bạn có chắc muốn in ?
+      </v-col>
+      <template v-slot:m-foot>
+        <v-btn color="blue darken-1" text @click="btnPrint()">
+          In
+        </v-btn>
+      </template>
+    </my-Modal>
   </v-container>
 </template>
 
@@ -243,15 +245,17 @@ export default {
       total: 0,
       IdOrder: "",
       allId: [],
+      printOne: false,
       search: "",
+      printAll: false,
       IdProvince: null,
       DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       address: "",
       menu: false,
       isShow: false,
-      isShowUp: false,
       Show: false,
+      isShowUp: false,
       loading: true,
       Shop: [],
       Orders: [],
@@ -376,7 +380,20 @@ export default {
       });
     },
     PrintCode() {
+      this.printAll = true;
+      this.printOne = false;
+      this.Show = true;
+    },
+
+    PrintOne(item) {
+      this.IdOrder = item;
+      this.printAll = false;
+      this.printOne = true;
+      this.Show = true;
+    },
+    btnPrint() {
       window.print();
+      this.Show = false;
     },
     async changeInfo(e) {
       this.objAddOrder = e;
@@ -453,7 +470,7 @@ export default {
   background-color: #eef1f6;
   border-color: #d1dbe5;
 }
-#printContentAll {
+.hidePrint {
   display: none;
 }
 @media print {
@@ -468,14 +485,16 @@ export default {
   body {
     visibility: hidden;
   }
-  #printContent {
-    visibility: visible;
-    position: absolute;
-  }
-  #printContentAll {
+  #print-One {
     visibility: visible;
     // position: absolute;
-    display: block;
+    display: block !important;
+    top: 0;
+  }
+  #print-All {
+    visibility: visible;
+    // position: absolute;
+    display: block !important;
     top: 0;
   }
   .v-dialog:not(.v-dialog--fullscreen) {
