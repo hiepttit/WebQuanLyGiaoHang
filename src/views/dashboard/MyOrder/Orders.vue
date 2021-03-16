@@ -474,7 +474,7 @@ export default {
   }
   #printContentAll {
     visibility: visible;
-    position: absolute;
+    // position: absolute;
     display: block;
     top: 0;
   }
@@ -499,6 +499,9 @@ export default {
   }
   .pagebreak {
     page-break-after: always;
+  }
+  #table {
+    display: none;
   }
 }
 </style>
