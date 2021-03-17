@@ -158,6 +158,12 @@ export default {
           this.objAddOrder.ShipFee = val.CustomerName.ShipFee;
           this.objAddOrder.Cod = val.CustomerName.Cod;
         }
+        if (val.PhoneNumber) {
+          this.objAddOrder.CustomerName = val.PhoneNumber.CustomerName;
+          this.objAddOrder.TheAddress = val.PhoneNumber.TheAddress;
+          this.objAddOrder.ShipFee = val.PhoneNumber.ShipFee;
+          this.objAddOrder.Cod = val.PhoneNumber.Cod;
+        }
       },
     },
     async IdProvince(val) {
@@ -172,7 +178,7 @@ export default {
       }
     },
     DateOfIssueIdNumber(val) {
-      this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
+      this.dateFormatted = this.formatDate(val);
     },
     async ProvinceId(val) {
       if (val != 0) {
@@ -269,6 +275,9 @@ export default {
     Save() {
       if (this.objAddOrder.CustomerName.CustomerName) {
         this.objAddOrder.CustomerName = this.objAddOrder.CustomerName.CustomerName;
+      }
+      if (this.objAddOrder.PhoneNumber.PhoneNumber) {
+        this.objAddOrder.PhoneNumber = this.objAddOrder.PhoneNumber.PhoneNumber;
       }
       let obj = JSON.parse(JSON.stringify(this.objAddOrder));
       obj.CreatedAt = this.DateOfIssueIdNumber;
