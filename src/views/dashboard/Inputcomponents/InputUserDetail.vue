@@ -22,21 +22,24 @@
                   required
                 ></v-text-field>
               </v-col> -->
-    <v-col cols="6">
-      <v-text-field
-        label="Tên đăng nhập:*"
-        v-model="objAddUser.UserName"
-        required
-      ></v-text-field>
-    </v-col>
-    <v-col cols="6">
-      <v-text-field
-        label="Mật khẩu*"
-        v-model="objAddUser.Pwd"
-        type="password"
-        required
-      ></v-text-field>
-    </v-col>
+    <template v-if="Create">
+      <v-col cols="6">
+        <v-text-field
+          label="Tên đăng nhập:*"
+          v-model="objAddUser.UserName"
+          required
+        ></v-text-field>
+      </v-col>
+      <v-col cols="6">
+        <v-text-field
+          label="Mật khẩu*"
+          v-model="objAddUser.Pwd"
+          type="password"
+          required
+        ></v-text-field>
+      </v-col>
+    </template>
+
     <v-col cols="4">
       <v-text-field
         type="number"
@@ -154,7 +157,7 @@ import myModal from "../components/Modal.vue";
 
 export default {
   components: { myModal },
-  props: ["user", "IdProvince", "isShow"],
+  props: ["user", "IdProvince", "isShow", "Create"],
   data() {
     return {
       menu: false,
@@ -173,7 +176,6 @@ export default {
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       address: "",
       url: "http://localhost:60189/odata",
-      //SaveModal(objAddUser)
     };
   },
   async mounted() {
@@ -198,7 +200,9 @@ export default {
     },
     async IdProvince(val) {
       this.Province = await this.getProvince();
-      this.ProvinceId = val;
+      if (val.length) {
+        this.ProvinceId = val;
+      }
       this.DistrictId = null;
       this.WardId = null;
       this.District = [];
@@ -227,6 +231,7 @@ export default {
       }
     },
     async DistrictId(val) {
+      console.log(val);
       if (val) {
         let resp = await this.$stores.api.get(
           `${this.url}/Ward?$filter=DistrictId eq ${val}&$orderby=Name asc`
@@ -303,7 +308,7 @@ export default {
           this.ProvinceName;
       }
       obj.DateOfIssueIdNumber = this.DateOfIssueIdNumber;
-      if (Object.keys(obj).length < 5) {
+      if (Object.keys(obj).length < 4) {
         obj = "";
         this.$emit("update", obj);
       } else this.$emit("update", obj);

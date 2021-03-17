@@ -68,6 +68,21 @@
                   Số: {{ item.BankAccountNumber }}
                   <div>Ngân hàng: {{ item.BankName }}</div>
                 </template>
+                <template v-slot:item.Action="{ item }">
+                  <div class="text-left">
+                    <i
+                      aria-hidden="true"
+                      class="v-icon notranslate mdi mdi-pencil-plus"
+                      style="margin-left: 10px;cursor: pointer;"
+                      @click="
+                        (isShowUp = true),
+                          (objAddUser = item),
+                          (IdUser = item.Id),
+                          (IdProvince = [])
+                      "
+                    ></i>
+                  </div>
+                </template>
               </v-data-table>
               <div class="text-center pt-2">
                 <v-pagination
@@ -125,6 +140,21 @@
                   Số: {{ item.BankAccountNumber }}
                   <div>Ngân hàng: {{ item.BankName }}</div>
                 </template>
+                <template v-slot:item.Action="{ item }">
+                  <div class="text-left">
+                    <i
+                      aria-hidden="true"
+                      class="v-icon notranslate mdi mdi-pencil-plus"
+                      style="margin-left: 10px;cursor: pointer;"
+                      @click="
+                        (isShowUp = true),
+                          (objAddUser = item),
+                          (IdUser = item.Id),
+                          (IdProvince = [])
+                      "
+                    ></i>
+                  </div>
+                </template>
               </v-data-table>
               <div class="text-center pt-2">
                 <v-pagination
@@ -142,13 +172,25 @@
       :user="objAddUser"
       :isShow="isShow"
       :IdProvince="IdProvince"
-      class="printed-content"
+      :Create="true"
       @update="
         (e) => {
           SaveModal(e);
         }
       "
       @close="isShow = false"
+    />
+    <input-detail
+      :user="objAddUser"
+      :IdProvince="IdProvince"
+      :isShow="isShowUp"
+      :Create="false"
+      @update="
+        (e) => {
+          changeInfo(e);
+        }
+      "
+      @close="isShowUp = false"
     />
   </v-container>
 </template>
@@ -204,6 +246,7 @@ export default {
       optionsShop: {},
       searchStaff: "",
       searchShop: "",
+      IdUser: "",
       pageCountStaff: 0,
       pageCountShop: 0,
       IdProvince: null,
@@ -227,7 +270,9 @@ export default {
         { text: "Địa Chỉ", value: "TheAddress" },
         { text: "Số điện thoại", value: "PhoneNumber" },
         { text: "Tài khoản ngân hàng", value: "Bank" },
+        { text: "Tác Vụ", value: "Action" },
       ],
+      isShowUp: false,
     };
   },
 
@@ -333,6 +378,20 @@ export default {
     },
     print() {
       window.print();
+    },
+    async changeInfo(e) {
+      this.objAddUser = e;
+      this.objAddUser.Id = this.IdUser;
+      let objAddUser = this.objAddUser;
+      let url = `${this.url}/TheUsers/${this.IdUser}`;
+      let resp = await this.$stores.api.patch(`${url}`, objAddUser);
+      if (resp && resp.status == 200) {
+        alert("Updated successfully.");
+        this.isShowUp = false;
+        this.getDataFromApi();
+      } else {
+        alert("Updated failed.");
+      }
     },
   },
 };

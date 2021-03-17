@@ -169,7 +169,9 @@ export default {
     async IdProvince(val) {
       if (val) {
         this.Province = await this.getProvince();
-        this.ProvinceId = val;
+        if (val.length) {
+          this.ProvinceId = val;
+        }
         this.DistrictId = null;
         this.WardId = null;
         this.District = [];
