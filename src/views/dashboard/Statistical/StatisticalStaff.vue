@@ -121,49 +121,58 @@
           Xuất excel
         </v-btn>
       </v-col>
-      <tableStatic
-        :list="OrdersSuccess"
-        :number="OrdersSuccess.length"
-        :total="totalSuccess"
-        :header="'Đơn hàng thành công'"
-        :detail="'Danh sách tất cả đơn hàng thành công'"
-        :color="'success'"
-      />
       <template v-if="OrdersSuccessStock.length">
         <tableStatic
           :list="OrdersSuccessStock"
           :number="OrdersSuccessStock.length"
           :total="totalSuccessStock"
+          :stock="true"
           :header="'Đơn hàng tồn kho đã hoàn thành'"
           :detail="'Danh sách tất cả đơn hàng tồn kho đã hoàn thành'"
           :color="'#1867c0'"
         />
       </template>
-      <tableStatic
-        :list="OrdersFail"
-        :number="OrdersFail.length"
-        :total="totalFail"
-        :header="'Đơn hàng trả'"
-        :detail="'Danh sách tất cả đơn hàng trả'"
-        :color="'error'"
-      />
-      <tableStatic
-        :list="OrdersDelay"
-        :number="OrdersDelay.length"
-        :total="totalDelay"
-        :header="'Đơn hàng hoãn'"
-        :detail="'Danh sách tất cả đơn hàng hoãn'"
-        :color="'warning'"
-        :delay="true"
-      />
-      <tableStatic
-        :list="OrdersHalf"
-        :number="OrdersHalf.length"
-        :total="totalHalf"
-        :header="'Đơn hàng thành công một phần'"
-        :detail="'Danh sách tất cả đơn hàng thành công 1 phần'"
-        :color="'#5cbbf6'"
-      />
+      <template v-if="OrdersSuccess.length">
+        <tableStatic
+          :list="OrdersSuccess"
+          :number="OrdersSuccess.length"
+          :total="totalSuccess"
+          :header="'Đơn hàng thành công'"
+          :detail="'Danh sách tất cả đơn hàng thành công'"
+          :color="'success'"
+        />
+      </template>
+      <template v-if="OrdersFail.length">
+        <tableStatic
+          :list="OrdersFail"
+          :number="OrdersFail.length"
+          :total="totalFail"
+          :header="'Đơn hàng trả'"
+          :detail="'Danh sách tất cả đơn hàng trả'"
+          :color="'error'"
+        />
+      </template>
+      <template v-if="OrdersDelay.length">
+        <tableStatic
+          :list="OrdersDelay"
+          :number="OrdersDelay.length"
+          :total="totalDelay"
+          :header="'Đơn hàng hoãn'"
+          :detail="'Danh sách tất cả đơn hàng hoãn'"
+          :color="'warning'"
+          :delay="true"
+        />
+      </template>
+      <template v-if="OrdersHalf.length">
+        <tableStatic
+          :list="OrdersHalf"
+          :number="OrdersHalf.length"
+          :total="totalHalf"
+          :header="'Đơn hàng thành công một phần'"
+          :detail="'Danh sách tất cả đơn hàng thành công 1 phần'"
+          :color="'#5cbbf6'"
+        />
+      </template>
     </v-row>
   </v-container>
 </template>
@@ -211,14 +220,14 @@ export default {
   },
   watch: {
     DateOfIssueIdNumber(val) {
-      this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
+      this.dateFormatted = this.formatDate(val);
       this.getDataFromApi();
     },
     FromDate(val) {
-      this.fromDate = this.formatDate(this.FromDate);
+      this.fromDate = this.formatDate(val);
     },
     ToDate(val) {
-      this.toDate = this.formatDate(this.ToDate);
+      this.toDate = this.formatDate(val);
     },
     IdStaff(val) {
       this.getDataFromApi();

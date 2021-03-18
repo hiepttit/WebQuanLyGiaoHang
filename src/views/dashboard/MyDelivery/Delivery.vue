@@ -43,7 +43,7 @@
           @click="
             Show = true;
             hasStock = false;
-            IdTheOrder=[]
+            IdTheOrder = [];
           "
         >
           Giao hàng
@@ -56,8 +56,8 @@
           class="mr-0 btnDelivery"
           @click="
             Show = true;
-            hasStock = true;    
-            IdTheOrder=[];       
+            hasStock = true;
+            IdInStock = [];
           "
         >
           Giao đơn tồn kho
@@ -348,7 +348,9 @@ export default {
       let url = `${this.url}/DeliveryOrders`;
       let arr = this.IdTheOrder;
       for (var i = 0; i < arr.length; i++) {
-        objAddDelivery.IdTheOrder = arr[i].id;
+        if (arr[i].id) {
+          objAddDelivery.IdTheOrder = arr[i].id;
+        } else objAddDelivery.IdTheOrder = arr[i];
         let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
         if (resp && resp.status == 200 && i == arr.length - 1) {
           alert("Updated successfully.");
@@ -367,12 +369,13 @@ export default {
       let objAddDelivery = this.objAddDelivery;
       let url = `${this.url}/DeliveryOrders`;
       let arr = this.IdInStock;
+      let id = "";
       for (var i = 0; i < arr.length; i++) {
         objAddDelivery.TheStatus = 0;
-        let resp = await this.$stores.api.patch(
-          `${url}/${arr[i].id}`,
-          objAddDelivery
-        );
+        if (arr[i].id) {
+          id = arr[i].id;
+        } else id = arr[i];
+        let resp = await this.$stores.api.patch(`${url}/${id}`, objAddDelivery);
         if (resp && resp.status == 200 && i == arr.length - 1) {
           alert("Updated successfully.");
           this.Show = false;

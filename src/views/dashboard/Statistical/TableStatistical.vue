@@ -6,14 +6,6 @@
       <template v-slot:heading>
         <div class="display-2 font-weight-light">
           {{ header }}
-          <!-- <v-card-title style="width: 200px; float: right">
-            <v-text-field
-              append-icon="mdi-magnify"
-              label="Search"
-              single-line
-              hide-details
-            ></v-text-field>
-          </v-card-title> -->
         </div>
 
         <div class="subtitle-1 font-weight-light">
@@ -56,23 +48,56 @@
           </thead>
 
           <tbody>
-            <template v-for="(item, i) in list">
-              <tr :key="`r${i}`">
-                <td>{{ i }}</td>
-                <td>{{ item.Id }}</td>
-                <td>{{ item.CustomerName }}</td>
-                <td>{{ item.TheAddress }}</td>
-                <td>{{ item.PhoneNumber }}</td>
-                <td>{{ formatNumber(item.Cod) }}</td>
-                <td>{{ formatNumber(item.ShipFee) }}</td>
-                <td v-if="delay">{{ formatdelayDate(item.StockOrders) }}</td>
-                <td v-else>
-                  <span v-if="item.RealReceive == null">
-                    {{ formatNumber(item.ShipFee + item.Cod) }}
-                  </span>
-                  <span v-else>{{ formatNumber(item.RealReceive) }}</span>
-                </td>
-              </tr>
+            <template v-if="stock">
+              <template v-for="(item, i) in list">
+                <tr
+                  :key="`r${i}`"
+                  :style="
+                    `color: ${
+                      item.TheStatus == 2
+                        ? 'red'
+                        : item.TheStatus == 4
+                        ? 'yellow'
+                        : 'green'
+                    }`
+                  "
+                >
+                  <td>{{ i }}</td>
+                  <td>{{ item.Id }}</td>
+                  <td>{{ item.CustomerName }}</td>
+                  <td>{{ item.TheAddress }}</td>
+                  <td>{{ item.PhoneNumber }}</td>
+                  <td>{{ formatNumber(item.Cod) }}</td>
+                  <td>{{ formatNumber(item.ShipFee) }}</td>
+                  <td v-if="delay">{{ formatdelayDate(item.StockOrders) }}</td>
+                  <td v-else>
+                    <span v-if="item.RealReceive == null">
+                      {{ formatNumber(item.ShipFee + item.Cod) }}
+                    </span>
+                    <span v-else>{{ formatNumber(item.RealReceive) }}</span>
+                  </td>
+                </tr>
+              </template>
+            </template>
+            <template v-else>
+              <template v-for="(item, i) in list">
+                <tr :key="`r${i}`">
+                  <td>{{ i }}</td>
+                  <td>{{ item.Id }}</td>
+                  <td>{{ item.CustomerName }}</td>
+                  <td>{{ item.TheAddress }}</td>
+                  <td>{{ item.PhoneNumber }}</td>
+                  <td>{{ formatNumber(item.Cod) }}</td>
+                  <td>{{ formatNumber(item.ShipFee) }}</td>
+                  <td v-if="delay">{{ formatdelayDate(item.StockOrders) }}</td>
+                  <td v-else>
+                    <span v-if="item.RealReceive == null">
+                      {{ formatNumber(item.ShipFee + item.Cod) }}
+                    </span>
+                    <span v-else>{{ formatNumber(item.RealReceive) }}</span>
+                  </td>
+                </tr>
+              </template>
             </template>
           </tbody>
         </v-simple-table>
@@ -83,7 +108,16 @@
 <script>
 import moment from "moment";
 export default {
-  props: ["list", "number", "total", "header", "detail", "color", "delay"],
+  props: [
+    "list",
+    "number",
+    "total",
+    "header",
+    "detail",
+    "color",
+    "delay",
+    "stock",
+  ],
   methods: {
     monentDate(date) {
       return moment(date).format("DD/MM/YYYY");

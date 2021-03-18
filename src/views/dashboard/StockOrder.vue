@@ -199,6 +199,7 @@ export default {
       this.loading = true;
       this.fakeApiCall().then((data) => {
         this.Orders = data.items;
+        console.log(this.Orders);
         this.total = data.total;
         this.loading = false;
       });
@@ -221,7 +222,7 @@ export default {
           skip = `&$skip=${(page - 1) * itemsPerPage}`;
         }
         let filter = search && ` and contains(Id, '${search}')`;
-        let url = `${this.url}/Orders?$expand=StockOrders&$filter=StockOrders/any(x:x/Delaydate ne null) and IdShop eq '${this.IdShop}'${filter}&$count=true${top}${skip}`;
+        let url = `${this.url}/Orders?$expand=StockOrders&$filter=StockOrders/any(x:x/Delaydate ne null) and StockOrders/any(x:x/Delaydate Ge ${this.DateOfIssueIdNumber}) and IdShop eq '${this.IdShop}'${filter}&$count=true${top}${skip}`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();

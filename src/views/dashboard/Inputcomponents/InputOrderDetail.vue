@@ -1,16 +1,11 @@
 <template>
   <my-Modal :show="isShow" :title="'Tạo người dùng'" @close="$emit('close')">
     <v-col cols="12" sm="6" md="6">
-      <v-combobox
-        item-text="CustomerName"
-        item-value="CustomerName"
-        :items="objOrder"
+      <v-text-field
         label="Họ tên khách hàng:*"
-        dense
-        outlined
         v-model="objAddOrder.CustomerName"
         required
-      ></v-combobox>
+      ></v-text-field>
     </v-col>
     <v-col cols="12" sm="6" md="6">
       <v-combobox
@@ -152,12 +147,12 @@ export default {
     objAddOrder: {
       deep: true,
       handler(val) {
-        if (val.CustomerName) {
-          this.objAddOrder.PhoneNumber = val.CustomerName.PhoneNumber;
-          this.objAddOrder.TheAddress = val.CustomerName.TheAddress;
-          this.objAddOrder.ShipFee = val.CustomerName.ShipFee;
-          this.objAddOrder.Cod = val.CustomerName.Cod;
-        }
+        // if (val.CustomerName) {
+        //   this.objAddOrder.PhoneNumber = val.CustomerName.PhoneNumber;
+        //   this.objAddOrder.TheAddress = val.CustomerName.TheAddress;
+        //   this.objAddOrder.ShipFee = val.CustomerName.ShipFee;
+        //   this.objAddOrder.Cod = val.CustomerName.Cod;
+        // }
         if (val.PhoneNumber) {
           this.objAddOrder.CustomerName = val.PhoneNumber.CustomerName;
           this.objAddOrder.TheAddress = val.PhoneNumber.TheAddress;

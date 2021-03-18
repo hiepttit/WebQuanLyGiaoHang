@@ -77,7 +77,7 @@
                   <template
                     v-if="item.TheStatus == null || item.TheStatus == 3"
                   >
-                    <v-btn color="#5cbbf6" @click="onState(item)">
+                    <v-btn color="teal" @click="onState(item)">
                       Đang giao
                       <i
                         aria-hidden="true"
@@ -328,6 +328,7 @@ export default {
         if (half.RealReceive > 0 && half.RealReceive < price) {
           let resp = await this.$stores.api.patch(`${url}`, half);
           if (resp && resp.status == 200) {
+            this.getDataFromApi();
             return true;
           }
         } else {

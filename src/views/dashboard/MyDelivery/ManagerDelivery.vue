@@ -84,7 +84,7 @@
               </template>
               <template v-slot:item.Action="{ item }">
                 <template v-if="item.TheStatus == null || item.TheStatus == 0">
-                  <v-btn color="#5cbbf6" @click="onState(item)">
+                  <v-btn dark color="teal" @click="onState(item)">
                     Đang giao
                     <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
                     </i>
@@ -103,15 +103,11 @@
                 <template v-if="item.TheStatus == 3">
                   <v-btn color="warning" @click="onState(item)">
                     Tồn kho
-                    <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
-                    </i>
                   </v-btn>
                 </template>
                 <template v-if="item.TheStatus == 4">
                   <v-btn color="#5cbbf6" @click="onState(item)">
                     Hoàn thành 1 phần
-                    <i aria-hidden="true" class="v-icon mdi mdi-pencil-outline">
-                    </i>
                   </v-btn>
                 </template>
               </template>
@@ -274,12 +270,12 @@ export default {
   },
   watch: {
     async DateOfIssueIdNumber(val) {
-      this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
+      this.dateFormatted = this.formatDate(val);
       this.check = await this.checkInStock();
       this.getDataFromApi();
     },
     DateOfIssueIdNumberModal(val) {
-      this.dateFormattedModal = this.formatDate(this.DateOfIssueIdNumberModal);
+      this.dateFormattedModal = this.formatDate(val);
     },
     async IdUser(val) {
       this.check = await this.checkInStock();
@@ -449,6 +445,11 @@ export default {
       return null;
     },
     async onState(item) {
+      this.DateOfIssueIdNumberModal = new Date().toISOString().substr(0, 10);
+      this.dateFormattedModal = this.formatDate(
+        new Date().toISOString().substr(0, 10)
+      );
+      this.realReceive = null;
       this.defaultStateSelected = 0;
       this.IdKey = item.Id;
       let delayDate = await this.getDelayDate(item.Id);
@@ -494,6 +495,12 @@ export default {
   background-image: none;
   background-color: #eef1f6;
   border-color: #d1dbe5;
+}
+.v-btn {
+  width: 10rem;
+}
+.v-btn span {
+  font-size: 0.8rem;
 }
 @media print {
   body {

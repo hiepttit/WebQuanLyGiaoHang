@@ -461,7 +461,7 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .disabled {
   pointer-events: none;
   color: #bfcbd9;
