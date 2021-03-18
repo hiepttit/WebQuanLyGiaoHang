@@ -523,6 +523,13 @@ export default {
       );
       Name.push(this.dateFormatted);
 
+      const dataSuccessInStock = this.formatJson(
+        filterVal,
+        this.OrdersSuccessStock
+      );
+      const successInStockData = [headerDisplay, ...dataSuccessInStock];
+      const newDataSuccessInStock = [Name, ...successInStockData];
+
       const dataSuccess = this.formatJson(filterVal, this.OrdersSuccess);
       const successData = [headerDisplay, ...dataSuccess];
       const newDataSuccess = [Name, ...successData];
@@ -541,6 +548,7 @@ export default {
 
       let wb = XLSX.utils.book_new(),
         ws = XLSX.utils.aoa_to_sheet(newDataSuccess),
+        wst = XLSX.utils.aoa_to_sheet(newDataSuccessInStock),
         wsh = XLSX.utils.aoa_to_sheet(newDataHalf),
         wsd = XLSX.utils.aoa_to_sheet(newDataDelay),
         wsf = XLSX.utils.aoa_to_sheet(newDataFail);
@@ -556,10 +564,12 @@ export default {
         { wch: 15 },
       ];
       ws["!cols"] = wscols;
+      wst["!cols"] = wscols;
       wsh["!cols"] = wscols;
       wsd["!cols"] = wscols;
       wsf["!cols"] = wscols;
       XLSX.utils.book_append_sheet(wb, ws, "ThanhCong");
+      XLSX.utils.book_append_sheet(wb, wst, "ThanhCongKho");
       XLSX.utils.book_append_sheet(wb, wsh, "ThanhCong1Phan");
       XLSX.utils.book_append_sheet(wb, wsd, "Hoan");
       XLSX.utils.book_append_sheet(wb, wsf, "Tra");

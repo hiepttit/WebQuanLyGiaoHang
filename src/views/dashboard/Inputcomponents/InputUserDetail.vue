@@ -210,7 +210,7 @@ export default {
       this.address = "";
     },
     DateOfIssueIdNumber(val) {
-      this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
+      this.dateFormatted = this.formatDate(val);
     },
     async ProvinceId(val) {
       if (val) {

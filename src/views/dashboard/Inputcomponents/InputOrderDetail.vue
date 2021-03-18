@@ -147,12 +147,6 @@ export default {
     objAddOrder: {
       deep: true,
       handler(val) {
-        // if (val.CustomerName) {
-        //   this.objAddOrder.PhoneNumber = val.CustomerName.PhoneNumber;
-        //   this.objAddOrder.TheAddress = val.CustomerName.TheAddress;
-        //   this.objAddOrder.ShipFee = val.CustomerName.ShipFee;
-        //   this.objAddOrder.Cod = val.CustomerName.Cod;
-        // }
         if (val.PhoneNumber) {
           this.objAddOrder.CustomerName = val.PhoneNumber.CustomerName;
           this.objAddOrder.TheAddress = val.PhoneNumber.TheAddress;

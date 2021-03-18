@@ -138,6 +138,7 @@
       </v-col>
     </v-row>
     <input-detail
+      :user="objAddOrder"
       :IdProvince="IdProvince"
       :isShow="isShow"
       @update="
