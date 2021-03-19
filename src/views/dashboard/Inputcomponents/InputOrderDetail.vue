@@ -156,7 +156,13 @@ export default {
     objAddOrder: {
       deep: true,
       handler(val) {
-        if (val.PhoneNumber) {
+        if (
+          val.PhoneNumber &&
+          val.PhoneNumber.CustomerName &&
+          val.PhoneNumber.TheAddress &&
+          val.PhoneNumber.ShipFee &&
+          val.PhoneNumber.Cod
+        ) {
           this.objAddOrder.CustomerName = val.PhoneNumber.CustomerName;
           this.objAddOrder.TheAddress = val.PhoneNumber.TheAddress;
           this.objAddOrder.ShipFee = val.PhoneNumber.ShipFee;

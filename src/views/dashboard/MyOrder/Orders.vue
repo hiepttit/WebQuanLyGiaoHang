@@ -111,7 +111,7 @@
                     aria-hidden="true"
                     style="cursor: pointer;"
                     class="v-icon notranslate mdi mdi-cloud-print"
-                    @click="PrintOne(item.Id)"
+                    @click="PrintOne(item)"
                   ></i>
                   <i
                     aria-hidden="true"
@@ -160,14 +160,28 @@
       @close="isShowUp = false"
     />
     <div :id="`${printOne && !printAll ? 'print-One' : ''}`" class="hidePrint">
-      <VueBarcode
-        v-bind:options="{
-          lineColor: '#0275d8',
-          text: 'Scan',
-          format: 'CODE39',
-        }"
-        v-bind:value="IdOrder"
-      />
+      <div style="border: 1px solid;margin-top:0.3rem">
+        <div style="text-align:center">Họ tên: {{ oneOrder.CustomerName }}</div>
+        <div style="text-align:center">
+          Số điện thoại: {{ oneOrder.PhoneNumber }}
+        </div>
+        <div style="text-align:center">Địa chỉ: {{ oneOrder.TheAddress }}</div>
+        <div style="text-align:center">Cod: {{ oneOrder.Cod }}</div>
+        <div style="text-align:center">Ship: {{ oneOrder.ShipFee }}</div>
+        <div style="text-align:center">
+          Tổng phí: {{ oneOrder.ShipFee + oneOrder.Cod }}
+        </div>
+        <div style="text-align:center">
+          <VueBarcode
+            v-bind:options="{
+              lineColor: '#0275d8',
+              text: 'Scan',
+              format: 'CODE39',
+            }"
+            v-bind:value="oneOrder.Id"
+          />
+        </div>
+      </div>
     </div>
     <div :id="`${printAll && !printOne ? 'print-All' : ''}`" class="hidePrint">
       <span v-for="(item, i) in Orders" :key="i">
@@ -245,7 +259,7 @@ export default {
       pageCount: 0,
       options: {},
       total: 0,
-      IdOrder: "",
+      oneOrder: {},
       allId: [],
       printOne: false,
       search: "",
@@ -389,7 +403,7 @@ export default {
     },
 
     PrintOne(item) {
-      this.IdOrder = item;
+      this.oneOrder = item;
       this.printAll = false;
       this.printOne = true;
       this.Show = true;
