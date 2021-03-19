@@ -252,7 +252,6 @@ export default {
       }
     },
     async DistrictId(val) {
-      console.log(val);
       if (val) {
         let resp = await this.$stores.api.get(
           `${this.url}/Ward?$filter=DistrictId eq ${val}&$orderby=Name asc`

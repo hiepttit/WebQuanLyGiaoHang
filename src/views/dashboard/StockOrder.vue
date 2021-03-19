@@ -199,7 +199,6 @@ export default {
       this.loading = true;
       this.fakeApiCall().then((data) => {
         this.Orders = data.items;
-        console.log(this.Orders);
         this.total = data.total;
         this.loading = false;
       });
