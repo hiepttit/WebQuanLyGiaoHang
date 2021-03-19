@@ -365,6 +365,10 @@ export default {
       }
     },
     async DeliveryInStock() {
+      if (!this.IdStaff) {
+        alert("Tên nhân viên không được để trống");
+        return;
+      }
       this.objAddDelivery.IdStaff = this.IdStaff;
       let objAddDelivery = this.objAddDelivery;
       let url = `${this.url}/DeliveryOrders`;

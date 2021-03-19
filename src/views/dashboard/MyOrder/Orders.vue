@@ -119,7 +119,7 @@
                     style="margin-left: 10px;cursor: pointer;"
                     @click="
                       (isShowUp = true),
-                        (objAddOrder = item),
+                        (objUpdateOrder = item),
                         (IdOrder = item.Id)
                     "
                   ></i>
@@ -148,8 +148,8 @@
       "
       @close="isShow = false"
     />
-    <input-detail
-      :user="objAddOrder"
+    <input-update
+      :user="objUpdateOrder"
       :IdProvince="IdProvince"
       :isShow="isShowUp"
       @update="
@@ -207,6 +207,7 @@
 
 <script>
 import InputDetail from "../Inputcomponents/InputOrderDetail.vue";
+import InputUpdate from "../Inputcomponents/InputUpdateOrder.vue";
 import moment from "moment";
 import VueBarcode from "vue-barcode";
 import myModal from "../components/Modal.vue";
@@ -218,7 +219,7 @@ export default {
   metaInfo: {
     title: "Tao Don Hang",
   },
-  components: { InputDetail, VueBarcode, myModal },
+  components: { InputDetail, VueBarcode, myModal, InputUpdate },
   async mounted() {
     this.Shop = await this.getShop();
     this.getDataFromApi();
@@ -261,6 +262,7 @@ export default {
       Shop: [],
       Orders: [],
       objAddOrder: {},
+      objUpdateOrder: {},
       url: "http://localhost:60189/odata",
       headers: [
         {

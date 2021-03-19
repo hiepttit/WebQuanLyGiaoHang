@@ -21,15 +21,20 @@
       ></v-combobox>
     </v-col>
     <v-col cols="3">
-      <v-text-field v-model="address" label="Địa chỉ:" required></v-text-field>
+      <v-text-field
+        v-model="address"
+        :label="`${nameAdd ? nameAdd : 'Địa chỉ:'}`"
+        required
+      ></v-text-field>
     </v-col>
     <v-col cols="3">
       <v-select
         item-text="Name"
         item-value="Id"
-        :items="Province"
-        label="Tỉnh/Thành phố*"
-        v-model="ProvinceId"
+        :items="Ward"
+        v-bind:class="{ disabled: Ward.length ? false : true }"
+        :label="`${nameWard ? nameWard : 'Phường/Xã*'}`"
+        v-model="WardId"
         required
       ></v-select>
     </v-col>
@@ -39,7 +44,9 @@
         item-value="Id"
         :items="District"
         v-bind:class="{ disabled: District.length ? false : true }"
-        label="Quận/Huyện/Thành phố/Thị xã*"
+        :label="
+          `${nameDistrict ? nameDistrict : 'Quận/Huyện/Thành phố/Thị xã*'}`
+        "
         v-model="DistrictId"
         required
       ></v-select>
@@ -48,10 +55,9 @@
       <v-select
         item-text="Name"
         item-value="Id"
-        :items="Ward"
-        v-bind:class="{ disabled: Ward.length ? false : true }"
-        label="Phường/Xã*"
-        v-model="WardId"
+        :items="Province"
+        :label="`${nameProvince ? nameProvince : 'Tỉnh/Thành phố*'}`"
+        v-model="ProvinceId"
         required
       ></v-select>
     </v-col>
@@ -124,8 +130,11 @@ export default {
       DistrictName: "",
       Ward: [],
       WardId: null,
-      roles: [],
       WardName: "",
+      nameAdd: "",
+      nameProvince: "",
+      nameDistrict: "",
+      nameWard: "",
       DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       address: "",
@@ -133,7 +142,6 @@ export default {
     };
   },
   async mounted() {
-    this.roles = await this.getRoles();
     this.Province = await this.getProvince();
     this.objOrder = await this.getOrder();
   },
@@ -142,6 +150,7 @@ export default {
       deep: true,
       handler(val) {
         this.objAddOrder = val;
+        this.nameAd = val;
       },
     },
     objAddOrder: {
@@ -152,6 +161,20 @@ export default {
           this.objAddOrder.TheAddress = val.PhoneNumber.TheAddress;
           this.objAddOrder.ShipFee = val.PhoneNumber.ShipFee;
           this.objAddOrder.Cod = val.PhoneNumber.Cod;
+        }
+        if (Object.keys(val).length != 0) {
+          let address = this.objAddOrder.TheAddress;
+          if (address) {
+            this.nameAdd = address.split(",")[0];
+            this.nameWard = address.split(",")[1];
+            this.nameDistrict = address.split(",")[2];
+            this.nameProvince = address.split(",")[3];
+          }
+        } else {
+          this.nameAdd = "";
+          this.nameWard = "";
+          this.nameDistrict = "";
+          this.nameProvince = "";
         }
       },
     },
@@ -264,9 +287,6 @@ export default {
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
     Save() {
-      if (this.objAddOrder.CustomerName.CustomerName) {
-        this.objAddOrder.CustomerName = this.objAddOrder.CustomerName.CustomerName;
-      }
       if (this.objAddOrder.PhoneNumber.PhoneNumber) {
         this.objAddOrder.PhoneNumber = this.objAddOrder.PhoneNumber.PhoneNumber;
       }

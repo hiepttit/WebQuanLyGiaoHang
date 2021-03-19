@@ -2,86 +2,20 @@
   <my-Modal :show="isShow" :title="'Tạo người dùng'" @close="$emit('close')">
     <v-col cols="12" sm="6" md="6">
       <v-text-field
-        label="Họ tên:*"
-        v-model="objAddUser.Name"
+        label="Họ tên khách hàng:*"
+        v-model="objAddOrder.CustomerName"
         required
       ></v-text-field>
     </v-col>
     <v-col cols="12" sm="6" md="6">
       <v-text-field
-        label="Số điện thoại"
-        v-model="objAddUser.PhoneNumber"
+        label="Số điện thoại:*"
+        dense
+        outlined
+        v-model="objAddOrder.PhoneNumber"
+        required
         type="number"
       ></v-text-field>
-    </v-col>
-    <!-- <v-col cols="12" sm="6" md="4">
-                <v-text-field
-                  label="Legal last name*"
-                  hint="example of persistent helper text"
-                  persistent-hint
-                  required
-                ></v-text-field>
-              </v-col> -->
-    <template v-if="Create">
-      <v-col cols="6">
-        <v-text-field
-          label="Tên đăng nhập:*"
-          v-model="objAddUser.UserName"
-          required
-        ></v-text-field>
-      </v-col>
-      <v-col cols="6">
-        <v-text-field
-          label="Mật khẩu*"
-          v-model="objAddUser.Pwd"
-          type="password"
-          required
-        ></v-text-field>
-      </v-col>
-    </template>
-
-    <v-col cols="4">
-      <v-text-field
-        type="number"
-        v-model="objAddUser.IdNumber"
-        label="CMND:*"
-        required
-      ></v-text-field>
-    </v-col>
-    <v-col cols="4">
-      <v-menu
-        v-model="menu"
-        :close-on-content-click="false"
-        :nudge-right="40"
-        transition="scale-transition"
-        offset-y
-        min-width="auto"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-text-field
-            v-model="dateFormatted"
-            label="Ngày cấp:"
-            prepend-icon="mdi-calendar"
-            v-bind="attrs"
-            @blur="date = parseDate(dateFormatted)"
-            v-on="on"
-          ></v-text-field>
-        </template>
-        <v-date-picker
-          v-model="DateOfIssueIdNumber"
-          @input="menu = false"
-        ></v-date-picker>
-      </v-menu>
-    </v-col>
-    <v-col cols="4">
-      <v-select
-        item-text="Name"
-        item-value="Name"
-        :items="Province"
-        label="Nơi cấp*"
-        v-model="objAddUser.PlaceOfIssueIdNumber"
-        required
-      ></v-select>
     </v-col>
     <v-col cols="3">
       <v-text-field
@@ -125,28 +59,19 @@
       ></v-select>
     </v-col>
     <v-col cols="6">
-      <v-select
-        item-text="RoleName"
-        item-value="Id"
-        :items="roles"
-        v-model="objAddUser.IdRole"
-        label="Vai trò*"
-        required
-      ></v-select>
-    </v-col>
-    <v-col cols="6">
       <v-text-field
         type="number"
-        label="Tài khoàn ngân hàng:"
+        label="COD:"
         required
-        v-model="objAddUser.BankAccountNumber"
+        v-model="objAddOrder.Cod"
       ></v-text-field>
     </v-col>
     <v-col cols="6">
       <v-text-field
-        v-model="objAddUser.BankName"
-        label="Tên ngân hàng:"
+        type="number"
+        label="Ship:"
         required
+        v-model="objAddOrder.ShipFee"
       ></v-text-field>
     </v-col>
     <template v-slot:m-foot>
@@ -162,11 +87,12 @@ import myModal from "../components/Modal.vue";
 
 export default {
   components: { myModal },
-  props: ["user", "IdProvince", "isShow", "Create"],
+  props: ["user", "IdProvince", "isShow"],
   data() {
     return {
       menu: false,
-      objAddUser: {},
+      objAddOrder: {},
+      objOrder: [],
       Province: [],
       ProvinceId: null,
       ProvinceName: "",
@@ -176,41 +102,37 @@ export default {
       Ward: [],
       WardId: null,
       roles: [],
+      WardName: "",
       nameAdd: "",
       nameProvince: "",
       nameDistrict: "",
       nameWard: "",
-      WardName: "",
-      DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
-      dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       address: "",
       url: "http://localhost:60189/odata",
     };
   },
   async mounted() {
-    let roles = await this.getRoles();
-    this.roles = roles.map((_) => {
-      if (_.RoleName == "Staff") {
-        _.RoleName = "Nhân Viên";
-      }
-
-      if (_.RoleName == "Administrator") {
-        _.RoleName = "Admin";
-      }
-      return _;
-    });
+    this.Province = await this.getProvince();
   },
   watch: {
     user: {
       deep: true,
       handler(val) {
-        this.objAddUser = val;
+        this.objAddOrder = val;
+        this.nameAd = val;
+      },
+    },
+    objAddOrder: {
+      deep: true,
+      handler(val) {
         if (Object.keys(val).length != 0) {
-          let address = this.objAddUser.TheAddress;
-          this.nameAdd = address.split(",")[0];
-          this.nameWard = address.split(",")[1];
-          this.nameDistrict = address.split(",")[2];
-          this.nameProvince = address.split(",")[3];
+          let address = this.objAddOrder.TheAddress;
+          if (address) {
+            this.nameAdd = address.split(",")[0];
+            this.nameWard = address.split(",")[1];
+            this.nameDistrict = address.split(",")[2];
+            this.nameProvince = address.split(",")[3];
+          }
         } else {
           this.nameAdd = "";
           this.nameWard = "";
@@ -220,21 +142,20 @@ export default {
       },
     },
     async IdProvince(val) {
-      this.Province = await this.getProvince();
-      if (val.length) {
-        this.ProvinceId = val;
+      if (val) {
+        this.Province = await this.getProvince();
+        if (val.length) {
+          this.ProvinceId = val;
+        }
+        this.DistrictId = null;
+        this.WardId = null;
+        this.District = [];
+        this.Ward = [];
+        this.address = "";
       }
-      this.DistrictId = null;
-      this.WardId = null;
-      this.District = [];
-      this.Ward = [];
-      this.address = "";
-    },
-    DateOfIssueIdNumber(val) {
-      this.dateFormatted = this.formatDate(val);
     },
     async ProvinceId(val) {
-      if (val) {
+      if (val != 0) {
         let resp = await this.$stores.api.get(
           `${this.url}/District?$filter=ProvinceId eq ${val}&$orderby=Name asc`
         );
@@ -252,7 +173,6 @@ export default {
       }
     },
     async DistrictId(val) {
-      console.log(val);
       if (val) {
         let resp = await this.$stores.api.get(
           `${this.url}/Ward?$filter=DistrictId eq ${val}&$orderby=Name asc`
@@ -293,16 +213,6 @@ export default {
       }
       return null;
     },
-    async getRoles() {
-      let resp = await this.$stores.api.get(
-        `http://localhost:60189/odata/Roles?$orderby=RoleName asc`
-      );
-      if (resp && resp.status == 200) {
-        let data = await resp.json();
-        return data.value;
-      }
-      return [];
-    },
     formatDate(date) {
       if (!date) return null;
 
@@ -317,7 +227,11 @@ export default {
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
     Save() {
-      let obj = JSON.parse(JSON.stringify(this.objAddUser));
+      if (this.objAddOrder.PhoneNumber.PhoneNumber) {
+        this.objAddOrder.PhoneNumber = this.objAddOrder.PhoneNumber.PhoneNumber;
+      }
+      let obj = JSON.parse(JSON.stringify(this.objAddOrder));
+
       if (this.address && this.WardName && this.District && this.ProvinceName) {
         obj.TheAddress =
           this.address +
@@ -328,8 +242,7 @@ export default {
           ", " +
           this.ProvinceName;
       }
-      obj.DateOfIssueIdNumber = this.DateOfIssueIdNumber;
-      if (Object.keys(obj).length < 8) {
+      if (Object.keys(obj).length < 6) {
         obj = "";
         this.$emit("update", obj);
       } else this.$emit("update", obj);
