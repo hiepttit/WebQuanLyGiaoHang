@@ -269,6 +269,13 @@ export default {
     this.getDataFromApi();
   },
   watch: {
+    options: {
+      immediate: false,
+      handler() {
+        this.getDataFromApi();
+      },
+      deep: true,
+    },
     async DateOfIssueIdNumber(val) {
       this.dateFormatted = this.formatDate(val);
       this.check = await this.checkInStock();

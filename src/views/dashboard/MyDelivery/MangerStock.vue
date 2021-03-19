@@ -221,6 +221,13 @@ export default {
     this.getDataFromApi();
   },
   watch: {
+    options: {
+      immediate: false,
+      handler() {
+        this.getDataFromApi();
+      },
+      deep: true,
+    },
     DateOfIssueIdNumber(val) {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
       this.getDataFromApi();

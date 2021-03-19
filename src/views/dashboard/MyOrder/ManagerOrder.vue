@@ -36,6 +36,72 @@
             @input="menu = false"
           ></v-date-picker>
         </v-menu>
+        <v-row>
+          <v-col cols="4" class="inputDate">
+            <v-menu
+              v-model="menuFrom"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="fromDate"
+                  label="Từ Ngày:"
+                  prepend-icon="mdi-calendar"
+                  v-bind="attrs"
+                  @blur="date = parseDate(fromDate)"
+                  style="float:right;margin: 0 auto;"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="FromDate"
+                @input="menuFrom = false"
+              ></v-date-picker>
+            </v-menu>
+          </v-col>
+          <v-col cols="4" class="inputDate">
+            <v-menu
+              v-model="menuTo"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="toDate"
+                  label="Đến Ngày:"
+                  prepend-icon="mdi-calendar"
+                  v-bind="attrs"
+                  @blur="date = parseDate(toDate)"
+                  style="float:left;margin: 0 auto;"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="ToDate"
+                @input="menuTo = false"
+              ></v-date-picker>
+            </v-menu>
+          </v-col>
+          <v-col cols="4">
+            <v-btn
+              color="success"
+              id="btnPrint"
+              rounded
+              style="float: left"
+              class="mr-3"
+              @click="filterGroupDate()"
+            >
+              Thống kê
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-col>
       <v-row>
         <v-col cols="6">
@@ -142,6 +208,14 @@ export default {
     this.getDataFromApi();
   },
   watch: {
+    options: {
+      immediate: false,
+      handler() {
+        this.getDataFromApi();
+        this.filterGroupDate();
+      },
+      deep: true,
+    },
     DateOfIssueIdNumber(val) {
       this.dateFormatted = this.formatDate(this.DateOfIssueIdNumber);
       this.getDataFromApi();
@@ -154,6 +228,12 @@ export default {
         this.getDataFromApi();
       },
     },
+    FromDate(val) {
+      this.fromDate = this.formatDate(val);
+    },
+    ToDate(val) {
+      this.toDate = this.formatDate(val);
+    },
   },
   data() {
     return {
@@ -165,6 +245,12 @@ export default {
       search: "",
       DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
+      FromDate: new Date().toISOString().substr(0, 10),
+      fromDate: this.formatDate(new Date().toISOString().substr(0, 10)),
+      ToDate: new Date().toISOString().substr(0, 10),
+      toDate: this.formatDate(new Date().toISOString().substr(0, 10)),
+      menuFrom: false,
+      menuTo: false,
       menu: false,
       isShow: false,
       Show: false,
@@ -305,6 +391,59 @@ export default {
             items: data.value,
           };
         }
+      }
+      return { total: 0, items: [] };
+    },
+
+    filterGroupDate() {
+      this.fakeApiCallDate().then((data) => {
+        this.Orders = data.items;
+        this.total = data.total;
+        this.countSucess = data.items.filter((_) => _.IsSuccess == 1).length;
+        this.countUnSucess = data.items.filter((_) => _.IsSuccess == 0).length;
+        this.countRealUnSucess = data.items.filter(
+          (_) => _.IsSuccess == 0 && _.RealReceive != null
+        ).length;
+        this.totalRealSucess = this.sum(
+          data.items.filter((_) => _.IsSuccess == 1),
+          "RealReceive"
+        );
+        this.totalRealUnSucess = this.sum(
+          data.items.filter((_) => _.IsSuccess == 0),
+          "RealReceive"
+        );
+        this.loading = false;
+      });
+    },
+    async fakeApiCallDate() {
+      const { sortBy, page, itemsPerPage } = this.options;
+      const search = this.search;
+      let data = await this.getDeliveryDate(page, itemsPerPage, search);
+      return {
+        items: data.items,
+        total: data.total,
+      };
+    },
+    async getDeliveryDate(page, itemsPerPage, search) {
+      let top = "";
+      let skip = "";
+      if (this.IdShop) {
+        if (itemsPerPage > 0) {
+          top = `&$top=${itemsPerPage}`;
+          skip = `&$skip=${(page - 1) * itemsPerPage}`;
+        }
+        let filter = search && ` and contains(Id, '${search}')`;
+        let url = `${this.url}/Orders?$filter=IdShop eq '${this.IdShop}'and CreatedAt ge ${this.FromDate} and CreatedAt le ${this.ToDate}&$count=true${top}${skip}`;
+        let resp = await this.$stores.api.get(`${url}`);
+        if (resp && resp.status == 200) {
+          let data = await resp.json();
+          let total = data["@odata.count"];
+          return {
+            total,
+            items: data.value,
+          };
+        }
+        return { total: 0, items: [] };
       }
       return { total: 0, items: [] };
     },
