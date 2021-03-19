@@ -1,5 +1,5 @@
 <template>
-  <my-Modal :show="isShow" :title="'Tạo người dùng'" @close="$emit('close')">
+  <my-Modal :show="isShow" :title="'Tạo Đơn Hàng'" @close="$emit('close')">
     <v-col cols="12" sm="6" md="6">
       <v-text-field
         label="Họ tên khách hàng:*"
