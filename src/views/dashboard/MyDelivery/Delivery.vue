@@ -178,6 +178,7 @@
           outlined
           multiple
           v-model="IdTheOrder"
+          v-on:keyup.enter="onEnterCode"
         ></v-combobox>
       </v-col>
       <template v-else-if="CodeInStock.length">
@@ -548,6 +549,9 @@ export default {
       XLSX.utils.book_append_sheet(wb, wsh, "ThanhCong1Phan");
 
       XLSX.writeFile(wb, "DonHangNhanVien.xlsx");
+    },
+    onEnterCode() {
+      this.IdTheOrder = [...new Set(this.IdTheOrder)];
     },
   },
 };
