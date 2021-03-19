@@ -161,6 +161,9 @@
     />
     <div :id="`${printOne && !printAll ? 'print-One' : ''}`" class="hidePrint">
       <div style="border: 1px solid;margin-top:0.3rem">
+        <div style="text-align:center">
+          Ngày giao: {{ monentDate(oneOrder.CreatedAt) }}
+        </div>
         <div style="text-align:center">Họ tên: {{ oneOrder.CustomerName }}</div>
         <div style="text-align:center">
           Số điện thoại: {{ oneOrder.PhoneNumber }}
@@ -186,6 +189,9 @@
     <div :id="`${printAll && !printOne ? 'print-All' : ''}`" class="hidePrint">
       <span v-for="(item, i) in Orders" :key="i">
         <div style="border: 1px solid;margin-top:0.3rem">
+          <div style="text-align:center">
+            Ngày giao: {{ monentDate(item.CreatedAt) }}
+          </div>
           <div style="text-align:center">Họ tên: {{ item.CustomerName }}</div>
           <div style="text-align:center">
             Số điện thoại: {{ item.PhoneNumber }}

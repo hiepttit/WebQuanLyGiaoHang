@@ -174,6 +174,7 @@
           :items="Code"
           label="Chọn mã:"
           dense
+          chips
           outlined
           multiple
           v-model="IdTheOrder"
@@ -187,6 +188,7 @@
             :items="CodeInStock"
             label="Hàng tồn kho:"
             dense
+            chips
             outlined
             multiple
             v-model="IdInStock"
