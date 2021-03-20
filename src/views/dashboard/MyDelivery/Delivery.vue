@@ -349,6 +349,7 @@ export default {
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
     async SaveModal() {
+      let code = this.Code.map((_) => _.id);
       if (!this.IdStaff) {
         alert("Tên nhân viên không được để trống");
         return;
@@ -358,19 +359,24 @@ export default {
       let url = `${this.url}/DeliveryOrders`;
       let arr = this.IdTheOrder;
       for (var i = 0; i < arr.length; i++) {
-        if (arr[i].id) {
-          objAddDelivery.IdTheOrder = arr[i].id;
-        } else objAddDelivery.IdTheOrder = arr[i];
-        let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
-        if (resp && resp.status == 200 && i == arr.length - 1) {
-          alert("Updated successfully.");
-          this.Show = false;
-          this.getDataFromApi();
-          this.Code = await this.getIdFromOrder();
-        } else {
-          if (i == arr.length - 1) {
-            alert("Updated failed.");
+        if (code.includes(arr[i].id)) {
+          if (arr[i].id) {
+            objAddDelivery.IdTheOrder = arr[i].id;
+          } else objAddDelivery.IdTheOrder = arr[i];
+          let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
+          if (resp && resp.status == 200 && i == arr.length - 1) {
+            alert("Updated successfully.");
+            this.Show = false;
+            this.getDataFromApi();
+            this.Code = await this.getIdFromOrder();
+          } else {
+            if (i == arr.length - 1) {
+              alert("Updated failed.");
+            }
           }
+        } else {
+          alert("Mã không tồn tại !");
+          return;
         }
       }
     },
