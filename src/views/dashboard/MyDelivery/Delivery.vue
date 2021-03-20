@@ -178,15 +178,17 @@
           chips
         >
           <template v-slot:selection="data">
-            <v-chip
-              :key="JSON.stringify(data.item.id)"
-              v-bind="data.attrs"
-              :input-value="data.selected"
-              :disabled="data.disabled"
-              @click:close="data.parent.selectItem(data.item.id)"
-            >
-              {{ data.item.id }}
-            </v-chip>
+            <template v-if="data.item.id">
+              <v-chip
+                :key="JSON.stringify(data.item.id)"
+                v-bind="data.attrs"
+                :input-value="data.selected"
+                :disabled="data.disabled"
+                @click:close="data.parent.selectItem(data.item.id)"
+              >
+                {{ data.item.id }}
+              </v-chip>
+            </template>
           </template>
         </v-combobox>
       </v-col>
@@ -202,15 +204,17 @@
             chips
           >
             <template v-slot:selection="data">
-              <v-chip
-                :key="JSON.stringify(data.item.id)"
-                v-bind="data.attrs"
-                :input-value="data.selected"
-                :disabled="data.disabled"
-                @click:close="data.parent.selectItem(data.item.id)"
-              >
-                {{ data.item.id }}
-              </v-chip>
+              <template v-if="data.item.id">
+                <v-chip
+                  :key="JSON.stringify(data.item.id)"
+                  v-bind="data.attrs"
+                  :input-value="data.selected"
+                  :disabled="data.disabled"
+                  @click:close="data.parent.selectItem(data.item.id)"
+                >
+                  {{ data.item.id }}
+                </v-chip>
+              </template>
             </template>
           </v-combobox>
         </v-col>
