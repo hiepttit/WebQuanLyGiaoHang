@@ -171,29 +171,48 @@
         <v-combobox
           item-text="id"
           item-value="id"
+          v-model="IdTheOrder"
           :items="Code"
           label="Chọn mã:"
-          dense
-          chips
-          outlined
           multiple
-          v-model="IdTheOrder"
-          v-on:keyup.enter="onEnterCode"
-        ></v-combobox>
+          chips
+        >
+          <template v-slot:selection="data">
+            <v-chip
+              :key="JSON.stringify(data.item.id)"
+              v-bind="data.attrs"
+              :input-value="data.selected"
+              :disabled="data.disabled"
+              @click:close="data.parent.selectItem(data.item.id)"
+            >
+              {{ data.item.id }}
+            </v-chip>
+          </template>
+        </v-combobox>
       </v-col>
       <template v-else-if="CodeInStock.length">
         <v-col cols="12">
           <v-combobox
             item-text="id"
             item-value="id"
+            v-model="IdInStock"
             :items="CodeInStock"
             label="Hàng tồn kho:"
-            dense
-            chips
-            outlined
             multiple
-            v-model="IdInStock"
-          ></v-combobox>
+            chips
+          >
+            <template v-slot:selection="data">
+              <v-chip
+                :key="JSON.stringify(data.item.id)"
+                v-bind="data.attrs"
+                :input-value="data.selected"
+                :disabled="data.disabled"
+                @click:close="data.parent.selectItem(data.item.id)"
+              >
+                {{ data.item.id }}
+              </v-chip>
+            </template>
+          </v-combobox>
         </v-col>
       </template>
 
