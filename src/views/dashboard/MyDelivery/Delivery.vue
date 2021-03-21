@@ -390,7 +390,8 @@ export default {
       this.objAddDelivery.IdStaff = this.IdStaff;
       let objAddDelivery = this.objAddDelivery;
       let url = `${this.url}/DeliveryOrders`;
-      let arr = [...new Set(this.IdTheOrder)];
+      let preArr = [...new Set(this.IdTheOrder)];
+      let arr = preArr.filter((_) => typeof _ !== "string");
 
       for (var i = 0; i < arr.length; i++) {
         if (arr[i].id) {
@@ -455,8 +456,9 @@ export default {
       this.objAddDelivery.IdStaff = this.IdStaff;
       let objAddDelivery = this.objAddDelivery;
       let url = `${this.url}/DeliveryOrders`;
-      let arr = [...new Set(this.IdInStock)];
-      let id = "";
+      let preArr = [...new Set(this.IdInStock)];
+      let arr = preArr.filter((_) => typeof _ !== "string");
+
       for (var i = 0; i < arr.length; i++) {
         if (arr[i].id) {
           if (code.includes(arr[i].id)) {
