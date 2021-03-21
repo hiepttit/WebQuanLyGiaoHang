@@ -170,6 +170,7 @@
       <v-col v-if="!hasStock" cols="12">
         <v-combobox
           item-text="id"
+          item-value="id"
           v-model="IdTheOrder"
           :items="Code"
           label="Chọn mã:"

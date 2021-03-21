@@ -24,7 +24,12 @@
               style="float: right"
               rounded
               class="mr-0"
-              @click="(isShow = true), (objAddUser = {}), (IdProvince = [])"
+              @click="
+                (isShow = true),
+                  (objAddUser = {}),
+                  (IdProvince = []),
+                  (isCreate = true)
+              "
             >
               Thêm
             </v-btn>
@@ -94,7 +99,8 @@
                         (isShowUp = true),
                           (objAddUser = item),
                           (IdUser = item.Id),
-                          (IdProvince = [])
+                          (IdProvince = []),
+                          (isCreate = false)
                       "
                     ></i>
                   </div>
@@ -188,7 +194,7 @@
       :user="objAddUser"
       :isShow="isShow"
       :IdProvince="IdProvince"
-      :Create="true"
+      :Create="isCreate"
       @update="
         (e) => {
           SaveModal(e);
@@ -200,7 +206,7 @@
       :user="objAddUser"
       :IdProvince="IdProvince"
       :isShow="isShowUp"
-      :Create="false"
+      :Create="isCreate"
       @update="
         (e) => {
           changeInfo(e);
@@ -269,6 +275,7 @@ export default {
       pageCountShop: 0,
       IdProvince: null,
       objAddUser: {},
+      isCreate: false,
       url: "http://localhost:60189/odata",
       headers: [
         {

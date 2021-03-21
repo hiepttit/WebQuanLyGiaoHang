@@ -114,19 +114,19 @@
                   </td>
                 </tr>
               </template>
-              <tr>
-                <td colspan="5"></td>
-                <td>
-                  {{
-                    this.sum(
-                      list.map((_) => _.DeliveryOrders[0]),
-                      "Amount"
-                    )
-                  }}
-                </td>
-                <td v-if="delay"></td>
-                <td v-else></td>
-              </tr>
+              <template v-if="isStaff">
+                <tr>
+                  <td colspan="5"></td>
+                  <td>
+                    {{
+                      sum(
+                        list.map((_) => _.DeliveryOrders[0]),
+                        "Amount"
+                      )
+                    }}
+                  </td>
+                </tr>
+              </template>
             </template>
           </tbody>
         </v-simple-table>

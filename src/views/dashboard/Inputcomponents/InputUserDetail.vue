@@ -205,17 +205,19 @@ export default {
       deep: true,
       handler(val) {
         this.objAddUser = val;
-        if (Object.keys(val).length != 0) {
-          let address = this.objAddUser.TheAddress;
-          this.nameAdd = address.split(",")[0];
-          this.nameWard = address.split(",")[1];
-          this.nameDistrict = address.split(",")[2];
-          this.nameProvince = address.split(",")[3];
-        } else {
-          this.nameAdd = "";
-          this.nameWard = "";
-          this.nameDistrict = "";
-          this.nameProvince = "";
+        if (this.Create == false) {
+          if (Object.keys(val).length != 0) {
+            let address = this.objAddUser.TheAddress;
+            this.nameAdd = address.split(",")[0];
+            this.nameWard = address.split(",")[1];
+            this.nameDistrict = address.split(",")[2];
+            this.nameProvince = address.split(",")[3];
+          } else {
+            this.nameAdd = "";
+            this.nameWard = "";
+            this.nameDistrict = "";
+            this.nameProvince = "";
+          }
         }
       },
     },
