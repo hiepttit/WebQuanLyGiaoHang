@@ -61,17 +61,35 @@
                 <template v-slot:item.Stt="{ index }">
                   {{ index + 1 }}
                 </template>
-                <template v-slot:item.Cod="{ item }">
+                <!-- <template v-slot:item.Cod="{ item }">
                   <div>{{ formatNumber(item.Cod) }}</div>
                 </template>
                 <template v-slot:item.ShipFee="{ item }">
                   <div>{{ formatNumber(item.ShipFee) }}</div>
-                </template>
+                </template> -->
                 <template v-slot:item.Sum="{ item }">
                   <div v-if="item.RealReceive == null">
                     {{ formatNumber(item.ShipFee + item.Cod) }}
                   </div>
                   <div v-else>{{ formatNumber(item.RealReceive) }}</div>
+                </template>
+                <template v-slot:item.Status="{ item }">
+                  <template v-if="item.DeliveryOrders[0].TheStatus == 2">
+                    <v-btn
+                      color="warning"
+                      @click="UpdateDeliveryStatus(item.Id, 1)"
+                    >
+                      Bàn giao
+                    </v-btn>
+                  </template>
+                  <template v-if="item.DeliveryOrders[0].TheStatus == 1">
+                    <v-btn
+                      color="success"
+                      @click="UpdateDeliveryStatus(item.Id, 2)"
+                    >
+                      Kết thúc
+                    </v-btn>
+                  </template>
                 </template>
                 <template v-slot:item.Action="{ item }">
                   <template
@@ -191,9 +209,10 @@ export default {
         { text: "Tên khách hàng", align: "start", value: "CustomerName" },
         { text: "Địa chỉ", value: "TheAddress", align: "left" },
         { text: "Số điện thoại", value: "PhoneNumber" },
-        { text: "COD", value: "Cod" },
-        { text: "Ship", value: "ShipFee" },
+        // { text: "COD", value: "Cod" },
+        // { text: "Ship", value: "ShipFee" },
         { text: "Tổng thu", value: "Sum" },
+        { text: "Trạng thái giao", value: "Status" },
         { text: "Trạng thái", value: "Action" },
       ],
       headersCreate: [
@@ -322,6 +341,21 @@ export default {
         this.getDataFromApi();
       } else {
         alert("Updated failed.");
+      }
+    },
+    async UpdateDeliveryStatus(IdKey, status) {
+      try {
+        let obj = {};
+        obj.TheStatus = status;
+        let url = `${this.url}/DeliveryOrders/${IdKey}`;
+        let resp = await this.$stores.api.patch(`${url}`, obj);
+        if (resp && resp.status == 200) {
+          this.getDataFromApi();
+        }
+      } catch (e) {
+        let x = await e.json();
+        alert(x.detail);
+        return false;
       }
     },
     async UpdateStateHalf() {

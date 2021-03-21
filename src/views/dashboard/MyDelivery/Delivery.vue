@@ -414,7 +414,6 @@ export default {
       let arr = this.IdInStock;
       let id = "";
       for (var i = 0; i < arr.length; i++) {
-        objAddDelivery.TheStatus = 0;
         if (arr[i].id) {
           id = arr[i].id;
         } else id = arr[i];

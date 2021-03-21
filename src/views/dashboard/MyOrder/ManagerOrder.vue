@@ -169,6 +169,33 @@
                 </div>
                 <div v-else>{{ formatNumber(item.RealReceive) }}</div>
               </template>
+              <template v-slot:item.Status="{ item }">
+                <template v-if="item.TheStatus == null || item.TheStatus == 0">
+                  <v-btn dark color="teal">
+                    Đang giao
+                  </v-btn>
+                </template>
+                <template v-if="item.TheStatus == 1">
+                  <v-btn color="success">
+                    Thành công
+                  </v-btn>
+                </template>
+                <template v-if="item.TheStatus == 2">
+                  <v-btn color="error">
+                    Trả hàng
+                  </v-btn>
+                </template>
+                <template v-if="item.TheStatus == 3">
+                  <v-btn color="warning">
+                    Tồn kho
+                  </v-btn>
+                </template>
+                <template v-if="item.TheStatus == 4">
+                  <v-btn color="#5cbbf6">
+                    Hoàn thành 1 phần
+                  </v-btn>
+                </template>
+              </template>
               <template v-slot:item.Action="{ item }">
                 <template v-if="item.IsSuccess == null || item.IsSuccess == 0">
                   <v-btn color="warning" @click="SaveModal(item, 1)">
@@ -278,6 +305,7 @@ export default {
         { text: "COD", value: "Cod" },
         { text: "Ship", value: "ShipFee" },
         { text: "Tổng thu", value: "Sum" },
+        { text: "Trạng thái giao", value: "Status" },
         { text: "Trạng thái", value: "Action" },
       ],
       // StateSelected: 0,
@@ -484,5 +512,8 @@ export default {
   font-size: 1rem;
   border-radius: 4px;
   padding: 5px 20px;
+}
+.v-btn {
+  width: 10rem;
 }
 </style>

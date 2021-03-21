@@ -94,10 +94,9 @@
       <v-select
         item-text="Name"
         item-value="Id"
-        :items="Ward"
-        v-bind:class="{ disabled: Ward.length ? false : true }"
-        :label="`${nameWard ? nameWard : 'Phường/Xã*'}`"
-        v-model="WardId"
+        :items="Province"
+        :label="`${nameProvince ? nameProvince : 'Tỉnh/Thành phố*'}`"
+        v-model="ProvinceId"
         required
       ></v-select>
     </v-col>
@@ -118,9 +117,10 @@
       <v-select
         item-text="Name"
         item-value="Id"
-        :items="Province"
-        :label="`${nameProvince ? nameProvince : 'Tỉnh/Thành phố*'}`"
-        v-model="ProvinceId"
+        :items="Ward"
+        v-bind:class="{ disabled: Ward.length ? false : true }"
+        :label="`${nameWard ? nameWard : 'Phường/Xã*'}`"
+        v-model="WardId"
         required
       ></v-select>
     </v-col>
