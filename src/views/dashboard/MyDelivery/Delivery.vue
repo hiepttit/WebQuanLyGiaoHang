@@ -392,60 +392,64 @@ export default {
       let url = `${this.url}/DeliveryOrders`;
       let preArr = [...new Set(this.IdTheOrder)];
       let arr = preArr.filter((_) => typeof _ !== "string");
-
-      for (var i = 0; i < arr.length; i++) {
-        if (arr[i].id) {
-          if (code.includes(arr[i].id)) {
-            objAddDelivery.IdTheOrder = arr[i].id;
-            objAddDelivery.Coefficient = arr[i].coefficient;
-            if (this.salary != 0) {
-              objAddDelivery.Amount = (
-                arr[i].coefficient * this.salary
-              ).toFixed(2);
-            }
-
-            let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
-            if (resp && resp.status == 200 && i == arr.length - 1) {
-              alert("Updated successfully.");
-              this.Show = false;
-              this.getDataFromApi();
-              this.Code = await this.getIdFromOrder();
-            } else {
-              if (i == arr.length - 1) {
-                alert("Updated failed.");
+      if (arr.length) {
+        for (var i = 0; i < arr.length; i++) {
+          if (arr[i].id) {
+            if (code.includes(arr[i].id)) {
+              objAddDelivery.IdTheOrder = arr[i].id;
+              objAddDelivery.Coefficient = arr[i].coefficient;
+              if (this.salary != 0) {
+                objAddDelivery.Amount = (
+                  arr[i].coefficient * this.salary
+                ).toFixed(2);
               }
-            }
-          } else {
-            alert("Mã không tồn tại !");
-            return;
-          }
-        } else {
-          if (code.includes(arr[i])) {
-            objAddDelivery.IdTheOrder = arr[i];
-            let arrOrder = this.Code.find((_) => _.id == arr[i]);
-            objAddDelivery.Coefficient = arrOrder.coefficient;
-            if (this.salary != 0) {
-              objAddDelivery.Amount = (
-                arrOrder.coefficient * this.salary
-              ).toFixed(2);
-            }
 
-            let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
-            if (resp && resp.status == 200 && i == arr.length - 1) {
-              alert("Updated successfully.");
-              this.Show = false;
-              this.getDataFromApi();
-              this.Code = await this.getIdFromOrder();
-            } else {
-              if (i == arr.length - 1) {
-                alert("Updated failed.");
+              let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
+              if (resp && resp.status == 200 && i == arr.length - 1) {
+                alert("Updated successfully.");
+                this.Show = false;
+                this.getDataFromApi();
+                this.Code = await this.getIdFromOrder();
+              } else {
+                if (i == arr.length - 1) {
+                  alert("Updated failed.");
+                }
               }
+            } else {
+              alert("Mã không tồn tại !");
+              return;
             }
-          } else {
-            alert("Mã không tồn tại !");
-            return;
           }
+          // else {
+          //   if (code.includes(arr[i])) {
+          //     objAddDelivery.IdTheOrder = arr[i];
+          //     let arrOrder = this.Code.find((_) => _.id == arr[i]);
+          //     objAddDelivery.Coefficient = arrOrder.coefficient;
+          //     if (this.salary != 0) {
+          //       objAddDelivery.Amount = (
+          //         arrOrder.coefficient * this.salary
+          //       ).toFixed(2);
+          //     }
+
+          //     let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
+          //     if (resp && resp.status == 200 && i == arr.length - 1) {
+          //       alert("Updated successfully.");
+          //       this.Show = false;
+          //       this.getDataFromApi();
+          //       this.Code = await this.getIdFromOrder();
+          //     } else {
+          //       if (i == arr.length - 1) {
+          //         alert("Updated failed.");
+          //       }
+          //     }
+          //   } else {
+          //     alert("Mã không tồn tại !");
+          //     return;
+          //   }
+          // }
         }
+      } else {
+        alert("Mã sai chọn lại !");
       }
     },
     async DeliveryInStock() {
@@ -459,59 +463,63 @@ export default {
       let preArr = [...new Set(this.IdInStock)];
       let arr = preArr.filter((_) => typeof _ !== "string");
 
-      for (var i = 0; i < arr.length; i++) {
-        if (arr[i].id) {
-          if (code.includes(arr[i].id)) {
-            objAddDelivery.IdTheOrder = arr[i].id;
-            objAddDelivery.Coefficient = arr[i].coefficient;
-            if (this.salary != 0) {
-              objAddDelivery.Amount = (
-                arr[i].coefficient * this.salary
-              ).toFixed(2);
-            }
-
-            let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
-            if (resp && resp.status == 200 && i == arr.length - 1) {
-              alert("Updated successfully.");
-              this.Show = false;
-              this.getDataFromApi();
-              this.Code = await this.getIdFromOrder();
-            } else {
-              if (i == arr.length - 1) {
-                alert("Updated failed.");
+      if (arr.length) {
+        for (var i = 0; i < arr.length; i++) {
+          if (arr[i].id) {
+            if (code.includes(arr[i].id)) {
+              objAddDelivery.IdTheOrder = arr[i].id;
+              objAddDelivery.Coefficient = arr[i].coefficient;
+              if (this.salary != 0) {
+                objAddDelivery.Amount = (
+                  arr[i].coefficient * this.salary
+                ).toFixed(2);
               }
+
+              let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
+              if (resp && resp.status == 200 && i == arr.length - 1) {
+                alert("Updated successfully.");
+                this.Show = false;
+                this.getDataFromApi();
+                this.Code = await this.getIdFromOrder();
+              } else {
+                if (i == arr.length - 1) {
+                  alert("Updated failed.");
+                }
+              }
+            } else {
+              alert("Mã không tồn tại !");
+              return;
             }
           } else {
-            alert("Mã không tồn tại !");
-            return;
-          }
-        } else {
-          if (code.includes(arr[i])) {
-            objAddDelivery.IdTheOrder = arr[i];
-            let arrOrder = this.Code.find((_) => _.id == arr[i]);
-            objAddDelivery.Coefficient = arrOrder.coefficient;
-            if (this.salary != 0) {
-              objAddDelivery.Amount = (
-                arrOrder.coefficient * this.salary
-              ).toFixed(2);
-            }
-
-            let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
-            if (resp && resp.status == 200 && i == arr.length - 1) {
-              alert("Updated successfully.");
-              this.Show = false;
-              this.getDataFromApi();
-              this.Code = await this.getIdFromOrder();
-            } else {
-              if (i == arr.length - 1) {
-                alert("Updated failed.");
+            if (code.includes(arr[i])) {
+              objAddDelivery.IdTheOrder = arr[i];
+              let arrOrder = this.Code.find((_) => _.id == arr[i]);
+              objAddDelivery.Coefficient = arrOrder.coefficient;
+              if (this.salary != 0) {
+                objAddDelivery.Amount = (
+                  arrOrder.coefficient * this.salary
+                ).toFixed(2);
               }
+
+              let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
+              if (resp && resp.status == 200 && i == arr.length - 1) {
+                alert("Updated successfully.");
+                this.Show = false;
+                this.getDataFromApi();
+                this.Code = await this.getIdFromOrder();
+              } else {
+                if (i == arr.length - 1) {
+                  alert("Updated failed.");
+                }
+              }
+            } else {
+              alert("Mã không tồn tại !");
+              return;
             }
-          } else {
-            alert("Mã không tồn tại !");
-            return;
           }
         }
+      } else {
+        alert("Mã sai chọn lại !");
       }
     },
     async getSalary() {
