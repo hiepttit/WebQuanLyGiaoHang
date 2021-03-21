@@ -390,7 +390,7 @@ export default {
       this.objAddDelivery.IdStaff = this.IdStaff;
       let objAddDelivery = this.objAddDelivery;
       let url = `${this.url}/DeliveryOrders`;
-      let arr = this.IdTheOrder;
+      let arr = [...new Set(this.IdTheOrder)];
 
       for (var i = 0; i < arr.length; i++) {
         if (arr[i].id) {
@@ -455,7 +455,7 @@ export default {
       this.objAddDelivery.IdStaff = this.IdStaff;
       let objAddDelivery = this.objAddDelivery;
       let url = `${this.url}/DeliveryOrders`;
-      let arr = this.IdInStock;
+      let arr = [...new Set(this.IdInStock)];
       let id = "";
       for (var i = 0; i < arr.length; i++) {
         if (arr[i].id) {
