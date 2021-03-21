@@ -31,10 +31,9 @@
       <v-select
         item-text="Name"
         item-value="Id"
-        :items="Ward"
-        v-bind:class="{ disabled: Ward.length ? false : true }"
-        :label="`${nameWard ? nameWard : 'Phường/Xã*'}`"
-        v-model="WardId"
+        :items="Province"
+        :label="`${nameProvince ? nameProvince : 'Tỉnh/Thành phố*'}`"
+        v-model="ProvinceId"
         required
       ></v-select>
     </v-col>
@@ -55,13 +54,14 @@
       <v-select
         item-text="Name"
         item-value="Id"
-        :items="Province"
-        :label="`${nameProvince ? nameProvince : 'Tỉnh/Thành phố*'}`"
-        v-model="ProvinceId"
+        :items="Ward"
+        v-bind:class="{ disabled: Ward.length ? false : true }"
+        :label="`${nameWard ? nameWard : 'Phường/Xã*'}`"
+        v-model="WardId"
         required
       ></v-select>
     </v-col>
-    <v-col cols="12">
+    <v-col cols="6">
       <v-menu
         v-model="menu"
         :close-on-content-click="false"
@@ -86,6 +86,14 @@
           @input="menu = false"
         ></v-date-picker>
       </v-menu>
+    </v-col>
+    <v-col cols="6">
+      <v-text-field
+        type="number"
+        label="Hệ số lương:"
+        required
+        v-model="Coefficient"
+      ></v-text-field>
     </v-col>
     <v-col cols="6">
       <v-text-field
@@ -135,6 +143,7 @@ export default {
       nameProvince: "",
       nameDistrict: "",
       nameWard: "",
+      Coefficient: 1,
       DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       address: "",
@@ -181,6 +190,7 @@ export default {
           this.nameWard = "";
           this.nameDistrict = "";
           this.nameProvince = "";
+          this.Coefficient = 1;
         }
       },
     },
@@ -293,6 +303,7 @@ export default {
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
     Save() {
+      this.objAddOrder.Coefficient = this.Coefficient;
       if (this.objAddOrder.PhoneNumber.PhoneNumber) {
         this.objAddOrder.PhoneNumber = this.objAddOrder.PhoneNumber.PhoneNumber;
       }

@@ -58,6 +58,14 @@
         required
       ></v-select>
     </v-col>
+    <v-col cols="12">
+      <v-text-field
+        type="number"
+        label="Hệ số lương:"
+        required
+        v-model="Coefficient"
+      ></v-text-field>
+    </v-col>
     <v-col cols="6">
       <v-text-field
         type="number"
@@ -108,6 +116,7 @@ export default {
       nameDistrict: "",
       nameWard: "",
       address: "",
+      Coefficient: 1,
       url: "http://localhost:60189/odata",
     };
   },
@@ -138,6 +147,7 @@ export default {
           this.nameWard = "";
           this.nameDistrict = "";
           this.nameProvince = "";
+          this.Coefficient = 1;
         }
       },
     },
@@ -227,6 +237,7 @@ export default {
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
     Save() {
+      this.objAddOrder.Coefficient = this.Coefficient;
       if (this.objAddOrder.PhoneNumber.PhoneNumber) {
         this.objAddOrder.PhoneNumber = this.objAddOrder.PhoneNumber.PhoneNumber;
       }

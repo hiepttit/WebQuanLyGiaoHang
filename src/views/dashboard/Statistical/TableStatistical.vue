@@ -31,13 +31,19 @@
               <th class="primary--text">
                 Số điện thoại
               </th>
-              <th class="primary--text">
-                COD
-              </th>
-              <th class="primary--text">
-                Ship
-              </th>
-
+              <template v-if="isStaff">
+                <th class="primary--text">
+                  Thu Nhập
+                </th>
+              </template>
+              <template v-else>
+                <th class="primary--text">
+                  COD
+                </th>
+                <th class="primary--text">
+                  Ship
+                </th>
+              </template>
               <th v-if="delay" class="primary--text">
                 Hoãn tới
               </th>
@@ -62,13 +68,18 @@
                     }`
                   "
                 >
-                  <td>{{ i }}</td>
+                  <td>{{ i + 1 }}</td>
                   <td>{{ item.Id }}</td>
                   <td>{{ item.CustomerName }}</td>
                   <td>{{ item.TheAddress }}</td>
                   <td>{{ item.PhoneNumber }}</td>
-                  <td>{{ formatNumber(item.Cod) }}</td>
-                  <td>{{ formatNumber(item.ShipFee) }}</td>
+                  <template v-if="isStaff">
+                    <td>{{ item.DeliveryOrders[0].Amount }}</td>
+                  </template>
+                  <template v-else>
+                    <td>{{ formatNumber(item.Cod) }}</td>
+                    <td>{{ formatNumber(item.ShipFee) }}</td>
+                  </template>
                   <td v-if="delay">{{ formatdelayDate(item.StockOrders) }}</td>
                   <td v-else>
                     <span v-if="item.RealReceive == null">
@@ -82,13 +93,18 @@
             <template v-else>
               <template v-for="(item, i) in list">
                 <tr :key="`r${i}`">
-                  <td>{{ i }}</td>
+                  <td>{{ i + 1 }}</td>
                   <td>{{ item.Id }}</td>
                   <td>{{ item.CustomerName }}</td>
                   <td>{{ item.TheAddress }}</td>
                   <td>{{ item.PhoneNumber }}</td>
-                  <td>{{ formatNumber(item.Cod) }}</td>
-                  <td>{{ formatNumber(item.ShipFee) }}</td>
+                  <template v-if="isStaff">
+                    <td>{{ item.DeliveryOrders[0].Amount }}</td>
+                  </template>
+                  <template v-else>
+                    <td>{{ formatNumber(item.Cod) }}</td>
+                    <td>{{ formatNumber(item.ShipFee) }}</td>
+                  </template>
                   <td v-if="delay">{{ formatdelayDate(item.StockOrders) }}</td>
                   <td v-else>
                     <span v-if="item.RealReceive == null">
@@ -98,6 +114,19 @@
                   </td>
                 </tr>
               </template>
+              <tr>
+                <td colspan="5"></td>
+                <td>
+                  {{
+                    this.sum(
+                      list.map((_) => _.DeliveryOrders[0]),
+                      "Amount"
+                    )
+                  }}
+                </td>
+                <td v-if="delay"></td>
+                <td v-else></td>
+              </tr>
             </template>
           </tbody>
         </v-simple-table>
@@ -117,6 +146,7 @@ export default {
     "color",
     "delay",
     "stock",
+    "isStaff",
   ],
   methods: {
     monentDate(date) {
@@ -136,6 +166,11 @@ export default {
           currency: "VND",
         });
       }
+    },
+    sum(array, key) {
+      return array.reduce(function(r, a) {
+        return r + a[key];
+      }, 0);
     },
   },
 };

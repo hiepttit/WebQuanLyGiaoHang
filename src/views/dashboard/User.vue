@@ -1,28 +1,44 @@
 <template>
   <v-container id="dashboard" fluid tag="section">
     <v-row>
-      <v-col cols="6" md="6">
+      <v-col cols="8" md="8">
         <h1 class="ml-10">Tổng nhân viên: {{ totalStaffs }}</h1>
+        <v-col cols="12">
+          <v-text-field
+            v-model="salary"
+            label="Lương cơ bản"
+            style="float:left;padding:0"
+            single-line
+            hide-details
+          ></v-text-field>
+          <v-btn color="success" rounded class="mr-0" @click="changeSalary()">
+            Ok
+          </v-btn>
+        </v-col>
       </v-col>
-      <v-col cols="6" md="4">
-        <v-btn
-          color="success"
-          style="float: right"
-          rounded
-          class="mr-0"
-          @click="(isShow = true), (objAddUser = {}), (IdProvince = [])"
-        >
-          Thêm
-        </v-btn>
-        <v-btn
-          color="success"
-          style="float: right"
-          rounded
-          class="mr-3"
-          @click="print()"
-        >
-          In
-        </v-btn>
+      <v-col cols="4" md="4">
+        <v-row>
+          <v-col cols="6" md="6">
+            <v-btn
+              color="success"
+              style="float: right"
+              rounded
+              class="mr-0"
+              @click="(isShow = true), (objAddUser = {}), (IdProvince = [])"
+            >
+              Thêm
+            </v-btn>
+            <v-btn
+              color="success"
+              style="float: right"
+              rounded
+              class="mr-3"
+              @click="print()"
+            >
+              In
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-col>
       <v-row id="printed-content">
         <v-col class="post-content" cols="12" md="12">
@@ -206,6 +222,8 @@ export default {
   async mounted() {
     this.getDataFromApi();
     this.getDataShopFromApi();
+    let preSalary = await this.getSalary();
+    this.salary = preSalary[0].Salary;
   },
   watch: {
     optionsStaff: {
@@ -273,9 +291,9 @@ export default {
         { text: "Tác Vụ", value: "Action" },
       ],
       isShowUp: false,
+      salary: 0,
     };
   },
-
   methods: {
     monentDate(date) {
       return moment(date).format("DD/MM/YYYY");
@@ -306,6 +324,15 @@ export default {
         this.totalStaffs = data.total;
         this.loadingStaff = false;
       });
+    },
+    async getSalary() {
+      let url = `${this.url}/BasicSalary`;
+      let resp = await this.$stores.api.get(`${url}`);
+      if (resp && resp.status == 200) {
+        let data = await resp.json();
+        return data.value;
+      }
+      return [];
     },
     async fakeStaffsApiCall() {
       const { sortBy, page, itemsPerPage } = this.optionsStaff;
@@ -388,6 +415,17 @@ export default {
       if (resp && resp.status == 200) {
         alert("Updated successfully.");
         this.isShowUp = false;
+        this.getDataFromApi();
+      } else {
+        alert("Updated failed.");
+      }
+    },
+    async changeSalary() {
+      let url = `${this.url}/BasicSalary/1`;
+      let obj = {};
+      obj.Salary = this.salary;
+      let resp = await this.$stores.api.patch(`${url}`, obj);
+      if (resp && resp.status == 200) {
         this.getDataFromApi();
       } else {
         alert("Updated failed.");

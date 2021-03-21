@@ -130,6 +130,7 @@
           :header="'Đơn hàng tồn kho đã hoàn thành'"
           :detail="'Danh sách tất cả đơn hàng tồn kho đã hoàn thành'"
           :color="'#1867c0'"
+          :isStaff="true"
         />
       </template>
       <template v-if="OrdersSuccess.length">
@@ -140,6 +141,7 @@
           :header="'Đơn hàng thành công'"
           :detail="'Danh sách tất cả đơn hàng thành công'"
           :color="'success'"
+          :isStaff="true"
         />
       </template>
       <template v-if="OrdersFail.length">
@@ -150,6 +152,7 @@
           :header="'Đơn hàng trả'"
           :detail="'Danh sách tất cả đơn hàng trả'"
           :color="'error'"
+          :isStaff="true"
         />
       </template>
       <template v-if="OrdersDelay.length">
@@ -161,6 +164,7 @@
           :detail="'Danh sách tất cả đơn hàng hoãn'"
           :color="'warning'"
           :delay="true"
+          :isStaff="true"
         />
       </template>
       <template v-if="OrdersHalf.length">
@@ -171,6 +175,7 @@
           :header="'Đơn hàng thành công một phần'"
           :detail="'Danh sách tất cả đơn hàng thành công 1 phần'"
           :color="'#5cbbf6'"
+          :isStaff="true"
         />
       </template>
     </v-row>

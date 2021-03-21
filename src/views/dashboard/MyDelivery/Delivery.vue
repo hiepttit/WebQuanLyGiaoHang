@@ -170,7 +170,6 @@
       <v-col v-if="!hasStock" cols="12">
         <v-combobox
           item-text="id"
-          item-value="id"
           v-model="IdTheOrder"
           :items="Code"
           label="Chọn mã:"
@@ -196,7 +195,6 @@
         <v-col cols="12">
           <v-combobox
             item-text="id"
-            item-value="id"
             v-model="IdInStock"
             :items="CodeInStock"
             label="Hàng tồn kho:"
@@ -310,6 +308,7 @@ export default {
       IdInStock: [],
       check: [],
       search: "",
+      preSalary: [],
     };
   },
   async mounted() {
@@ -317,6 +316,16 @@ export default {
     this.Code = await this.getIdFromOrder();
     this.CodeInStock = await this.getIdFromStockOrder();
     this.getDataFromApi();
+    this.preSalary = await this.getSalary();
+  },
+  computed: {
+    salary() {
+      if (this.preSalary.length) {
+        let sa = this.preSalary[0];
+        return sa.Salary;
+      }
+      return 0;
+    },
   },
   watch: {
     options: {
@@ -383,9 +392,14 @@ export default {
       let arr = this.IdTheOrder;
       for (var i = 0; i < arr.length; i++) {
         if (code.includes(arr[i].id)) {
-          if (arr[i].id) {
-            objAddDelivery.IdTheOrder = arr[i].id;
-          } else objAddDelivery.IdTheOrder = arr[i];
+          objAddDelivery.IdTheOrder = arr[i].id;
+          objAddDelivery.Coefficient = arr[i].coefficient;
+          if (this.salary != 0) {
+            objAddDelivery.Amount = (arr[i].coefficient * this.salary).toFixed(
+              2
+            );
+          }
+
           let resp = await this.$stores.api.post(`${url}`, objAddDelivery);
           if (resp && resp.status == 200 && i == arr.length - 1) {
             alert("Updated successfully.");
@@ -431,6 +445,15 @@ export default {
           }
         }
       }
+    },
+    async getSalary() {
+      let url = `${this.url}/BasicSalary`;
+      let resp = await this.$stores.api.get(`${url}`);
+      if (resp && resp.status == 200) {
+        let data = await resp.json();
+        return data.value;
+      }
+      return [];
     },
     async changeStaff() {
       let obj = {};
