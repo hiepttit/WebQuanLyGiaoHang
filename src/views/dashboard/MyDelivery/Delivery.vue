@@ -126,7 +126,12 @@
                 <div>{{ formatNumber(item.ShipFee) }}</div>
               </template>
               <template v-slot:item.Sum="{ item }">
-                <div>{{ formatNumber(item.ShipFee + item.Cod) }}</div>
+                <template v-if="item.ShipFee + item.Cod > 0">
+                  <div>{{ formatNumber(item.ShipFee + item.Cod) }}</div>
+                </template>
+                <template v-else>
+                  <div>0</div>
+                </template>
               </template>
               <template v-slot:item.Action="{ item }">
                 <div v-if="item.TheStatus == 0" class="text-left">
@@ -609,7 +614,17 @@ export default {
       return null;
     },
     formatJson(filterVal, jsonData) {
-      return jsonData.map((v) => filterVal.map((j) => v[j]));
+      let data = jsonData.map((v) => {
+        return {
+          Id: v.Id,
+          CustomerName: v.CustomerName,
+          TheAddress: v.TheAddress,
+          PhoneNumber: v.PhoneNumber,
+          Sum: v.Cod + v.ShipFee > 0 ? v.Cod + v.ShipFee : 0,
+        };
+      });
+      let res = data.map((v) => filterVal.map((j) => v[j]));
+      return res;
     },
     async checkInStock() {
       let url = `${this.url}/Orders?$expand=StockOrders,DeliveryOrders&$filter=DeliveryOrders/any(x:x/IdStaff eq '${this.IdStaff}')and StockOrders/any(x:x/Id ne null) and StockOrders/any(x:x/DeletedAt eq ${this.DateOfIssueIdNumber})`;
@@ -636,16 +651,14 @@ export default {
         "CustomerName",
         "TheAddress",
         "PhoneNumber",
-        "Cod",
-        "ShipFee",
+        "Sum",
       ];
       const headerDisplay = [
         "Mã",
         "Tên",
         "Địa chỉ",
         "Số điện thoại",
-        "COD",
-        "Ship",
+        "Tổng thu",
       ];
 
       const Name = this.Users.filter((_) => _.Id == this.IdStaff).map(
@@ -679,7 +692,7 @@ export default {
       wsh["!cols"] = wscols;
 
       XLSX.utils.book_append_sheet(wb, ws, "DonHangGiao");
-      XLSX.utils.book_append_sheet(wb, wsh, "ThanhCong1Phan");
+      XLSX.utils.book_append_sheet(wb, wsh, "DonHangTonGiao");
 
       XLSX.writeFile(wb, "DonHangNhanVien.xlsx");
     },

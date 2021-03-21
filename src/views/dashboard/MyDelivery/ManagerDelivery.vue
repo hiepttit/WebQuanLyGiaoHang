@@ -78,9 +78,21 @@
               </template> -->
               <template v-slot:item.Sum="{ item }">
                 <div v-if="item.RealReceive == null">
-                  {{ formatNumber(item.ShipFee + item.Cod) }}
+                  <template v-if="item.ShipFee + item.Cod > 0">
+                    <div>{{ formatNumber(item.ShipFee + item.Cod) }}</div>
+                  </template>
+                  <template v-else>
+                    <div>0</div>
+                  </template>
                 </div>
-                <div v-else>{{ formatNumber(item.RealReceive) }}</div>
+                <template v-else>
+                  <template v-if="item.RealReceive > 0">
+                    <div>{{ formatNumber(item.RealReceive) }}</div>
+                  </template>
+                  <template v-else>
+                    <div>0</div>
+                  </template>
+                </template>
               </template>
               <template v-slot:item.Status="{ item }">
                 <template

@@ -103,7 +103,12 @@
                 <div>{{ formatNumber(item.ShipFee) }}</div>
               </template>
               <template v-slot:item.Sum="{ item }">
-                <div>{{ formatNumber(item.ShipFee + item.Cod) }}</div>
+                <template v-if="item.ShipFee + item.Cod > 0">
+                  <div>{{ formatNumber(item.ShipFee + item.Cod) }}</div>
+                </template>
+                <template v-else>
+                  <div>0</div>
+                </template>
               </template>
               <template v-slot:item.Action="{ item }">
                 <div class="text-left">
