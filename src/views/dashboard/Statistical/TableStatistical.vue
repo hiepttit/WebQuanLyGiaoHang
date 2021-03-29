@@ -77,7 +77,14 @@
                     <td>{{ item.DeliveryOrders[0].Amount }}</td>
                   </template>
                   <template v-else>
-                    <td>{{ formatNumber(item.Cod) }}</td>
+                    <td>
+                      <template v-if="item.Cod > 0">
+                        {{ formatNumber(item.Cod) }}
+                      </template>
+                      <template v-else>
+                        {{ item.Cod }}
+                      </template>
+                    </td>
                     <td>{{ formatNumber(item.ShipFee) }}</td>
                   </template>
                   <td v-if="delay">{{ formatdelayDate(item.StockOrders) }}</td>
@@ -102,15 +109,34 @@
                     <td>{{ item.DeliveryOrders[0].Amount }}</td>
                   </template>
                   <template v-else>
-                    <td>{{ formatNumber(item.Cod) }}</td>
+                    <td>
+                      <template v-if="item.Cod > 0">
+                        {{ formatNumber(item.Cod) }}
+                      </template>
+                      <template v-else>
+                        {{ item.Cod }}
+                      </template>
+                    </td>
                     <td>{{ formatNumber(item.ShipFee) }}</td>
                   </template>
                   <td v-if="delay">{{ formatdelayDate(item.StockOrders) }}</td>
                   <td v-else>
                     <span v-if="item.RealReceive == null">
-                      {{ formatNumber(item.ShipFee + item.Cod) }}
+                      <template v-if="item.ShipFee + item.Cod > 0">
+                        {{ formatNumber(item.ShipFee + item.Cod) }}
+                      </template>
+                      <template v-else>
+                        0
+                      </template>
                     </span>
-                    <span v-else>{{ formatNumber(item.RealReceive) }}</span>
+                    <span v-else>
+                      <template v-if="item.RealReceive > 0">
+                        {{ formatNumber(item.RealReceive) }}
+                      </template>
+                      <template v-else>
+                        0
+                      </template>
+                    </span>
                   </td>
                 </tr>
               </template>

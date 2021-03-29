@@ -616,6 +616,7 @@ export default {
     formatJson(filterVal, jsonData) {
       let data = jsonData.map((v) => {
         return {
+          Number: jsonData.findIndex((_) => _.Id == v.Id) + 1,
           Id: v.Id,
           CustomerName: v.CustomerName,
           TheAddress: v.TheAddress,
@@ -647,6 +648,7 @@ export default {
     },
     exportExcel() {
       const filterVal = [
+        "Number",
         "Id",
         "CustomerName",
         "TheAddress",
@@ -654,6 +656,7 @@ export default {
         "Sum",
       ];
       const headerDisplay = [
+        "Stt",
         "Mã",
         "Tên",
         "Địa chỉ",
@@ -680,6 +683,7 @@ export default {
 
       ws.font = { size: 13 };
       let wscols = [
+        { wch: 5 },
         { wch: 20 },
         { wch: 15 },
         { wch: 40 },

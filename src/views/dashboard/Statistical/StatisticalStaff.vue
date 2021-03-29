@@ -471,11 +471,37 @@ export default {
       window.print();
     },
     formatJson(filterVal, jsonData) {
-      return jsonData.map((v) => filterVal.map((j) => v[j]));
+      let data = jsonData.map((_) => {
+        return {
+          Number: jsonData.findIndex((v) => v.Id == _.Id) + 1,
+          Id: _.Id,
+          CustomerName: _.CustomerName,
+          TheAddress: _.TheAddress,
+          PhoneNumber: _.PhoneNumber,
+          Cod: _.Cod,
+          ShipFee: _.ShipFee,
+          Sum: _.RealReceive && _.RealReceive > 0 ? _.RealReceive : 0,
+          Amount: _.DeliveryOrders[0].Amount,
+        };
+      });
+      return data.map((v) => filterVal.map((j) => v[j]));
     },
     formatJsonDelay(filterVal, jsonData) {
       let temp = [];
-      jsonData.map((v) =>
+      let data = jsonData.map((_) => {
+        return {
+          Number: jsonData.findIndex((v) => v.Id == _.Id) + 1,
+          Id: _.Id,
+          CustomerName: _.CustomerName,
+          TheAddress: _.TheAddress,
+          PhoneNumber: _.PhoneNumber,
+          Cod: _.Cod,
+          ShipFee: _.ShipFee,
+          Amount: _.DeliveryOrders[0].Amount,
+          StockOrders: _.StockOrders,
+        };
+      });
+      data.map((v) =>
         filterVal.map((j) => {
           if (j != "StockOrders") {
             temp.push(v[j]);
@@ -488,45 +514,53 @@ export default {
     },
     exportExcel() {
       const filterVal = [
+        "Number",
         "Id",
         "CustomerName",
         "TheAddress",
         "PhoneNumber",
-        "Cod",
         "ShipFee",
-        "RealReceive",
+        "Cod",
+        "Sum",
+        "Amount",
       ];
       const headerDisplay = [
+        "Stt",
         "Mã",
         "Tên",
         "Địa chỉ",
         "Số điện thoại",
-        "COD",
         "Ship",
-        "Tổng",
+        "Cod",
+        "Tổng thu",
+        "Lương",
       ];
       const filterValDelay = [
+        "Number",
         "Id",
         "CustomerName",
         "TheAddress",
         "PhoneNumber",
-        "Cod",
         "ShipFee",
+        "Cod",
         "StockOrders",
       ];
       const headerDisplayDalay = [
+        "Stt",
         "Mã",
         "Tên",
         "Địa chỉ",
         "Số điện thoại",
-        "COD",
         "Ship",
-        "Hoãn tới",
+        "Cod",
+        "Lương",
       ];
       const Name = this.Users.filter((_) => _.Id == this.IdStaff).map(
         (_) => _.Name
       );
       Name.push(this.dateFormatted);
+      Name.push("Từ ngày:" + this.fromDate);
+      Name.push("Tới ngày:" + this.toDate);
 
       const dataSuccessInStock = this.formatJson(
         filterVal,
@@ -560,13 +594,15 @@ export default {
 
       ws.font = { size: 13 };
       let wscols = [
+        { wch: 5 },
         { wch: 20 },
         { wch: 15 },
         { wch: 40 },
-        { wch: 10 },
+        { wch: 20 },
         { wch: 5 },
         { wch: 5 },
-        { wch: 15 },
+        { wch: 5 },
+        { wch: 5 },
       ];
       ws["!cols"] = wscols;
       wst["!cols"] = wscols;

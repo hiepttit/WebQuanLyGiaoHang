@@ -1,7 +1,7 @@
 <template>
   <v-container id="dashboard" fluid tag="section">
     <v-row>
-      <v-col cols="12">
+      <v-col cols="12" style="text-align: center;">
         <v-select
           item-text="Name"
           item-value="Id"
@@ -36,6 +36,15 @@
             @input="menu = false"
           ></v-date-picker>
         </v-menu>
+        <v-btn
+          color="success"
+          rounded
+          style="margin-left: 10px"
+          class="mr-0 btnDelivery"
+          @click="exportExcel()"
+        >
+          Xuất Excel
+        </v-btn>
       </v-col>
       <v-col cols="12" md="12">
         <h1>Số lượng: {{ total }}</h1>
@@ -248,6 +257,7 @@
 import moment from "moment";
 import myModal from "../components/Modal.vue";
 import StockTable from "./MangerStock.vue";
+import XLSX from "xlsx";
 
 export default {
   metaInfo: {
@@ -546,6 +556,78 @@ export default {
         style: "currency",
         currency: "VND",
       });
+    },
+    formatJson(filterVal, jsonData) {
+      let data = jsonData.map((v) => {
+        return {
+          Number: jsonData.findIndex((_) => _.Id == v.Id) + 1,
+          Id: v.Id,
+          CustomerName: v.CustomerName,
+          TheAddress: v.TheAddress,
+          PhoneNumber: v.PhoneNumber,
+          Sum: v.Cod + v.ShipFee > 0 ? v.Cod + v.ShipFee : 0,
+          Status:
+            v.TheStatus == 0 || v.TheStatus == null
+              ? "Đang Giao"
+              : v.TheStatus == 1
+              ? "Thành Công"
+              : v.TheStatus == 2
+              ? "Trả hàng"
+              : v.TheStatus == 3
+              ? "Tồn kho"
+              : "Hoàn thành 1 phần",
+        };
+      });
+      let res = data.map((v) => filterVal.map((j) => v[j]));
+      return res;
+    },
+    exportExcel() {
+      const filterVal = [
+        "Number",
+        "Id",
+        "CustomerName",
+        "TheAddress",
+        "PhoneNumber",
+        "Sum",
+        "Status",
+      ];
+      const headerDisplay = [
+        "Stt",
+        "Mã",
+        "Tên",
+        "Địa chỉ",
+        "Số điện thoại",
+        "Tổng thu",
+        "Trạng thái",
+      ];
+
+      const Name = this.Users.filter((_) => _.Id == this.IdStaff).map(
+        (_) => _.Name
+      );
+      Name.push(this.dateFormatted);
+
+      const dataSuccess = this.formatJson(filterVal, this.Orders);
+      const successData = [headerDisplay, ...dataSuccess];
+      const newDataSuccess = [Name, ...successData];
+
+      let wb = XLSX.utils.book_new(),
+        ws = XLSX.utils.aoa_to_sheet(newDataSuccess);
+
+      ws.font = { size: 13 };
+      let wscols = [
+        { wch: 5 },
+        { wch: 20 },
+        { wch: 15 },
+        { wch: 40 },
+        { wch: 10 },
+        { wch: 10 },
+        { wch: 15 },
+      ];
+      ws["!cols"] = wscols;
+
+      XLSX.utils.book_append_sheet(wb, ws, "DonHangGiao");
+
+      XLSX.writeFile(wb, "QuanLyGiaoHang.xlsx");
     },
   },
 };

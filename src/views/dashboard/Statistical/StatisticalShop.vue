@@ -272,19 +272,19 @@ export default {
         this.OrdersHalf = data.items.filter((_) => _.TheStatus == 4);
         this.totalSuccess = this.sum(
           data.items.filter((_) => _.TheStatus == 1),
-          "RealReceive"
+          "Cod"
         );
         this.totalFail = this.sum(
           data.items.filter((_) => _.TheStatus == 2),
-          "RealReceive"
+          "Cod"
         );
         this.totalDelay = this.sum(
           data.items.filter((_) => _.IsInStock == 1),
-          "RealReceive"
+          "Cod"
         );
         this.totalHalf = this.sum(
           data.items.filter((_) => _.TheStatus == 4),
-          "RealReceive"
+          "Cod"
         );
         this.total = data.total;
         this.loading = false;
@@ -296,7 +296,7 @@ export default {
         );
         this.totalSuccessStock = this.sum(
           data.items.filter((_) => _.IsInStock == 1 && _.TheStatus != 3),
-          "RealReceive"
+          "Cod"
         );
         this.total = data.total;
         this.loading = false;
@@ -343,19 +343,19 @@ export default {
         this.OrdersHalf = data.items.filter((_) => _.TheStatus == 4);
         this.totalSuccess = this.sum(
           data.items.filter((_) => _.TheStatus == 1),
-          "RealReceive"
+          "Cod"
         );
         this.totalFail = this.sum(
           data.items.filter((_) => _.TheStatus == 2),
-          "RealReceive"
+          "Cod"
         );
         this.totalDelay = this.sum(
           data.items.filter((_) => _.IsInStock == 1),
-          "RealReceive"
+          "Cod"
         );
         this.totalHalf = this.sum(
           data.items.filter((_) => _.TheStatus == 4),
-          "RealReceive"
+          "Cod"
         );
         this.total = data.total;
         this.loading = false;
@@ -367,7 +367,7 @@ export default {
         );
         this.totalSuccessStock = this.sum(
           data.items.filter((_) => _.IsInStock == 1 && _.TheStatus != 3),
-          "RealReceive"
+          "Cod"
         );
         this.total = data.total;
         this.loading = false;
@@ -421,11 +421,35 @@ export default {
       window.print();
     },
     formatJson(filterVal, jsonData) {
-      return jsonData.map((v) => filterVal.map((j) => v[j]));
+      let data = jsonData.map((_) => {
+        return {
+          Number: jsonData.findIndex((v) => v.Id == _.Id) + 1,
+          Id: _.Id,
+          CustomerName: _.CustomerName,
+          TheAddress: _.TheAddress,
+          PhoneNumber: _.PhoneNumber,
+          Cod: _.Cod,
+          ShipFee: _.ShipFee,
+          Sum: _.RealReceive && _.RealReceive > 0 ? _.RealReceive : 0,
+        };
+      });
+      return data.map((v) => filterVal.map((j) => v[j]));
     },
     formatJsonDelay(filterVal, jsonData) {
       let temp = [];
-      jsonData.map((v) =>
+      let data = jsonData.map((_) => {
+        return {
+          Number: jsonData.findIndex((v) => v.Id == _.Id) + 1,
+          Id: _.Id,
+          CustomerName: _.CustomerName,
+          TheAddress: _.TheAddress,
+          PhoneNumber: _.PhoneNumber,
+          Cod: _.Cod,
+          ShipFee: _.ShipFee,
+          StockOrders: _.StockOrders,
+        };
+      });
+      data.map((v) =>
         filterVal.map((j) => {
           if (j != "StockOrders") {
             temp.push(v[j]);
@@ -438,15 +462,17 @@ export default {
     },
     exportExcel() {
       const filterVal = [
+        "Number",
         "Id",
         "CustomerName",
         "TheAddress",
         "PhoneNumber",
         "Cod",
         "ShipFee",
-        "RealReceive",
+        "Sum",
       ];
       const headerDisplay = [
+        "Stt",
         "Mã",
         "Tên",
         "Địa chỉ",
@@ -456,6 +482,7 @@ export default {
         "Tổng",
       ];
       const filterValDelay = [
+        "Number",
         "Id",
         "CustomerName",
         "TheAddress",
@@ -465,6 +492,7 @@ export default {
         "StockOrders",
       ];
       const headerDisplayDalay = [
+        "Stt",
         "Mã",
         "Tên",
         "Địa chỉ",
@@ -477,6 +505,8 @@ export default {
         (_) => _.Name
       );
       Name.push(this.dateFormatted);
+      Name.push("Từ ngày:" + this.fromDate);
+      Name.push("Tới ngày:" + this.toDate);
 
       const dataSuccessInStock = this.formatJson(
         filterVal,
@@ -513,10 +543,11 @@ export default {
         { wch: 20 },
         { wch: 15 },
         { wch: 40 },
-        { wch: 10 },
+        { wch: 20 },
         { wch: 5 },
         { wch: 5 },
-        { wch: 15 },
+        { wch: 5 },
+        { wch: 5 },
       ];
       ws["!cols"] = wscols;
       wst["!cols"] = wscols;
