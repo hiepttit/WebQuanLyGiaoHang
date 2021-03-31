@@ -210,7 +210,6 @@
             />
           </div>
         </div>
-        <div class="pagebreak"></div>
       </span>
     </div>
     <my-Modal :show="Show" :title="'In mã'" @close="Show = false">
@@ -508,9 +507,6 @@ export default {
   size: A5;
 }
 @media print {
-  @page {
-    size: 80mm 80mm;
-  }
   header,
   nav,
   footer {
