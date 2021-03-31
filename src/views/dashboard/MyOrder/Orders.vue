@@ -165,7 +165,7 @@
       @close="isShowUp = false"
     />
     <div :id="`${printOne && !printAll ? 'print-One' : ''}`" class="hidePrint">
-      <div style="border: 1px solid;height:50%">
+      <div style="border: 1px solid">
         <div style="text-align:center">
           Ngày giao: {{ monentDate(oneOrder.CreatedAt) }}
         </div>
@@ -191,7 +191,7 @@
     </div>
     <div :id="`${printAll && !printOne ? 'print-All' : ''}`" class="hidePrint">
       <span v-for="(item, i) in Orders" :key="i">
-        <div style="border: 1px solid;height:50%">
+        <div style="border: 1px solid">
           <div style="text-align:center">
             Ngày giao: {{ monentDate(item.CreatedAt) }}
           </div>
@@ -506,8 +506,14 @@ export default {
 
 @media print {
   @page {
-    size: 80mm 80mm;
+    size: 5.5in 8.5in;
+    size: landscape;
     margin: 0;
+  }
+  header,
+  nav,
+  footer {
+    display: none;
   }
   body {
     visibility: hidden;
