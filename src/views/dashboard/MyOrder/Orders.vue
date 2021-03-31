@@ -190,27 +190,25 @@
       </div>
     </div>
     <div :id="`${printAll && !printOne ? 'print-All' : ''}`" class="hidePrint">
-      <span v-for="(item, i) in Orders" :key="i">
-        <div style="border: 1px solid">
-          <div style="text-align:center">
-            Ngày giao: {{ monentDate(item.CreatedAt) }}
-          </div>
-          <div style="text-align:center">Họ tên: {{ item.CustomerName }}</div>
-          <div style="text-align:center">
-            Số điện thoại: {{ item.PhoneNumber }}
-          </div>
-          <div style="text-align:center">Địa chỉ: {{ item.TheAddress }}</div>
-          <div style="text-align:center">
-            Tổng phí: {{ item.ShipFee + item.Cod }}
-          </div>
-          <div style="text-align:center">
-            <VueBarcode
-              v-bind:options="{ lineColor: '#0275d8', text: 'Scan' }"
-              v-bind:value="item.Id"
-            />
-          </div>
+      <div v-for="(item, i) in Orders" :key="i" style="border: 1px solid">
+        <div style="text-align:center">
+          Ngày giao: {{ monentDate(item.CreatedAt) }}
         </div>
-      </span>
+        <div style="text-align:center">Họ tên: {{ item.CustomerName }}</div>
+        <div style="text-align:center">
+          Số điện thoại: {{ item.PhoneNumber }}
+        </div>
+        <div style="text-align:center">Địa chỉ: {{ item.TheAddress }}</div>
+        <div style="text-align:center">
+          Tổng phí: {{ item.ShipFee + item.Cod }}
+        </div>
+        <div style="text-align:center">
+          <VueBarcode
+            v-bind:options="{ lineColor: '#0275d8', text: 'Scan' }"
+            v-bind:value="item.Id"
+          />
+        </div>
+      </div>
     </div>
     <my-Modal :show="Show" :title="'In mã'" @close="Show = false">
       <v-col cols="12" style="text-align: center">
