@@ -188,27 +188,31 @@
           />
         </div>
       </div>
+      <div :key="`page${i}`" class="pagebreak"></div>
     </div>
     <div :id="`${printAll && !printOne ? 'print-All' : ''}`" class="hidePrint">
-      <div v-for="(item, i) in Orders" :key="i" style="border: 1px solid">
-        <div style="text-align:center">
-          Ngày giao: {{ monentDate(item.CreatedAt) }}
+      <template v-for="(item, i) in Orders">
+        <div :key="i" style="border: 1px solid">
+          <div style="text-align:center">
+            Ngày giao: {{ monentDate(item.CreatedAt) }}
+          </div>
+          <div style="text-align:center">Họ tên: {{ item.CustomerName }}</div>
+          <div style="text-align:center">
+            Số điện thoại: {{ item.PhoneNumber }}
+          </div>
+          <div style="text-align:center">Địa chỉ: {{ item.TheAddress }}</div>
+          <div style="text-align:center">
+            Tổng phí: {{ item.ShipFee + item.Cod }}
+          </div>
+          <div style="text-align:center">
+            <VueBarcode
+              v-bind:options="{ lineColor: '#0275d8', text: 'Scan' }"
+              v-bind:value="item.Id"
+            />
+          </div>
         </div>
-        <div style="text-align:center">Họ tên: {{ item.CustomerName }}</div>
-        <div style="text-align:center">
-          Số điện thoại: {{ item.PhoneNumber }}
-        </div>
-        <div style="text-align:center">Địa chỉ: {{ item.TheAddress }}</div>
-        <div style="text-align:center">
-          Tổng phí: {{ item.ShipFee + item.Cod }}
-        </div>
-        <div style="text-align:center">
-          <VueBarcode
-            v-bind:options="{ lineColor: '#0275d8', text: 'Scan' }"
-            v-bind:value="item.Id"
-          />
-        </div>
-      </div>
+        <div :key="`page${i}`" class="pagebreak"></div>
+      </template>
     </div>
     <my-Modal :show="Show" :title="'In mã'" @close="Show = false">
       <v-col cols="12" style="text-align: center">
@@ -504,7 +508,7 @@ export default {
 
 @media print {
   @page {
-    size: 5mm 20cm;
+    size: 56mm 3mm;
     margin: 0;
   }
   .v-application--wrap {
@@ -543,10 +547,17 @@ export default {
   }
   .v-main {
     padding: 0px 0px 0px 0px !important;
+    .container .container--fluid {
+      height: 100%;
+    }
+    .row .justify-center {
+      margin: 0;
+    }
   }
   #table {
     display: none;
   }
+
   // .v-card__text {
   //   width: 100vw;
   //   height: 100vh;
