@@ -507,7 +507,7 @@ export default {
 @media print {
   @page {
     size: 80mm 80mm;
-    margin: 5;
+    margin: 0;
   }
   body {
     visibility: hidden;
