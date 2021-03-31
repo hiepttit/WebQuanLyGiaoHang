@@ -540,6 +540,7 @@ export default {
 
       ws.font = { size: 13 };
       let wscols = [
+        { wch: 5 },
         { wch: 20 },
         { wch: 15 },
         { wch: 40 },

@@ -170,7 +170,7 @@ export default {
           val.PhoneNumber.CustomerName &&
           val.PhoneNumber.TheAddress &&
           val.PhoneNumber.ShipFee &&
-          val.PhoneNumber.Cod
+          (val.PhoneNumber.Cod || val.PhoneNumber.Cod == 0)
         ) {
           this.objAddOrder.CustomerName = val.PhoneNumber.CustomerName;
           this.objAddOrder.TheAddress = val.PhoneNumber.TheAddress;

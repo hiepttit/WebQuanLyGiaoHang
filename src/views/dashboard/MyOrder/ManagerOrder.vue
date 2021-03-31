@@ -116,20 +116,22 @@
         <v-col cols="6">
           <div style="background-color:#1867c0;" class="statistical">
             <h1>Đơn hàng đã thanh toán: {{ countSucess }}</h1>
-            <!-- <h1>Tổng phí Cod: {{ totalCodSucess }}</h1>
-          <h1>Tổng phí Ship: {{ totalShipSucess }}</h1>
-          <h1>Tổng phí ban đầu: {{ totalCodSucess + totalShipSucess }}</h1> -->
-            <h1>Tổng phí đã trả: {{ totalRealSucess }}</h1>
+            <h1>Tổng phí Cod: {{ totalCodSucess }}</h1>
+            <!-- <h1>Tổng phí Ship: {{ totalShipSucess }}</h1>
+            <h1>Tổng phí ban đầu: {{ totalCodSucess + totalShipSucess }}</h1>
+            <h1>Tổng phí đã trả: {{ totalRealSucess }}</h1> -->
           </div>
         </v-col>
         <v-col cols="6">
           <div style="background-color:#fb8c00;float:left" class="statistical">
             <h1>Đơn hàng chưa thanh toán: {{ countUnSucess }}</h1>
             <h1>Đơn hàng đã xong: {{ countRealUnSucess }}</h1>
-            <!-- <h1>Tổng phí Cod: {{ totalCodUnSucess }}</h1>
-          <h1>Tổng phí Ship: {{ totalShipUnSucess }}</h1>
-          <h1>Tổng phí ban đầu: {{ totalCodUnSucess + totalShipUnSucess }}</h1> -->
-            <h1>Tổng phí phải trả: {{ totalRealUnSucess }}</h1>
+            <h1>Tổng phí Cod: {{ totalCodUnSucess }}</h1>
+            <!-- <h1>Tổng phí Ship: {{ totalShipUnSucess }}</h1>
+            <h1>
+              Tổng phí ban đầu: {{ totalCodUnSucess + totalShipUnSucess }}
+            </h1>
+            <h1>Tổng phí phải trả: {{ totalRealUnSucess }}</h1> -->
           </div>
         </v-col>
       </v-row>
@@ -390,13 +392,21 @@ export default {
         this.countRealUnSucess = data.items.filter(
           (_) => _.IsSuccess == 0 && _.RealReceive != null
         ).length;
-        this.totalRealSucess = this.sum(
+        // this.totalRealSucess = this.sum(
+        //   data.items.filter((_) => _.IsSuccess == 1),
+        //   "RealReceive"
+        // );
+        // this.totalRealUnSucess = this.sum(
+        //   data.items.filter((_) => _.IsSuccess == 0),
+        //   "RealReceive"
+        // );
+        this.totalCodSucess = this.sum(
           data.items.filter((_) => _.IsSuccess == 1),
-          "RealReceive"
+          "Cod"
         );
-        this.totalRealUnSucess = this.sum(
+        this.totalCodUnSucess = this.sum(
           data.items.filter((_) => _.IsSuccess == 0),
-          "RealReceive"
+          "Cod"
         );
         this.loading = false;
       });
@@ -442,13 +452,21 @@ export default {
         this.countRealUnSucess = data.items.filter(
           (_) => _.IsSuccess == 0 && _.RealReceive != null
         ).length;
-        this.totalRealSucess = this.sum(
+        // this.totalRealSucess = this.sum(
+        //   data.items.filter((_) => _.IsSuccess == 1),
+        //   "RealReceive"
+        // );
+        // this.totalRealUnSucess = this.sum(
+        //   data.items.filter((_) => _.IsSuccess == 0),
+        //   "RealReceive"
+        // );
+        this.totalCodSucess = this.sum(
           data.items.filter((_) => _.IsSuccess == 1),
-          "RealReceive"
+          "Cod"
         );
-        this.totalRealUnSucess = this.sum(
+        this.totalCodUnSucess = this.sum(
           data.items.filter((_) => _.IsSuccess == 0),
-          "RealReceive"
+          "Cod"
         );
         this.loading = false;
       });

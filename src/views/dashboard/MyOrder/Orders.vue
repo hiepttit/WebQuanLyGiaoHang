@@ -174,8 +174,6 @@
           Số điện thoại: {{ oneOrder.PhoneNumber }}
         </div>
         <div style="text-align:center">Địa chỉ: {{ oneOrder.TheAddress }}</div>
-        <div style="text-align:center">Cod: {{ oneOrder.Cod }}</div>
-        <div style="text-align:center">Ship: {{ oneOrder.ShipFee }}</div>
         <div style="text-align:center">
           Tổng phí: {{ oneOrder.ShipFee + oneOrder.Cod }}
         </div>
@@ -202,8 +200,6 @@
             Số điện thoại: {{ item.PhoneNumber }}
           </div>
           <div style="text-align:center">Địa chỉ: {{ item.TheAddress }}</div>
-          <div style="text-align:center">Cod: {{ item.Cod }}</div>
-          <div style="text-align:center">Ship: {{ item.ShipFee }}</div>
           <div style="text-align:center">
             Tổng phí: {{ item.ShipFee + item.Cod }}
           </div>

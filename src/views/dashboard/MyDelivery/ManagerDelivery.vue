@@ -429,8 +429,12 @@ export default {
       let order = this.Orders.filter((_) => _.Id == this.IdKey.toString());
       let price = order[0].Cod + order[0].ShipFee;
       let url = `${this.url}/Orders/${key}`;
-      if (this.defaultStateSelected == 1 || this.defaultStateSelected == 2) {
+      if (this.defaultStateSelected == 1) {
         state.RealReceive = price;
+      }
+      if (this.defaultStateSelected == 2) {
+        state.RealReceive = price;
+        this.UpdateAmountZero();
       }
       if (this.defaultStateSelected == 3) {
         let check = await this.UpdateStateDelay();
@@ -460,6 +464,7 @@ export default {
         stock.IdTheOrder = this.IdKey;
         stock.Delaydate = this.DateOfIssueIdNumberModal;
         let url = `${this.url}/StockOrder`;
+        this.UpdateAmountZero();
         let resp = await this.$stores.api.post(`${url}`, stock);
         if (resp && resp.status == 200) {
           return true;
@@ -489,6 +494,21 @@ export default {
       } catch (e) {
         let x = await e.json();
         alert(x.detail);
+        return false;
+      }
+    },
+    async UpdateAmountZero() {
+      try {
+        let url = `${this.url}/DeliveryOrders/${this.IdKey}`;
+
+        let obj = {};
+        obj.Amount = 0;
+        let resp = await this.$stores.api.patch(`${url}`, obj);
+        if (resp && resp.status == 200) {
+          return true;
+        }
+      } catch (e) {
+        let x = await e.json();
         return false;
       }
     },
@@ -600,8 +620,7 @@ export default {
         "Tổng thu",
         "Trạng thái",
       ];
-
-      const Name = this.Users.filter((_) => _.Id == this.IdStaff).map(
+      const Name = this.Users.filter((_) => _.Id == this.IdUser).map(
         (_) => _.Name
       );
       Name.push(this.dateFormatted);
