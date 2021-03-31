@@ -71,6 +71,12 @@ export default new Router({
           path: 'ThongKeShop',
           component: () => import('@/views/dashboard/Statistical/StatisticalShop'),
         },
+        // Revenue
+        {
+          name: 'Doanh thu',
+          path: 'DoanhThu',
+          component: () => import('@/views/dashboard/Statistical/Revenue'),
+        },
       ],
     },
   ],

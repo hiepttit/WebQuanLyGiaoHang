@@ -121,6 +121,11 @@ export default {
         icon: "mdi-mouse",
         to: "/ThongKeShop",
       },
+      {
+        title: "Doanh thu",
+        icon: "mdi-mouse",
+        to: "/DoanhThu",
+      },
     ],
   }),
 
