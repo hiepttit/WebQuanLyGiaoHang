@@ -508,9 +508,9 @@ export default {
   size: A5;
 }
 @media print {
-  // @page {
-  //   size: 5cm 10cm;
-  // }
+  @page {
+    size: 80mm 80mm;
+  }
   header,
   nav,
   footer {
