@@ -191,7 +191,6 @@
     </div>
     <div :id="`${printAll && !printOne ? 'print-All' : ''}`" class="hidePrint">
       <span v-for="(item, i) in Orders" :key="i">
-        <div class="pagebreak"></div>
         <div style="border: 1px solid">
           <div style="text-align:center">
             Ngày giao: {{ monentDate(item.CreatedAt) }}
@@ -507,8 +506,7 @@ export default {
 
 @media print {
   @page {
-    size: 50mm 50mm;
-    size: landscape;
+    size: 5mm 20cm;
     margin: 0;
   }
   .v-application--wrap {
@@ -546,7 +544,7 @@ export default {
     left: 0;
   }
   .v-main {
-    padding: 75px 0px 0px !important;
+    padding: 0px 0px 0px 0px !important;
   }
   #table {
     display: none;
