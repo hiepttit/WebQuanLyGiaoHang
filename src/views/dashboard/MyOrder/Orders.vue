@@ -191,6 +191,7 @@
     </div>
     <div :id="`${printAll && !printOne ? 'print-All' : ''}`" class="hidePrint">
       <span v-for="(item, i) in Orders" :key="i">
+        <div class="pagebreak"></div>
         <div style="border: 1px solid">
           <div style="text-align:center">
             Ngày giao: {{ monentDate(item.CreatedAt) }}
@@ -210,7 +211,6 @@
             />
           </div>
         </div>
-        <div class="pagebreak"></div>
       </span>
     </div>
     <my-Modal :show="Show" :title="'In mã'" @close="Show = false">
@@ -511,9 +511,14 @@ export default {
     size: landscape;
     margin: 0;
   }
-  header,
-  nav,
-  footer {
+  .v-application--wrap {
+    header,
+    nav,
+    footer {
+      display: none;
+    }
+  }
+  .v-dialog {
     display: none;
   }
   body {
@@ -551,7 +556,7 @@ export default {
   //   height: 100vh;
   // }
   .pagebreak {
-    page-break-after: always;
+    page-break-before: always;
   }
   #table {
     display: none;
