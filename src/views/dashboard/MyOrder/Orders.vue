@@ -165,7 +165,7 @@
       @close="isShowUp = false"
     />
     <div :id="`${printOne && !printAll ? 'print-One' : ''}`" class="hidePrint">
-      <div style="border: 1px solid">
+      <div style="border: 1px solid" class="bigsize">
         <div style="text-align:center">
           Ngày giao: {{ monentDate(oneOrder.CreatedAt) }}
         </div>
@@ -188,11 +188,11 @@
           />
         </div>
       </div>
-      <div :key="`page${i}`" class="pagebreak"></div>
+      <div class="pagebreak"></div>
     </div>
     <div :id="`${printAll && !printOne ? 'print-All' : ''}`" class="hidePrint">
       <template v-for="(item, i) in Orders">
-        <div :key="i" style="border: 1px solid">
+        <div :key="i" style="border: 1px solid" class="bigsize">
           <div style="text-align:center">
             Ngày giao: {{ monentDate(item.CreatedAt) }}
           </div>
@@ -211,7 +211,7 @@
             />
           </div>
         </div>
-        <div :key="`page${i}`" class="pagebreak"></div>
+        <div :key="`page${i}`" style="height:10px" class="pagebreak"></div>
       </template>
     </div>
     <my-Modal :show="Show" :title="'In mã'" @close="Show = false">
@@ -508,8 +508,8 @@ export default {
 
 @media print {
   @page {
-    size: 56mm 3mm;
-    margin: 0;
+    // size: 80mm 80mm;
+    margin: 0px;
   }
   .v-application--wrap {
     header,
@@ -530,6 +530,9 @@ export default {
     display: block !important;
     top: 0;
   }
+  .bigsize {
+    font-size: 20px;
+  }
   #print-All {
     visibility: visible;
     // position: absolute;
@@ -541,6 +544,7 @@ export default {
   }
   svg {
     width: 60%;
+    height: 60%;
   }
   header {
     left: 0;
@@ -557,7 +561,6 @@ export default {
   #table {
     display: none;
   }
-
   // .v-card__text {
   //   width: 100vw;
   //   height: 100vh;
