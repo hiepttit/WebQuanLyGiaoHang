@@ -45,6 +45,15 @@
         >
           Xuất Excel
         </v-btn>
+        <v-btn
+          color="success"
+          rounded
+          style="margin-left: 10px"
+          class="mr-0 btnDelivery"
+          @click="ShowIsCheck = true"
+        >
+          Cập nhật
+        </v-btn>
       </v-col>
       <v-col cols="12" md="12">
         <h1>Số lượng: {{ total }}</h1>
@@ -76,6 +85,21 @@
               :loading="loading"
               @page-count="pageCount = $event"
             >
+              <template v-slot:header.All>
+                <v-checkbox v-model="checkAll"></v-checkbox>
+              </template>
+              <template v-slot:item.All="{ item }">
+                <template v-if="checkAll">
+                  <v-checkbox v-model="checkAll"></v-checkbox>
+                </template>
+                <template v-else>
+                  <template
+                    v-if="item.TheStatus == null || item.TheStatus == 0"
+                  >
+                    <v-checkbox v-model="item.check"></v-checkbox>
+                  </template>
+                </template>
+              </template>
               <template v-slot:item.Stt="{ index }">
                 {{ index + 1 }}
               </template>
@@ -250,6 +274,28 @@
         </v-btn>
       </template>
     </my-Modal>
+    <my-Modal
+      :show="ShowIsCheck"
+      :title="'CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG'"
+      @close="ShowIsCheck = false"
+    >
+      <v-col cols="12">
+        <v-select
+          item-text="Name"
+          item-value="Id"
+          :items="StatesCheck"
+          v-model="selectStatus"
+          label="Chọn trạng thái"
+          dense
+          outlined
+        ></v-select>
+      </v-col>
+      <template v-slot:m-foot>
+        <v-btn color="blue darken-1" text @click="getOrderChoose()">
+          Ok
+        </v-btn>
+      </template>
+    </my-Modal>
   </v-container>
 </template>
 
@@ -278,9 +324,11 @@ export default {
       dateFormattedModal: this.formatDate(
         new Date().toISOString().substr(0, 10)
       ),
+      checkAll: false,
       menu: false,
       menuModal: false,
       Show: false,
+      ShowIsCheck: false,
       loading: true,
       Users: [],
       Orders: [],
@@ -290,6 +338,7 @@ export default {
       objAddOrder: {},
       url: "http://localhost:60189/odata",
       headers: [
+        { text: "", align: "center", sortable: false, value: "All" },
         { text: "Stt", align: "center", sortable: false, value: "Stt" },
         { text: "Mã", align: "start", sortable: false, value: "Id" },
         { text: "Tên khách hàng", align: "start", value: "CustomerName" },
@@ -302,12 +351,17 @@ export default {
         { text: "Trạng thái", value: "Action" },
       ],
       defaultStateSelected: 0,
+      selectStatus: 0,
       States: [
         // { Id: "0", Name: "Đang giao" },
         { Id: "1", Name: "Thành công" },
         { Id: "2", Name: "Trả hàng" },
         { Id: "3", Name: "Tồn kho" },
         { Id: "4", Name: "Hoàn thành 1 phần" },
+      ],
+      StatesCheck: [
+        { Id: "1", Name: "Thành công" },
+        { Id: "2", Name: "Trả hàng" },
       ],
       IdKey: "",
       data: [],
@@ -343,6 +397,17 @@ export default {
       handler(val) {
         this.getDataFromApi();
       },
+    },
+    checkAll(val) {
+      if (val) {
+        let arr = this.Orders;
+        arr.forEach((_) => (_.check = true));
+        this.Orders = arr;
+      } else {
+        let arr = this.Orders;
+        arr.forEach((_) => (_.check = false));
+        this.Orders = arr;
+      }
     },
   },
 
@@ -422,6 +487,7 @@ export default {
       }
       return { total: 0, items: [] };
     },
+
     async UpdateState() {
       let state = {};
       state.TheStatus = this.defaultStateSelected;
@@ -600,6 +666,54 @@ export default {
       });
       let res = data.map((v) => filterVal.map((j) => v[j]));
       return res;
+    },
+    getOrderChoose() {
+      let arr = this.Orders.filter((_) => _.check);
+      if (arr && arr.length) {
+        arr.forEach((_) => {
+          this.UpdateStateChoose(_);
+        });
+      } else {
+        alert("Phải chọn đơn cần cập nhật!");
+      }
+    },
+    async UpdateAmountZeroChoose(currentOrder) {
+      try {
+        let url = `${this.url}/DeliveryOrders/${currentOrder.Id}`;
+
+        let obj = {};
+        obj.Amount = 0;
+        let resp = await this.$stores.api.patch(`${url}`, obj);
+        if (resp && resp.status == 200) {
+          return true;
+        }
+      } catch (e) {
+        let x = await e.json();
+        return false;
+      }
+    },
+    async UpdateStateChoose(currentOrder) {
+      let state = {};
+      state.TheStatus = this.selectStatus;
+      let key = currentOrder.Id;
+      let price = currentOrder.Cod + currentOrder.ShipFee;
+      let url = `${this.url}/Orders/${key}`;
+      if (this.selectStatus == 1) {
+        this.UpdateDeliveryStatus(currentOrder.Id, 1);
+        state.RealReceive = price;
+      }
+      if (this.selectStatus == 2) {
+        state.RealReceive = price;
+        this.UpdateDeliveryStatus(currentOrder.Id, 1);
+        this.UpdateAmountZeroChoose(currentOrder);
+      }
+      let resp = await this.$stores.api.patch(`${url}`, state);
+      if (resp && resp.status == 200) {
+        this.ShowIsCheck = false;
+        this.getDataFromApi();
+      } else {
+        alert("Updated failed.");
+      }
     },
     exportExcel() {
       const filterVal = [

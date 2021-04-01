@@ -457,6 +457,7 @@ export default {
       }
     },
     async DeliveryInStock() {
+      let code = this.CodeInStock.map((_) => _.id);
       if (!this.IdStaff) {
         alert("Tên nhân viên không được để trống");
         return;
