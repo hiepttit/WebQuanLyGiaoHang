@@ -456,36 +456,6 @@ export default {
         alert("Mã sai chọn lại !");
       }
     },
-    //  async DeliveryInStock() {
-    //   if (!this.IdStaff) {
-    //     alert("Tên nhân viên không được để trống");
-    //     return;
-    //   }
-    //   this.objAddDelivery.IdStaff = this.IdStaff;
-    //   let objAddDelivery = this.objAddDelivery;
-    //   let url = `${this.url}/DeliveryOrders`;
-    //   let arr = this.IdInStock;
-    //   let id = "";
-    //   for (var i = 0; i < arr.length; i++) {
-    //     objAddDelivery.TheStatus = 0;
-    //     if (arr[i].id) {
-    //       id = arr[i].id;
-    //     } else id = arr[i];
-    //     let resp = await this.$stores.api.patch(`${url}/${id}`, objAddDelivery);
-    //     if (resp && resp.status == 200 && i == arr.length - 1) {
-    //       alert("Updated successfully.");
-    //       this.Show = false;
-    //       this.getDataFromApi();
-    //       this.Code = await this.getIdFromOrder();
-    //       this.check = await this.checkInStock();
-    //       this.CodeInStock = await this.getIdFromStockOrder();
-    //     } else {
-    //       if (i == arr.length - 1) {
-    //         alert("Updated failed.");
-    //       }
-    //     }
-    //   }
-    // },
     async DeliveryInStock() {
       let code = this.CodeInStock.map((_) => _.id);
       if (!this.IdStaff) {
@@ -502,7 +472,6 @@ export default {
         for (var i = 0; i < arr.length; i++) {
           if (arr[i].id) {
             if (code.includes(arr[i].id)) {
-              objAddDelivery.IdTheOrder = arr[i].id;
               objAddDelivery.Coefficient = arr[i].coefficient;
               if (this.salary != 0) {
                 objAddDelivery.Amount = (
@@ -511,7 +480,7 @@ export default {
               }
 
               let resp = await this.$stores.api.patch(
-                `${url}/${id}`,
+                `${url}/${arr[i].id}`,
                 objAddDelivery
               );
               if (resp && resp.status == 200 && i == arr.length - 1) {
@@ -540,7 +509,7 @@ export default {
               }
 
               let resp = await this.$stores.api.patch(
-                `${url}/${id}`,
+                `${url}/${arr[i].id}`,
                 objAddDelivery
               );
               if (resp && resp.status == 200 && i == arr.length - 1) {
