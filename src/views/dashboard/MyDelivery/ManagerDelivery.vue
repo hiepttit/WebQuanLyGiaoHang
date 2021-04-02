@@ -499,7 +499,7 @@ export default {
         state.RealReceive = price;
       }
       if (this.defaultStateSelected == 2) {
-        state.RealReceive = price;
+        state.RealReceive = 0;
         this.UpdateAmountZero();
       }
       if (this.defaultStateSelected == 3) {
@@ -703,7 +703,7 @@ export default {
         state.RealReceive = price;
       }
       if (this.selectStatus == 2) {
-        state.RealReceive = price;
+        state.RealReceive = 0;
         this.UpdateDeliveryStatus(currentOrder.Id, 1);
         this.UpdateAmountZeroChoose(currentOrder);
       }
