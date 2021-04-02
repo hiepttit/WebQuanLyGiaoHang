@@ -1,9 +1,8 @@
 <template>
   <v-container id="dashboard" fluid tag="section">
     <v-row>
-      <v-col cols="8" md="8">
-        <h1 class="ml-10">Tổng nhân viên: {{ totalStaffs }}</h1>
-        <v-col cols="12">
+      <v-row>
+        <v-col cols="12" style="margin-left: 20px">
           <v-text-field
             v-model="salary"
             label="Lương cơ bản"
@@ -15,36 +14,33 @@
             Ok
           </v-btn>
         </v-col>
-      </v-col>
-      <v-col cols="4" md="4">
+        <v-col cols md="6" style="text-align:center">
+          <h1 class="ml-10">Tổng nhân viên: {{ totalStaffs }}</h1>
+        </v-col>
         <v-row>
-          <v-col cols="6" md="6">
-            <v-btn
-              color="success"
-              style="float: right"
-              rounded
-              class="mr-0"
-              @click="
-                (isShow = true),
-                  (objAddUser = {}),
-                  (IdProvince = []),
-                  (isCreate = true)
-              "
-            >
-              Thêm
-            </v-btn>
-            <v-btn
-              color="success"
-              style="float: right"
-              rounded
-              class="mr-3"
-              @click="print()"
-            >
-              In
-            </v-btn>
+          <v-col cols="12" md="6" style="text-align:center">
+            <v-col>
+              <v-btn
+                color="success"
+                rounded
+                class="mr-0"
+                @click="
+                  (isShow = true),
+                    (objAddUser = {}),
+                    (IdProvince = []),
+                    (isCreate = true)
+                "
+              >
+                Thêm
+              </v-btn>
+              <v-btn color="success" rounded class="mr-3" @click="print()">
+                In
+              </v-btn>
+            </v-col>
           </v-col>
         </v-row>
-      </v-col>
+      </v-row>
+
       <v-row id="printed-content">
         <v-col class="post-content" cols="12" md="12">
           <base-material-card color="warning" class="px-5 py-3">

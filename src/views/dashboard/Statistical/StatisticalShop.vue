@@ -37,7 +37,7 @@
           ></v-date-picker>
         </v-menu>
         <v-row>
-          <v-col cols="4" class="inputDate">
+          <v-col cols="6" md="4" class="inputDate">
             <v-menu
               v-model="menuFrom"
               :close-on-content-click="false"
@@ -63,7 +63,7 @@
               ></v-date-picker>
             </v-menu>
           </v-col>
-          <v-col cols="4" class="inputDate">
+          <v-col cols="6" md="4" class="inputDate">
             <v-menu
               v-model="menuTo"
               :close-on-content-click="false"
@@ -89,12 +89,11 @@
               ></v-date-picker>
             </v-menu>
           </v-col>
-          <v-col cols="4">
+          <v-col cols="12" md="4" class="justify-content-center">
             <v-btn
               color="success"
               id="btnPrint"
               rounded
-              style="float: left"
               class="mr-3"
               @click="filterGroupDate()"
             >
@@ -102,24 +101,28 @@
             </v-btn>
           </v-col>
         </v-row>
-        <v-btn
-          color="success"
-          id="btnPrint"
-          rounded
-          class="mr-3"
-          @click="print()"
-        >
-          In
-        </v-btn>
-        <v-btn
-          color="success"
-          id="btnPrint"
-          rounded
-          class="mr-3"
-          @click="exportExcel()"
-        >
-          Xuất excel
-        </v-btn>
+        <v-row>
+          <v-col cols>
+            <v-btn
+              color="success"
+              id="btnPrint"
+              rounded
+              class="mr-3"
+              @click="print()"
+            >
+              In
+            </v-btn>
+            <v-btn
+              color="success"
+              id="btnPrint"
+              rounded
+              class="mr-3"
+              @click="exportExcel()"
+            >
+              Xuất excel
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-col>
       <template v-if="OrdersSuccessStock.length">
         <tableStatic
