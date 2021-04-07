@@ -520,7 +520,7 @@ export default {
     formatJson(filterVal, jsonData) {
       let data = jsonData.map((v) => {
         return {
-          Number: jsonData.findIndex((v) => v.Id == _.Id) + 1,
+          Number: jsonData.findIndex((_) => v.Id == _.Id) + 1,
           Id: v.Id,
           CustomerName: v.CustomerName,
           TheAddress: v.TheAddress,
