@@ -126,6 +126,11 @@ export default {
         icon: "mdi-mouse",
         to: "/DoanhThu",
       },
+      {
+        title: "Tìm kiếm",
+        icon: "mdi-magnify",
+        to: "/TimKiem",
+      },
     ],
   }),
 

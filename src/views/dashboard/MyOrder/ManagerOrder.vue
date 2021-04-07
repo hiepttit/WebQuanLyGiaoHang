@@ -328,8 +328,6 @@ export default {
   data() {
     return {
       IdShop: "",
-      pageCount: 0,
-      options: {},
       total: 0,
       IdOrder: "",
       search: "",
@@ -349,28 +347,6 @@ export default {
       Orders: [],
       IdKey: "",
       url: "http://localhost:60189/odata",
-      headers: [
-        {
-          text: "Stt",
-          align: "center",
-          sortable: false,
-          value: "Stt",
-        },
-        {
-          text: "Mã",
-          align: "start",
-          sortable: false,
-          value: "Id",
-        },
-        { text: "Tên khách hàng", align: "start", value: "CustomerName" },
-        { text: "Địa chỉ", value: "TheAddress", align: "left" },
-        { text: "Số điện thoại", value: "PhoneNumber" },
-        { text: "COD", value: "Cod" },
-        { text: "Ship", value: "ShipFee" },
-        { text: "Tổng thu", value: "Sum" },
-        { text: "Trạng thái giao", value: "Status" },
-        { text: "Trạng thái", value: "Action" },
-      ],
       // StateSelected: 0,
       // States: [
       //   { Id: "0", Name: "Chưa thanh toán" },

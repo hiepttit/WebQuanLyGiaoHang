@@ -77,6 +77,12 @@ export default new Router({
           path: 'DoanhThu',
           component: () => import('@/views/dashboard/Statistical/Revenue'),
         },
+        // Search
+        {
+          name: 'Tim kiem',
+          path: 'TimKiem',
+          component: () => import('@/views/dashboard/Search'),
+        },
       ],
     },
   ],
