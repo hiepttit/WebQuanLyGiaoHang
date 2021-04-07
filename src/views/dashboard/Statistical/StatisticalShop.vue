@@ -449,19 +449,11 @@ export default {
           PhoneNumber: _.PhoneNumber,
           Cod: _.Cod,
           ShipFee: _.ShipFee,
-          StockOrders: _.StockOrders,
+          Amount: _.DeliveryOrders[0].Amount,
+          DelayDate: this.monentDate(new Date(_.StockOrders[0].Delaydate)),
         };
       });
-      data.map((v) =>
-        filterVal.map((j) => {
-          if (j != "StockOrders") {
-            temp.push(v[j]);
-          } else {
-            temp.push(this.formatdelayDate(v[j]));
-          }
-        })
-      );
-      return [temp];
+      return data.map((v) => filterVal.map((j) => v[j]));
     },
     exportExcel() {
       const filterVal = [
@@ -490,9 +482,10 @@ export default {
         "CustomerName",
         "TheAddress",
         "PhoneNumber",
-        "Cod",
         "ShipFee",
-        "StockOrders",
+        "Cod",
+        "Amount",
+        "DelayDate",
       ];
       const headerDisplayDalay = [
         "Stt",
@@ -500,9 +493,10 @@ export default {
         "Tên",
         "Địa chỉ",
         "Số điện thoại",
-        "COD",
         "Ship",
-        "Hoãn tới",
+        "Cod",
+        "Lương",
+        "Hoãn tới ngày",
       ];
       const Name = this.Shop.filter((_) => _.Id == this.IdShop).map(
         (_) => _.Name

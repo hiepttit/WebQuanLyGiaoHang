@@ -392,7 +392,7 @@ export default {
           skip = `&$skip=${(page - 1) * itemsPerPage}`;
         }
         let filter = search && ` and contains(Id, '${search}')`;
-        let url = `${this.url}/Orders?$filter=IdShop eq '${this.IdShop}' and CreatedAt eq ${this.DateOfIssueIdNumber}${filter}&$count=true${top}${skip}`;
+        let url = `${this.url}/Orders?$filter=IdShop eq '${this.IdShop}' and CreatedAt eq ${this.DateOfIssueIdNumber}${filter}&$orderby=Id asc&$count=true${top}${skip}`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();

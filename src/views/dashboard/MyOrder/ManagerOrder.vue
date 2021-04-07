@@ -160,76 +160,124 @@
             </div>
           </template>
           <v-card-text>
-            <v-data-table
-              :headers="headers"
-              :items="Orders"
-              :options.sync="options"
-              :server-items-length="total"
-              :loading="loading"
-              @page-count="pageCount = $event"
-            >
-              <template v-slot:item.Stt="{ index }">
-                {{ index + 1 }}
-              </template>
-              <template v-slot:item.Cod="{ item }">
-                <div>{{ formatNumber(item.Cod) }}</div>
-              </template>
-              <template v-slot:item.ShipFee="{ item }">
-                <div>{{ formatNumber(item.ShipFee) }}</div>
-              </template>
-              <template v-slot:item.Sum="{ item }">
-                <div v-if="item.RealReceive == null">
-                  {{ formatNumber(item.ShipFee + item.Cod) }}
-                </div>
-                <div v-else>{{ formatNumber(item.RealReceive) }}</div>
-              </template>
-              <template v-slot:item.Status="{ item }">
-                <template v-if="item.TheStatus == null || item.TheStatus == 0">
-                  <v-btn dark color="teal">
-                    Đang giao
-                  </v-btn>
+            <v-simple-table>
+              <thead>
+                <tr>
+                  <th class="primary--text">
+                    Stt
+                  </th>
+                  <th class="primary--text">
+                    Mã
+                  </th>
+                  <th class="primary--text">
+                    Tên khách hàng
+                  </th>
+                  <th class="primary--text">
+                    Địa chỉ
+                  </th>
+                  <th class="primary--text">
+                    Số điện thoại
+                  </th>
+                  <th class="primary--text">
+                    COD
+                  </th>
+                  <th class="primary--text">
+                    Ship
+                  </th>
+                  <th class="primary--text">
+                    Tổng thu
+                  </th>
+                  <th class="primary--text">
+                    Trạng thái giao
+                  </th>
+                  <th class="primary--text">
+                    Trạng thái
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <template v-for="(item, i) in Orders">
+                  <tr :key="`r${i}`">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ item.Id }}</td>
+                    <td>{{ item.CustomerName }}</td>
+                    <td>{{ item.TheAddress }}</td>
+                    <td>{{ item.PhoneNumber }}</td>
+                    <td>
+                      <template v-if="item.Cod > 0">
+                        {{ formatNumber(item.Cod) }}
+                      </template>
+                      <template v-else>
+                        {{ item.Cod }}
+                      </template>
+                    </td>
+                    <td>{{ formatNumber(item.ShipFee) }}</td>
+                    <td>
+                      <span v-if="item.RealReceive == null">
+                        <template v-if="item.ShipFee + item.Cod > 0">
+                          {{ formatNumber(item.ShipFee + item.Cod) }}
+                        </template>
+                        <template v-else>
+                          0
+                        </template>
+                      </span>
+                      <span v-else>
+                        <template v-if="item.RealReceive > 0">
+                          {{ formatNumber(item.RealReceive) }}
+                        </template>
+                        <template v-else>
+                          0
+                        </template>
+                      </span>
+                    </td>
+                    <td>
+                      <template
+                        v-if="item.TheStatus == null || item.TheStatus == 0"
+                      >
+                        <v-btn dark color="teal">
+                          Đang giao
+                        </v-btn>
+                      </template>
+                      <template v-if="item.TheStatus == 1">
+                        <v-btn color="success">
+                          Thành công
+                        </v-btn>
+                      </template>
+                      <template v-if="item.TheStatus == 2">
+                        <v-btn color="error">
+                          Trả hàng
+                        </v-btn>
+                      </template>
+                      <template v-if="item.TheStatus == 3">
+                        <v-btn color="warning">
+                          Tồn kho
+                        </v-btn>
+                      </template>
+                      <template v-if="item.TheStatus == 4">
+                        <v-btn color="#5cbbf6">
+                          Hoàn thành 1 phần
+                        </v-btn>
+                      </template>
+                    </td>
+                    <td>
+                      <template
+                        v-if="item.IsSuccess == null || item.IsSuccess == 0"
+                      >
+                        <v-btn color="warning" @click="SaveModal(item, 1)">
+                          Chưa thanh toán
+                        </v-btn>
+                      </template>
+                      <template v-if="item.IsSuccess == 1">
+                        <v-btn color="#1867c0" @click="SaveModal(item, 0)">
+                          Đã thanh toán
+                        </v-btn>
+                      </template>
+                    </td>
+                  </tr>
                 </template>
-                <template v-if="item.TheStatus == 1">
-                  <v-btn color="success">
-                    Thành công
-                  </v-btn>
-                </template>
-                <template v-if="item.TheStatus == 2">
-                  <v-btn color="error">
-                    Trả hàng
-                  </v-btn>
-                </template>
-                <template v-if="item.TheStatus == 3">
-                  <v-btn color="warning">
-                    Tồn kho
-                  </v-btn>
-                </template>
-                <template v-if="item.TheStatus == 4">
-                  <v-btn color="#5cbbf6">
-                    Hoàn thành 1 phần
-                  </v-btn>
-                </template>
-              </template>
-              <template v-slot:item.Action="{ item }">
-                <template v-if="item.IsSuccess == null || item.IsSuccess == 0">
-                  <v-btn color="warning" @click="SaveModal(item, 1)">
-                    Chưa thanh toán
-                  </v-btn>
-                </template>
-                <template v-if="item.IsSuccess == 1">
-                  <v-btn color="#1867c0" @click="SaveModal(item, 0)">
-                    Đã thanh toán
-                  </v-btn>
-                </template>
-              </template>
-            </v-data-table>
-            <div class="text-center pt-2">
-              <v-pagination
-                v-model="options.page"
-                :length="pageCount"
-                :total-visible="7"
-              ></v-pagination>
-            </div>
+              </tbody>
+            </v-simple-table>
           </v-card-text>
         </base-material-card>
       </v-col>
@@ -372,17 +420,13 @@ export default {
       let key = item.Id;
       let url = `${this.url}/Orders/${key}`;
       let order = this.Orders.filter((_) => _.Id == key.toString());
-      if (order[0].TheStatus) {
-        let resp = await this.$stores.api.patch(`${url}`, state);
-        if (resp && resp.status == 200) {
-          alert("Updated successfully.");
-          this.Show = false;
-          this.getDataFromApi();
-        } else {
-          alert("Updated failed.");
-        }
+      let resp = await this.$stores.api.patch(`${url}`, state);
+      if (resp && resp.status == 200) {
+        alert("Updated successfully.");
+        this.Show = false;
+        this.getDataFromApi();
       } else {
-        alert("Đơn hàng đang giao");
+        alert("Updated failed.");
       }
     },
     getDataFromApi() {
@@ -415,24 +459,17 @@ export default {
       });
     },
     async fakeApiCall() {
-      const { sortBy, page, itemsPerPage } = this.options;
       const search = this.search;
-      let data = await this.getOrders(page, itemsPerPage, search);
+      let data = await this.getOrders(search);
       return {
         items: data.items,
         total: data.total,
       };
     },
-    async getOrders(page, itemsPerPage, search) {
-      let top = "";
-      let skip = "";
+    async getOrders(search) {
       if (this.IdShop) {
-        if (itemsPerPage > 0) {
-          top = `&$top=${itemsPerPage}`;
-          skip = `&$skip=${(page - 1) * itemsPerPage}`;
-        }
         let filter = search && ` and contains(Id, '${search}')`;
-        let url = `${this.url}/Orders?$filter=IdShop eq '${this.IdShop}'and CreatedAt eq ${this.DateOfIssueIdNumber}${filter}&$count=true${top}${skip}`;
+        let url = `${this.url}/Orders?$filter=IdShop eq '${this.IdShop}'and CreatedAt eq ${this.DateOfIssueIdNumber}${filter}&$count=true`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();
@@ -475,24 +512,17 @@ export default {
       });
     },
     async fakeApiCallDate() {
-      const { sortBy, page, itemsPerPage } = this.options;
       const search = this.search;
-      let data = await this.getDeliveryDate(page, itemsPerPage, search);
+      let data = await this.getDeliveryDate(search);
       return {
         items: data.items,
         total: data.total,
       };
     },
-    async getDeliveryDate(page, itemsPerPage, search) {
-      let top = "";
-      let skip = "";
+    async getDeliveryDate(search) {
       if (this.IdShop) {
-        if (itemsPerPage > 0) {
-          top = `&$top=${itemsPerPage}`;
-          skip = `&$skip=${(page - 1) * itemsPerPage}`;
-        }
         let filter = search && ` and contains(Id, '${search}')`;
-        let url = `${this.url}/Orders?$filter=IdShop eq '${this.IdShop}'and CreatedAt ge ${this.FromDate} and CreatedAt le ${this.ToDate}&$count=true${top}${skip}`;
+        let url = `${this.url}/Orders?$filter=IdShop eq '${this.IdShop}'and CreatedAt ge ${this.FromDate} and CreatedAt le ${this.ToDate}&$count=true`;
         let resp = await this.$stores.api.get(`${url}`);
         if (resp && resp.status == 200) {
           let data = await resp.json();
