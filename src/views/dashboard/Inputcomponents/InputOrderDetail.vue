@@ -147,7 +147,7 @@ export default {
       DateOfIssueIdNumber: new Date().toISOString().substr(0, 10),
       dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       address: "",
-      url: "http://localhost:60189/odata",
+      url: this.$urlApi,
     };
   },
   async mounted() {
@@ -271,7 +271,7 @@ export default {
     },
     async getRoles() {
       let resp = await this.$stores.api.get(
-        `http://localhost:60189/odata/Roles?$orderby=RoleName asc`
+        `${this.$urlApi}/Roles?$orderby=RoleName asc`
       );
       if (resp && resp.status == 200) {
         let data = await resp.json();
@@ -281,7 +281,7 @@ export default {
     },
     async getOrder() {
       let resp = await this.$stores.api.get(
-        `http://localhost:60189/odata/Orders?$orderby=CustomerName asc`
+        `${this.$urlApi}/Orders?$orderby=CustomerName asc`
       );
       if (resp && resp.status == 200) {
         let data = await resp.json();

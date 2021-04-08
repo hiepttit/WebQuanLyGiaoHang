@@ -296,7 +296,7 @@ export default {
       stockOrders: [],
       Receive: 0,
       objAddDelivery: {},
-      url: "http://localhost:60189/odata",
+      url: this.$urlApi,
       headers: [
         { text: "Stt", align: "center", sortable: false, value: "Stt" },
         { text: "Mã", align: "start", sortable: false, value: "Id" },

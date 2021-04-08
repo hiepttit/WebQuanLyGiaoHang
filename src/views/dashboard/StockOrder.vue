@@ -147,7 +147,7 @@ export default {
       Orders: [],
       objAddOrder: {},
       search: "",
-      url: "http://localhost:60189/odata",
+      url: this.$urlApi,
       headers: [
         {
           text: "Stt",

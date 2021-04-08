@@ -219,7 +219,7 @@ export default {
       totalHalf: 0,
       totalSuccessStock: 0,
       Receive: 0,
-      url: "http://localhost:60189/odata",
+      url: this.$urlApi,
     };
   },
   async mounted() {

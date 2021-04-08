@@ -272,7 +272,7 @@ export default {
       IdProvince: null,
       objAddUser: {},
       isCreate: false,
-      url: "http://localhost:60189/odata",
+      url: this.$urlApi,
       headers: [
         {
           text: "Stt",
@@ -374,7 +374,7 @@ export default {
       }
       let filter = searchStaff && `and contains(Name, '${searchStaff}')`;
       let url = `${this.url}/TheUserView?$count=true${top}${skip}&$filter=IdRole eq 2 ${filter}`;
-      // let url = `http://localhost:60189/odata/District?$count=true${top}${skip}`;
+      // let url = `${this.url}/District?$count=true${top}${skip}`;
       let resp = await this.$stores.api.get(`${url}`);
       if (resp && resp.status == 200) {
         let data = await resp.json();

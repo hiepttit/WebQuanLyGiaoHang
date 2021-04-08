@@ -336,7 +336,7 @@ export default {
       Receive: 0,
       search: "",
       objAddOrder: {},
-      url: "http://localhost:60189/odata",
+      url: this.$urlApi,
       headers: [
         { text: "", align: "center", sortable: false, value: "All" },
         { text: "Stt", align: "center", sortable: false, value: "Stt" },

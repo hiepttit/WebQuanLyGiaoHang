@@ -216,7 +216,7 @@ export default {
       toDate: this.formatDate(new Date().toISOString().substr(0, 10)),
       menuFrom: false,
       menuTo: false,
-      url: "http://localhost:60189/odata",
+      url: this.$urlApi,
     };
   },
   async mounted() {

@@ -117,7 +117,7 @@ export default {
       nameWard: "",
       address: "",
       Coefficient: 1,
-      url: "http://localhost:60189/odata",
+      url: this.$urlApi,
     };
   },
   async mounted() {

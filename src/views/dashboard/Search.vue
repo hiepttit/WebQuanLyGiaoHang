@@ -168,7 +168,7 @@ export default {
       loading: true,
       Shop: [],
       Orders: [],
-      url: "http://localhost:60189/odata",
+      url: this.$urlApi,
     };
   },
 
@@ -223,7 +223,6 @@ export default {
       });
     },
     getName(id) {
-      debugger;
       let arr = this.IdUser;
       let res = arr.find((_) => _.Id == id);
       if (res) return res.Name;

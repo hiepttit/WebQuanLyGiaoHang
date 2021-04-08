@@ -346,7 +346,7 @@ export default {
       Shop: [],
       Orders: [],
       IdKey: "",
-      url: "http://localhost:60189/odata",
+      url: this.$urlApi,
       // StateSelected: 0,
       // States: [
       //   { Id: "0", Name: "Chưa thanh toán" },
