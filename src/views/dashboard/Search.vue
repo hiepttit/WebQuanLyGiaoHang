@@ -216,7 +216,7 @@ export default {
             ShopName: this.getName(_.IdShop),
             Staff: _.DeliveryOrders.length
               ? this.getName(_.DeliveryOrders[0].IdStaff)
-              : "",
+              : "Chưa có nhân viên giao",
           };
         });
         this.loading = false;
