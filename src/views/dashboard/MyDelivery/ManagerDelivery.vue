@@ -86,18 +86,22 @@
               @page-count="pageCount = $event"
             >
               <template v-slot:header.All>
-                <v-checkbox v-model="checkAll"></v-checkbox>
+                <check-box
+                  v-model="selectedAll"
+                  class="custom-checkbox custom-control-inline"
+                ></check-box>
               </template>
               <template v-slot:item.All="{ item }">
-                <template v-if="checkAll">
-                  <v-checkbox v-model="checkAll"></v-checkbox>
-                </template>
-                <template v-else>
-                  <template
-                    v-if="item.TheStatus == null || item.TheStatus == 0"
-                  >
-                    <v-checkbox v-model="item.check"></v-checkbox>
-                  </template>
+                <template v-if="item.TheStatus == null || item.TheStatus == 0">
+                  <check-box
+                    :value="
+                      selectedList[item.Id]
+                        ? selectedList[item.Id].selected
+                        : false
+                    "
+                    @input="(v) => onRowChecked(item.Id, v)"
+                    class="custom-checkbox custom-control-inline mr-0"
+                  />
                 </template>
               </template>
               <template v-slot:item.Stt="{ index }">
@@ -304,12 +308,13 @@ import moment from "moment";
 import myModal from "../components/Modal.vue";
 import StockTable from "./MangerStock.vue";
 import XLSX from "xlsx";
+import CheckBox from "../components/Checkbox.vue";
 
 export default {
   metaInfo: {
     title: "Quan Ly Giao Hang",
   },
-  components: { myModal, StockTable },
+  components: { myModal, StockTable, CheckBox },
   data() {
     return {
       IdUser: "",
@@ -336,6 +341,7 @@ export default {
       Receive: 0,
       search: "",
       objAddOrder: {},
+      selectedList: {},
       url: this.$urlApi,
       headers: [
         { text: "", align: "center", sortable: false, value: "All" },
@@ -373,6 +379,21 @@ export default {
     this.Users = await this.getUser();
     this.getDataFromApi();
   },
+  computed: {
+    selectedAll: {
+      get() {
+        let Id = [];
+        Id = this.Orders.map((_) => _.Id);
+        if (Object.keys(this.selectedList).length < 1) return false;
+        return Id.every((_) =>
+          this.selectedList[_] ? this.selectedList[_].selected : false
+        );
+      },
+      set(value) {
+        this.toggleSelect(-1, value);
+      },
+    },
+  },
   watch: {
     options: {
       immediate: false,
@@ -400,9 +421,7 @@ export default {
     },
     checkAll(val) {
       if (val) {
-        let arr = this.Orders;
-        arr.forEach((_) => (_.check = true));
-        this.Orders = arr;
+        this.Orders.forEach((_) => (_.check = true));
       } else {
         let arr = this.Orders;
         arr.forEach((_) => (_.check = false));
@@ -668,11 +687,14 @@ export default {
       return res;
     },
     getOrderChoose() {
-      let arr = this.Orders.filter((_) => _.check);
+      let arr = Object.keys(this.selectedList).filter(
+        (t) => this.selectedList[t] && this.selectedList[t].selected
+      );
       if (arr && arr.length) {
         arr.forEach((_) => {
           this.UpdateStateChoose(_);
         });
+        this.getDataFromApi();
       } else {
         alert("Phải chọn đơn cần cập nhật!");
       }
@@ -692,7 +714,8 @@ export default {
         return false;
       }
     },
-    async UpdateStateChoose(currentOrder) {
+    async UpdateStateChoose(Id) {
+      let currentOrder = this.Orders.find((_) => _.Id == Id);
       let state = {};
       state.TheStatus = this.selectStatus;
       let key = currentOrder.Id;
@@ -710,7 +733,6 @@ export default {
       let resp = await this.$stores.api.patch(`${url}`, state);
       if (resp && resp.status == 200) {
         this.ShowIsCheck = false;
-        this.getDataFromApi();
       } else {
         alert("Updated failed.");
       }
@@ -761,6 +783,34 @@ export default {
       XLSX.utils.book_append_sheet(wb, ws, "DonHangGiao");
 
       XLSX.writeFile(wb, "QuanLyGiaoHang.xlsx");
+    },
+    onRowChecked(id, v) {
+      let tmp = this.selectedList;
+      if (tmp[id]) {
+        tmp[id].selected = v;
+      } else {
+        tmp[id] = { selected: v };
+      }
+      this.selectedList = {};
+      this.selectedList = tmp;
+    },
+    toggleSelect(id, value) {
+      let orders = id > 0 ? this.Orders.filter((e) => e.Id == id) : this.Orders;
+
+      if (id < 0) {
+        this.selectedList = {};
+      }
+
+      let self = this;
+      orders.forEach((e) => {
+        if (self.selectedList[e.Id]) {
+          self.selectedList[e.Id].selected = value;
+        } else {
+          self.selectedList[e.Id] = {
+            selected: value,
+          };
+        }
+      });
     },
   },
 };
