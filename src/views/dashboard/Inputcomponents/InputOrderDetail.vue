@@ -308,7 +308,10 @@ export default {
         this.objAddOrder.PhoneNumber = this.objAddOrder.PhoneNumber.PhoneNumber;
       }
       let obj = JSON.parse(JSON.stringify(this.objAddOrder));
-      obj.CreatedAt = this.DateOfIssueIdNumber;
+      let dateCreated = new Date().toISOString().substr(0, 10);
+      if (dateCreated == this.DateOfIssueIdNumber) {
+        obj.CreatedAt = new Date().toISOString();
+      } else obj.CreatedAt = this.DateOfIssueIdNumber;
 
       if (this.address && this.WardName && this.District && this.ProvinceName) {
         obj.TheAddress =

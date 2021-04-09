@@ -449,7 +449,6 @@ export default {
           PhoneNumber: _.PhoneNumber,
           Cod: _.Cod,
           ShipFee: _.ShipFee,
-          Amount: _.DeliveryOrders[0].Amount,
           DelayDate: this.monentDate(new Date(_.StockOrders[0].Delaydate)),
         };
       });
@@ -495,7 +494,6 @@ export default {
         "Số điện thoại",
         "Ship",
         "Cod",
-        "Lương",
         "Hoãn tới ngày",
       ];
       const Name = this.Shop.filter((_) => _.Id == this.IdShop).map(

@@ -11,7 +11,7 @@ import stores from './views/stores/store.js'
 
 Vue.config.productionTip = false
 Vue.prototype.$stores = stores;
-const urlConfs = "http://192.168.0.182:60189/odata";
+const urlConfs = "http://localhost:60189/odata";
 Vue.prototype.$urlApi = urlConfs;
 
 new Vue({
