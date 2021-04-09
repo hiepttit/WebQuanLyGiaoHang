@@ -488,6 +488,8 @@ export default {
                 this.Show = false;
                 this.getDataFromApi();
                 this.Code = await this.getIdFromOrder();
+                this.check = await this.checkInStock();
+                this.CodeInStock = await this.getIdFromStockOrder();
               } else {
                 if (i == arr.length - 1) {
                   alert("Updated failed.");
@@ -517,6 +519,8 @@ export default {
                 this.Show = false;
                 this.getDataFromApi();
                 this.Code = await this.getIdFromOrder();
+                this.check = await this.checkInStock();
+                this.CodeInStock = await this.getIdFromStockOrder();
               } else {
                 if (i == arr.length - 1) {
                   alert("Updated failed.");
